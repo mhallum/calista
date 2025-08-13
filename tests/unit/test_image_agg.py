@@ -39,3 +39,19 @@ def test_that_registering_an_image_changes_registered_to_true():
     )
 
     assert image.registered is True
+
+
+def test_that_registering_an_image_is_idempotent():
+    """Test that registering an image is idempotent."""
+
+    image = ImageAggregate(image_id="test_image")
+    image.register(
+        session_id="session_1", file_path="path/to/image.jpg", header_meta={}
+    )
+
+    # Registering again should not change the state
+    image.register(
+        session_id="session_1", file_path="path/to/image.jpg", header_meta={}
+    )
+
+    assert len(image.pending_events) == 1
