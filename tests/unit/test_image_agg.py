@@ -55,3 +55,19 @@ def test_that_registering_an_image_is_idempotent():
     )
 
     assert len(image.pending_events) == 1
+
+
+def test_that_applying_an_event_bumps_the_version():
+    """Test that applying an event bumps the version."""
+    image = ImageAggregate(image_id="test_image")
+    assert image.version == 0
+
+    event = events.ImageRegistered(
+        image_id="test_image",
+        session_id="session_1",
+        file_path="path/to/image.jpg",
+        header_meta={},
+    )
+    image.apply(event)
+
+    assert image.version == 1
