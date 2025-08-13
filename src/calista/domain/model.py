@@ -18,6 +18,8 @@ class ImageAggregate:
 
     def register(self, session_id: str, file_path: str, header_meta: dict[str, Any]):
         """Register a new image."""
+        if self.registered:
+            return  # idempotent
         self.registered = True
         event = events.ImageRegistered(
             image_id=self.image_id,
