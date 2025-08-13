@@ -1,5 +1,6 @@
 """Testsuite for the ImageAggregate model"""
 
+from calista.domain import events
 from calista.domain.model import ImageAggregate
 
 
@@ -12,7 +13,6 @@ def test_image_aggregate_initializes_with_empty_events():
 
 def test_that_registering_an_image_adds_event_to_pending_events():
     """Test that registering an image adds an `ImageRegistered` event to the pending events list."""
-    from calista.domain.model import ImageRegistered
 
     image = ImageAggregate(image_id="test_image")
     image.register(
@@ -20,7 +20,7 @@ def test_that_registering_an_image_adds_event_to_pending_events():
     )
 
     assert len(image.pending_events) == 1
-    assert image.pending_events[0] == ImageRegistered(
+    assert image.pending_events[0] == events.ImageRegistered(
         image_id="test_image",
         session_id="session_1",
         file_path="path/to/image.jpg",
