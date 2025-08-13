@@ -15,6 +15,7 @@ class ImageAggregate:
         self.image_id: str = image_id
         self.registered: bool = False
         self.pending_events: list[events.DomainEvent] = []
+        self.version: int = 0
 
     def register(self, session_id: str, file_path: str, header_meta: dict[str, Any]):
         """Register a new image."""
@@ -28,3 +29,7 @@ class ImageAggregate:
             header_meta=header_meta,
         )
         self.pending_events.append(event)
+
+    def apply(self, event: events.DomainEvent):
+        """Apply an event to the aggregate."""
+        self.version += 1
