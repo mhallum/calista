@@ -13,10 +13,12 @@ class ImageAggregate:
 
     def __init__(self, image_id: str):
         self.image_id: str = image_id
+        self.registered: bool = False
         self.pending_events: list[events.DomainEvent] = []
 
     def register(self, session_id: str, file_path: str, header_meta: dict[str, Any]):
         """Register a new image."""
+        self.registered = True
         event = events.ImageRegistered(
             image_id=self.image_id,
             session_id=session_id,
