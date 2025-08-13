@@ -14,6 +14,7 @@ class ImageAggregate:
     def __init__(self, image_id: str):
         self.image_id: str = image_id
         self.registered: bool = False
+        self.raw_path: str | None = None
         self.pending_events: list[events.DomainEvent] = []
         self.version: int = 0
 
@@ -34,4 +35,5 @@ class ImageAggregate:
         """Apply an event to the aggregate."""
         if isinstance(event, events.ImageRegistered):
             self.registered = True
+            self.raw_path = event.file_path
         self.version += 1
