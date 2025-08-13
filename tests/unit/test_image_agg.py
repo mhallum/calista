@@ -71,3 +71,21 @@ def test_that_applying_an_event_bumps_the_version():
     image.apply(event)
 
     assert image.version == 1
+
+
+def test_that_applying_an_image_registered_event_changes_registered_to_true():
+    """Test that applying an ImageRegistered event changes the registered status to true."""
+    image = ImageAggregate(image_id="test_image")
+    assert image.registered is False
+
+    event = events.ImageRegistered(
+        image_id="test_image",
+        session_id="session_1",
+        file_path="path/to/image.jpg",
+        header_meta={},
+    )
+    image.apply(event)
+
+    assert image.registered is True, (
+        "Expected image to be registered after applying event"
+    )
