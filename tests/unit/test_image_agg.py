@@ -89,3 +89,21 @@ def test_that_applying_an_image_registered_event_changes_registered_to_true():
     assert image.registered is True, (
         "Expected image to be registered after applying event"
     )
+
+
+def test_that_applying_image_registered_event_adds_raw_path():
+    """Test that applying an ImageRegistered event adds the raw path to the aggregate."""
+    image = ImageAggregate(image_id="test_image")
+    assert image.raw_path is None
+
+    event = events.ImageRegistered(
+        image_id="test_image",
+        session_id="session_1",
+        file_path="path/to/image.jpg",
+        header_meta={},
+    )
+    image.apply(event)
+
+    assert image.raw_path == "path/to/image.jpg", (
+        "Expected raw_path to be set after applying event"
+    )
