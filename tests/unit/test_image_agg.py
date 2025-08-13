@@ -26,3 +26,16 @@ def test_that_registering_an_image_adds_event_to_pending_events():
         file_path="path/to/image.jpg",
         header_meta={},
     )
+
+
+def test_that_registering_an_image_changes_registered_to_true():
+    """Test that registering an image changes the registered status to true."""
+
+    image = ImageAggregate(image_id="test_image")
+    assert image.registered is False
+
+    image.register(
+        session_id="session_1", file_path="path/to/image.jpg", header_meta={}
+    )
+
+    assert image.registered is True
