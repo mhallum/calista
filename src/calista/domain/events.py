@@ -14,12 +14,13 @@ from typing import Any
 class DomainEvent:
     """Base class for all domain events."""
 
+    image_id: str
+
 
 @dataclass(frozen=True)
 class ImageRegistered(DomainEvent):
     """Event emitted when an image is registered."""
 
-    image_id: str
     session_id: str
     file_path: str
     header_meta: dict[str, Any]
