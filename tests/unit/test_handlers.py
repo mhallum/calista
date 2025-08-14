@@ -5,6 +5,7 @@ from pathlib import Path
 
 from calista.adapters.filestore import AbstractFileStore
 from calista.adapters.image_repository import AbstractImageRepository
+from calista.domain import commands
 from calista.domain.model import ImageAggregate
 from calista.service_layer import handlers
 from calista.service_layer.uow import AbstractUnitOfWork
@@ -71,11 +72,12 @@ def test_register_image_stores_file():
     """
     files = FakeFileStore(Path("fake_store"))
     uow = FakeUnitOfWork()
+    cmd = commands.RegisterImage(
+        image_id="fake0001", session_id="session1", src_path="path/to/fake.fits"
+    )
 
     handlers.register_image(
-        image_id="fake0001",
-        session_id="session1",
-        src_path="path/to/fake.fits",
+        cmd=cmd,
         uow=uow,
         files=files,
     )
@@ -92,10 +94,12 @@ def test_register_image_updates_image_aggregate():
     session_id = "session1"
     src_path = "path/to/fake.fits"
 
+    cmd = commands.RegisterImage(
+        image_id=image_id, session_id=session_id, src_path=src_path
+    )
+
     handlers.register_image(
-        image_id=image_id,
-        session_id=session_id,
-        src_path=src_path,
+        cmd=cmd,
         uow=uow,
         files=files,
     )
@@ -113,10 +117,11 @@ def test_register_image_commits_transaction():
     files = FakeFileStore(Path("fake_store"))
     uow = FakeUnitOfWork()
 
+    cmd = commands.RegisterImage(
+        image_id="fake0001", session_id="session1", src_path="path/to/fake.fits"
+    )
     handlers.register_image(
-        image_id="fake0001",
-        session_id="session1",
-        src_path="path/to/fake.fits",
+        cmd=cmd,
         uow=uow,
         files=files,
     )
