@@ -1,11 +1,12 @@
 """Handlers"""
 
+from collections.abc import Callable
 from pathlib import Path
 
 from calista.adapters.filestore import AbstractFileStore
 from calista.domain import commands
 from calista.domain.model import ImageAggregate
-from calista.service_layer.uow import AbstractUnitOfWork
+from calista.service_layer.unit_of_work import AbstractUnitOfWork
 
 
 def register_image(
@@ -26,3 +27,8 @@ def register_image(
         )
         uow.images.add(image)
         uow.commit()
+
+
+COMMAND_HANDLERS: dict[type[commands.Command], Callable[..., None]] = {
+    commands.RegisterImage: register_image,
+}

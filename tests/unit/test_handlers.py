@@ -2,13 +2,17 @@
 
 from collections.abc import Iterable
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from calista.adapters.filestore import AbstractFileStore
 from calista.adapters.image_repository import AbstractImageRepository
+from calista.bootstrap import bootstrap
 from calista.domain import commands
 from calista.domain.model import ImageAggregate
-from calista.service_layer import handlers
-from calista.service_layer.uow import AbstractUnitOfWork
+from calista.service_layer.unit_of_work import AbstractUnitOfWork
+
+if TYPE_CHECKING:
+    from calista.service_layer.messagebus import MessageBus
 
 # pylint: disable=too-few-public-methods
 
@@ -64,6 +68,11 @@ class FakeUnitOfWork(AbstractUnitOfWork):
         """Rollback the current transaction."""
 
 
+def bootstrap_test_app() -> "MessageBus":
+    """Bootstrap a test application with a fake file store and unit of work."""
+    return bootstrap(uow=FakeUnitOfWork(), files=FakeFileStore(Path("fake_store")))
+
+
 def test_register_image_stores_file():
     """Test that registering an image stores it in the file store.
 
@@ -72,58 +81,43 @@ def test_register_image_stores_file():
     """
     files = FakeFileStore(Path("fake_store"))
     uow = FakeUnitOfWork()
+    bus = bootstrap(uow=uow, files=files)
+
     cmd = commands.RegisterImage(
         image_id="fake0001", session_id="session1", src_path="path/to/fake.fits"
     )
-
-    handlers.register_image(
-        cmd=cmd,
-        uow=uow,
-        files=files,
-    )
+    bus.handle(cmd)
 
     assert files.exists("raw/session1/fake0001.fits")
 
 
 def test_register_image_updates_image_aggregate():
     """Test that registering an image updates the image aggregate."""
-    files = FakeFileStore(Path("fake_store"))
-    uow = FakeUnitOfWork()
 
-    image_id = "fake0001"
-    session_id = "session1"
-    src_path = "path/to/fake.fits"
+    bus = bootstrap_test_app()
 
     cmd = commands.RegisterImage(
-        image_id=image_id, session_id=session_id, src_path=src_path
+        image_id="fake0001", session_id="session1", src_path="path/to/fake.fits"
     )
-
-    handlers.register_image(
-        cmd=cmd,
-        uow=uow,
-        files=files,
-    )
+    bus.handle(cmd)
 
     expected_raw_path = "fake_store/raw/session1/fake0001.fits"
-    updated_image = uow.images.get(image_id)
+    updated_image = bus.uow.images.get(cmd.image_id)
     assert updated_image is not None
-    assert updated_image.image_id == image_id
+    assert updated_image.image_id == cmd.image_id
     assert updated_image.raw_path == expected_raw_path
     assert updated_image.registered is True
 
 
 def test_register_image_commits_transaction():
     """Test that registering an image commits the transaction."""
-    files = FakeFileStore(Path("fake_store"))
+
     uow = FakeUnitOfWork()
+    bus = bootstrap(uow=uow, files=FakeFileStore(Path("fake_store")))
 
     cmd = commands.RegisterImage(
         image_id="fake0001", session_id="session1", src_path="path/to/fake.fits"
     )
-    handlers.register_image(
-        cmd=cmd,
-        uow=uow,
-        files=files,
-    )
+    bus.handle(cmd)
 
     assert uow.committed is True
