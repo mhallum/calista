@@ -1,0 +1,46 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.7
+    hooks:
+      - id: ruff-check
+        name: lint with ruff
+        types: [python]
+      - id: ruff-check
+        name: sort impports with ruff
+        types: [python]
+        args: ["--select", "I", "--fix"]
+      - id: ruff-format
+        name: format with ruff
+        types: [python]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.17.1
+    hooks:
+      - id: mypy
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-yaml
+      - id: check-json
+
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: poetry run pylint src tests --fail-under=10.0
+        language: system
+        types: [python]
+        stages: [pre-push]
+        always_run: true
+        pass_filenames: false
+      - id: pytest
+        name: Run pytest
+        entry: poetry run pytest
+        language: system
+        types: [python]
+        stages: [pre-push]
+        always_run: true
+        pass_filenames: false

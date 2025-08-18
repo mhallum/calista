@@ -1,0 +1,8 @@
+.DS_Store
+*cache*
+.venv/
+.vscode/
+__pycache__/
+notes.txt
+.coverage
+coverage.xml
