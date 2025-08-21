@@ -2,6 +2,7 @@
 
 | Scope    | Description                      |
 | -------- | -------------------------------- |
+| adr      | ADR PRs                          |
 | domain   | domain logic or infrastructure   |
 | tests    | Adding or updating tests         |
 | config   | Config files (e.g. YAML, JSON)   |
