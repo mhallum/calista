@@ -19,7 +19,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 
-from calista.adapters.filestore.api import IntegrityError, NotFound
+from calista.adapters.filestore.interface import IntegrityError, NotFound
 from calista.adapters.filestore.memory import MemoryFileStore
 
 ## Adjust pylint to deal with fixtures

@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 if TYPE_CHECKING:
-    from calista.adapters.filestore.api import AbstractFileStore
+    from calista.adapters.filestore.interface import AbstractFileStore
 
 # Payload sizes (~5 MiB and ~20 MiB)
 SIZES = [5 * 1024 * 1024, 20 * 1024 * 1024]

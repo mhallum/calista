@@ -21,7 +21,7 @@ import pytest
 from calista.adapters.filestore.memory import MemoryFileStore
 
 if TYPE_CHECKING:
-    from calista.adapters.filestore.api import AbstractFileStore
+    from calista.adapters.filestore.interface import AbstractFileStore
 
 
 @pytest.fixture(params=["memory"])

@@ -32,6 +32,10 @@ pre-commit = "^4.3.0"
 pytest-cov = "^6.2.1"
 freezegun = "^1.5.5"
 hypothesis = "^6.138.2"
+griffe-inherited-docstrings = "^1.1.1"
+mkdocs-literate-nav = "^0.6.2"
+mkdocs-gen-files = "^0.5.0"
+mkdocs-exclude = "^1.0.2"
 
 
 

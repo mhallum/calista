@@ -26,7 +26,7 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from calista.adapters.filestore.api import AbstractFileStore, IntegrityError
+from calista.adapters.filestore.interface import AbstractFileStore, IntegrityError
 from calista.adapters.filestore.memory import MemoryFileStore
 
 ## Adjust pylint to deal with fixtures

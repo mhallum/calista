@@ -14,7 +14,7 @@ from threading import Barrier, BrokenBarrierError, Event
 
 import pytest
 
-from calista.adapters.filestore.api import AbstractFileStore
+from calista.adapters.filestore.interface import AbstractFileStore
 
 
 def test_concurrent_commit_dedup(store: AbstractFileStore, arbitrary_bytes: bytes):
