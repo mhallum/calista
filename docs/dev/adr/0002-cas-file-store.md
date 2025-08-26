@@ -1,4 +1,4 @@
-# ADR-0007: Content-Addressed File Store (CAS)
+# ADR-0002: Content-Addressed File Store (CAS)
 
 **Status**: Accepted
 

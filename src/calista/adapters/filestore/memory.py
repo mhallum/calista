@@ -59,7 +59,7 @@ import hashlib
 import io
 import threading
 
-from .api import (
+from .interface import (
     AbstractFileStore,
     AbstractWriter,
     BlobStat,

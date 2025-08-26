@@ -8,5 +8,7 @@
 
 **CALISTA** is a Python toolkit for processing CCD images and performing photometry, built on an **event-sourced** architecture.
 
-- **Core ideas:** message bus (commands/events), Unit of Work, SQLAlchemy repositories, projections.
-- **Use cases:** ingest FITS images, manage observing sessions, run aperture/PSF photometry, compare to catalog/comparison stars, export light curves.
+Choose your path:
+
+- 👤 **[User Guide](user/index.md)**
+- 🛠️ **[Developer Guide](dev/index.md)**

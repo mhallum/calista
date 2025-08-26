@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pytest
 
-from calista.adapters.filestore.api import AbstractFileStore
+from calista.adapters.filestore.interface import AbstractFileStore
 
 
 def test_put_path_and_symlink_policy(

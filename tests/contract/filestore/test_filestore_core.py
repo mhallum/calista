@@ -18,7 +18,7 @@ from pathlib import Path
 
 import pytest
 
-from calista.adapters.filestore.api import (
+from calista.adapters.filestore.interface import (
     AbstractFileStore,
     BlobStat,
     IntegrityError,
