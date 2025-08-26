@@ -1,14 +1,15 @@
 # Commit Scopes
 
-| Scope    | Description                      |
-| -------- | -------------------------------- |
-| adr      | ADR PRs                          |
-| domain   | domain logic or infrastructure   |
-| tests    | Adding or updating tests         |
-| config   | Config files (e.g. YAML, JSON)   |
-| docs     | Documentation updates            |
-| deps     | Dependencies (add/update/remove) |
-| cli      | Command-line interface           |
-| db       | Database schema or queries       |
-| service  | Internal service logic           |
-| adapters | Adaper logic or infrastructure   |
+| Scope     | Description                                    |
+| --------- | ---------------------------------------------- |
+| adr       | ADR PRs                                        |
+| domain    | domain logic or infrastructure                 |
+| tests     | Adding or updating tests                       |
+| config    | Config files (e.g. YAML, JSON)                 |
+| docs      | Documentation updates                          |
+| deps      | Dependencies (add/update/remove)               |
+| cli       | Command-line interface                         |
+| db        | Database schema or queries                     |
+| service   | Internal service logic                         |
+| adapters  | Adaper logic or infrastructure                 |
+| filestore | Related to the filestore(A subset of adapters) |
