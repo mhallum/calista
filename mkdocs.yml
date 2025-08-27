@@ -85,3 +85,4 @@ nav:
           - "ADR 0010: Retention & Archival": dev/adr/0010-retention-and-archival.md
           - "ADR 0011: File Store Integration": dev/adr/0011-filestore-integration.md
           - "ADR 0012: Domain vs Integration Events": dev/adr/0012-domain-vs-integration-events.md
+          - "ADR 0013: Querying & Projections": dev/adr/0013-querying-and-projections.md
