@@ -86,3 +86,4 @@ nav:
           - "ADR 0011: File Store Integration": dev/adr/0011-filestore-integration.md
           - "ADR 0012: Domain vs Integration Events": dev/adr/0012-domain-vs-integration-events.md
           - "ADR 0013: Querying & Projections": dev/adr/0013-querying-and-projections.md
+          - "ADR 0014: Event Store Testing Strategy": dev/adr/0014-eventstore-testing-strategy.md
