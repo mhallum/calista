@@ -81,3 +81,4 @@ nav:
           - "ADR 0006: Event Envelope": dev/adr/0006-event-envelope.md
           - "ADR 0007: Identifiers (UUID vs ULID)": dev/adr/0007-identifiers.md
           - "ADR 0008: Concurrency & Versioning": dev/adr/0008-concurrency-and-versioning.md
+          - "ADR 0009: Timekeeping": dev/adr/0009-timekeeping.md
