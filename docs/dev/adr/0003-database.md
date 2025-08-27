@@ -1,7 +1,6 @@
 # ADR-0003: Database
 
-**Status**: Accepted
-
+**Status**: Accepted <br>
 **Related**: ADR-0004 Schema Migrations, ADR-0005 Event Store
 
 ## Context
