@@ -82,3 +82,4 @@ nav:
           - "ADR 0007: Identifiers (UUID vs ULID)": dev/adr/0007-identifiers.md
           - "ADR 0008: Concurrency & Versioning": dev/adr/0008-concurrency-and-versioning.md
           - "ADR 0009: Timekeeping": dev/adr/0009-timekeeping.md
+          - "ADR 0010: Retention & Archival": dev/adr/0010-retention-and-archival.md
