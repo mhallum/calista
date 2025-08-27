@@ -77,3 +77,4 @@ nav:
           - "ADR 0002: Content-Addressed File Store (CAS)": dev/adr/0002-cas-file-store.md
           - "ADR 0003: Database": dev/adr/0003-database.md
           - "ADR 0004: Schema Migrations": dev/adr/0004-schema-migrations.md
+          - "ADR 0005: Event Store": dev/adr/0005-event-store.md
