@@ -1,0 +1,23 @@
+# cr.toml
+[cosmic-ray]
+module-path = "src"           # or a single file for focused runs
+test-command = "pytest -q"
+timeout = 30.0
+excluded-modules = ["*/tests/*","*/migrations/*"]
+
+[cosmic-ray.distributor]
+name = "local"
+
+# Optional: only mutate lines that differ from main
+[cosmic-ray.filters.git-filter]
+branch = "origin/main"
+
+# Optional: badge look & thresholds (used by cr-badge)
+[cosmic-ray.badge]
+label = "mutation"
+format = "%.1f %%"
+[cosmic-ray.badge.thresholds]
+50  = "red"
+70  = "orange"
+90  = "yellow"
+101 = "green"
