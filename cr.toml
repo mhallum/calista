@@ -3,7 +3,7 @@
 module-path = "src"           # or a single file for focused runs
 test-command = "pytest -q"
 timeout = 30.0
-excluded-modules = ["*/tests/*","*/migrations/*"]
+excluded-modules = ["*/tests/*","*/migrations/*", "*/docs/*", "*/scratch/*"]
 
 [cosmic-ray.distributor]
 name = "local"
@@ -11,6 +11,10 @@ name = "local"
 # Optional: only mutate lines that differ from main
 [cosmic-ray.filters.git-filter]
 branch = "origin/main"
+
+[cosmic-ray.filters.operators-filter]
+exclude-operators = ["core/ReplaceBinaryOperator_BitOr_.*"]
+
 
 # Optional: badge look & thresholds (used by cr-badge)
 [cosmic-ray.badge]

@@ -46,9 +46,11 @@ jobs:
         run: |
           # optional: skips mutants outside changed lines
           poetry run cr-filter-git cr.sqlite
+          poetry run cr-filter-operators cr.sqlite
+          poetry run cr-filter-pragma cr.sqlite
 
       - name: Baseline (sanity-check test command)
-        run: poetry run cosmic-ray baseline --report cr.toml cr.sqlite
+        run: poetry run cosmic-ray baseline cr.toml
 
       - name: Execute mutation tests
         run: poetry run cosmic-ray exec cr.toml cr.sqlite
