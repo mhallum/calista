@@ -36,6 +36,7 @@ griffe-inherited-docstrings = "^1.1.1"
 mkdocs-literate-nav = "^0.6.2"
 mkdocs-gen-files = "^0.5.0"
 mkdocs-exclude = "^1.0.2"
+cosmic-ray = "^8.4.1"
 
 
 
@@ -46,6 +47,7 @@ mkdocstrings = {extras = ["python"], version = "^0.30.0"}
 pymdown-extensions = "^10.16.1"
 
 [tool.pytest.ini_options]
+pythonpath = ["src"]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
