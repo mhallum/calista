@@ -1,6 +1,6 @@
 # ADR-0015: Mutation Testing Policy (Cosmic Ray)
 
-**Status**: Accepted <br>
+**Status**: Superseded by ADR-0016 <br>
 **Related**: ADR-0014 Event Store Testing Strategy
 
 ## Context
