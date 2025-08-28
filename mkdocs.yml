@@ -88,3 +88,4 @@ nav:
           - "ADR 0013: Querying & Projections": dev/adr/0013-querying-and-projections.md
           - "ADR 0014: Event Store Testing Strategy": dev/adr/0014-eventstore-testing-strategy.md
           - "ADR 0015: Mutation Testing Policy (Cosmic Ray)": dev/adr/0015-mutation-testing-policy.md
+          - "ADR 0016: Adopt Mutmut for Mutation Testing (supersedes Cosmic Ray)": dev/adr/0016-adopt-mutmut-for-mutation-testing.md
