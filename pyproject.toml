@@ -63,3 +63,7 @@ exclude=["docs"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["calista"]
+
+[tool.mutmut]
+paths_to_mutate = [ "src/" ]
+tests_dir = [ "tests/" ]
