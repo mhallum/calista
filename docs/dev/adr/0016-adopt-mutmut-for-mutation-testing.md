@@ -1,6 +1,6 @@
 # ADR-0016: Adopt Mutmut for Mutation Testing (supersedes Cosmic Ray)
 
-**Status**: Accepted <br>
+**Status**: Superseded by ADR-0017 <br>
 **Supersedes**: ADR-0015 "Mutation Testing Policy (Cosmic Ray)
 
 ## Context
