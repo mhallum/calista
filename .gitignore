@@ -29,6 +29,7 @@ cr/*.svg
 mutation-report.html
 *.mutation.html
 mutation.svg
+mutations/
 
 # Mutmut cache
 .mutmut-cache/
