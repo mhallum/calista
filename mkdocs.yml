@@ -89,3 +89,4 @@ nav:
           - "ADR 0014: Event Store Testing Strategy": dev/adr/0014-eventstore-testing-strategy.md
           - "ADR 0015: Mutation Testing Policy (Cosmic Ray)": dev/adr/0015-mutation-testing-policy.md
           - "ADR 0016: Adopt Mutmut for Mutation Testing (supersedes Cosmic Ray)": dev/adr/0016-adopt-mutmut-for-mutation-testing.md
+          - "ADR 0017: Remove Mutation Testing from CI (Mutmut remains optional)": dev/adr/0017-remove-mutation-testing-from-ci.md
