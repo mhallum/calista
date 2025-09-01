@@ -6,7 +6,7 @@ repos:
         name: lint with ruff
         types: [python]
       - id: ruff-check
-        name: sort impports with ruff
+        name: sort imports with ruff
         types: [python]
         args: ["--select", "I", "--fix"]
       - id: ruff-format
@@ -17,6 +17,8 @@ repos:
     rev: v1.17.1
     hooks:
       - id: mypy
+        args: [--config-file=pyproject.toml]
+        exclude: ^alembic/
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
