@@ -167,7 +167,7 @@ class _MemWriter(AbstractWriter):  # pylint: disable=too-many-instance-attribute
     # ---- AbstractWriter ----
 
     @property
-    def committed(self) -> bool:  # type: ignore[override]
+    def committed(self) -> bool:
         return self._committed
 
     def _ensure_open_for_write(self) -> None:
@@ -199,9 +199,9 @@ class _MemWriter(AbstractWriter):  # pylint: disable=too-many-instance-attribute
 
         data = bytes(self._buffer)
 
-        with self._store._lock:  # type: ignore # pylint: disable=protected-access
+        with self._store._lock:  # pyright: ignore[reportPrivateUsage] # pylint: disable=protected-access
             # pylint: disable=protected-access
-            existing = self._store._objects.setdefault(digest, data)  # type: ignore
+            existing = self._store._objects.setdefault(digest, data)  # pyright: ignore[reportPrivateUsage]
             size = len(
                 existing
             )  # if we inserted, existing is `data`; else it’s prior bytes

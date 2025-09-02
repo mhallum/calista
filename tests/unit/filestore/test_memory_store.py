@@ -59,8 +59,8 @@ def test_put_bytes_installs_once_and_matches_data(store: MemoryFileStore):
 
     # internal map contains exactly one object keyed by digest
     # pylint: disable=protected-access
-    assert set(store._objects.keys()) == {info.digest}  # type: ignore # noqa: SLF001
-    assert store._objects[info.digest] == data  # type: ignore # noqa: SLF001
+    assert set(store._objects.keys()) == {info.digest}  # pyright: ignore[reportPrivateUsage]
+    assert store._objects[info.digest] == data  # pyright: ignore[reportPrivateUsage]
 
 
 def test_duplicate_put_bytes_does_not_duplicate_storage(store: MemoryFileStore):
@@ -71,7 +71,7 @@ def test_duplicate_put_bytes_does_not_duplicate_storage(store: MemoryFileStore):
     assert d1 == d2
     # only one physical object stored
     # pylint: disable=protected-access
-    assert len(store._objects) == 1  # type: ignore # noqa: SLF001
+    assert len(store._objects) == 1  # pyright: ignore[reportPrivateUsage]
 
 
 def test_expected_digest_mismatch_raises_and_does_not_install(store: MemoryFileStore):
@@ -84,7 +84,7 @@ def test_expected_digest_mismatch_raises_and_does_not_install(store: MemoryFileS
             w.commit(expected_digest=wrong)
     # nothing installed on mismatch
     # pylint: disable=protected-access
-    assert len(store._objects) == 0  # type: ignore # noqa: SLF001
+    assert len(store._objects) == 0  # pyright: ignore[reportPrivateUsage]
 
 
 def test_commit_idempotent_returns_same_blobstat_object(store: MemoryFileStore):
@@ -108,7 +108,7 @@ def test_abort_idempotent_and_noop_after_commit(store: MemoryFileStore):
         w.abort()
         w.abort()
     # pylint: disable=protected-access
-    assert set(store._objects.keys()) == {stat.digest}  # type: ignore # noqa: SLF001
+    assert set(store._objects.keys()) == {stat.digest}  # pyright: ignore[reportPrivateUsage]
 
 
 def test_commit_after_abort_or_close_raises_and_does_not_install(
@@ -122,7 +122,7 @@ def test_commit_after_abort_or_close_raises_and_does_not_install(
     w.abort()
     with pytest.raises(ValueError):
         w.commit()
-    assert len(store._objects) == 0  # type: ignore # noqa: SLF001
+    assert len(store._objects) == 0  # pyright: ignore[reportPrivateUsage]
     w.close()
 
     # close then commit -> ValueError, nothing installed
@@ -131,7 +131,7 @@ def test_commit_after_abort_or_close_raises_and_does_not_install(
     w2.close()
     with pytest.raises(ValueError):
         w2.commit()
-    assert len(store._objects) == 0  # type: ignore # noqa: SLF001
+    assert len(store._objects) == 0  # pyright: ignore[reportPrivateUsage]
 
 
 def test_open_read_returns_new_stream_each_time(store: MemoryFileStore):
@@ -211,8 +211,8 @@ def test_concurrent_duplicate_ingest_dedup_internals(store: MemoryFileStore):
         futures = [ex.submit(worker) for _ in range(16)]
         digests = [f.result() for f in futures]
     # still only one stored object
-    assert len(store._objects) == 1  # type: ignore # noqa: SLF001
-    assert store._objects[digests[0]] == data  # type: ignore # noqa: SLF001
+    assert len(store._objects) == 1  # pyright: ignore[reportPrivateUsage]
+    assert store._objects[digests[0]] == data  # pyright: ignore[reportPrivateUsage]
 
 
 def test_writer_committed_property_transitions_commit(store: MemoryFileStore):

@@ -42,7 +42,7 @@ def test_index_naming_convention_for_single_and_multi_cols(
     """
     engine = sqlite_engine_memory
 
-    t = Table(  # type: ignore  # noqa: F841 # pylint: disable=unused-variable
+    t = Table(  # noqa: F841 # pylint: disable=unused-variable # pyright: ignore[reportUnusedVariable]
         "t_meta_ix",
         metadata,
         Column("id", Integer, primary_key=True),
@@ -75,7 +75,7 @@ def test_unique_constraint_uses_convention_name_or_unique_index_name(
     """
     engine = sqlite_engine_memory
 
-    t = Table(  # type: ignore  # noqa: F841 # pylint: disable=unused-variable
+    t = Table(  # noqa: F841 # pylint: disable=unused-variable # pyright: ignore[reportUnusedVariable]
         "t_meta_uq",
         metadata,
         Column("id", Integer, primary_key=True),
@@ -107,7 +107,7 @@ def test_check_constraint_uses_convention_with_explicit_name(
     """
     engine = sqlite_engine_memory
 
-    t = Table(  # type: ignore  # noqa: F841 # pylint: disable=unused-variable
+    t = Table(  # noqa: F841 # pylint: disable=unused-variable # pyright: ignore[reportUnusedVariable]
         "t_meta_ck",
         metadata,
         Column("id", Integer, primary_key=True),

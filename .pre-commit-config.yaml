@@ -17,8 +17,13 @@ repos:
     rev: v1.17.1
     hooks:
       - id: mypy
+        pass_filenames: false
         args: [--config-file=pyproject.toml]
         exclude: ^alembic/
+        additional_dependencies:
+          - sqlalchemy>=2
+          - alembic
+          - hypothesis
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
