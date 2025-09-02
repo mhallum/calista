@@ -9,7 +9,7 @@ Events must have reliable timestamps.
 
 ## Decision
 
-- Store `recorded_at` in UTC, RFC3339 format.
+- Store `recorded_at` as a timezone-aware UTC timestamp (`TIMESTAMPTZ` on Postgres). **When serialized** (logs, JSON, APIs), emit **RFC 3339 with** `Z`.
 
 ## Consequences
 
