@@ -18,12 +18,7 @@ from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Any
 
 import pytest
-from sqlalchemy import (
-    func,
-    insert,
-    inspect,
-    select,
-)
+from sqlalchemy import func, insert, inspect, select
 from sqlalchemy.exc import IntegrityError
 
 from calista.adapters.eventstore.schema import event_store
@@ -32,16 +27,19 @@ from tests.helpers.time_asserts import assert_strict_utc
 if TYPE_CHECKING:
     from sqlalchemy.engine import Engine
 
+# mypy: disable-error-code=no-untyped-def
 
 # Run this module against both backends via engine fixtures from conftest.py
 pytestmark = pytest.mark.parametrize(
     "engine",
-    ["sqlite_engine_file", "postgres_engine"],
+    ["sqlite_engine_file", "postgres_engine", "sqlite_engine_memory"],
     indirect=True,
 )  # pylint: disable=duplicate-code
 
 
-def test_insert_valid_row(engine: Engine, make_event: Callable[..., dict[str, Any]]):
+def test_insert_valid_row(
+    engine: Engine, make_event: Callable[..., dict[str, Any]]
+) -> None:
     """Insert a well-formed event and confirm it persisted (basic smoke test)."""
     with engine.begin() as conn:
         event = make_event()
@@ -54,7 +52,9 @@ def test_insert_valid_row(engine: Engine, make_event: Callable[..., dict[str, An
         assert count == 1
 
 
-def test_json_roundtrip(engine: Engine, make_event: Callable[..., dict[str, Any]]):
+def test_json_roundtrip(
+    engine: Engine, make_event: Callable[..., dict[str, Any]]
+) -> None:
     """Payload and metadata should round-trip through the DB unchanged."""
     with engine.begin() as conn:
         event = make_event(payload={"k": ["a", 1, True]}, metadata={"m": {"x": 1}})
@@ -70,7 +70,7 @@ def test_json_roundtrip(engine: Engine, make_event: Callable[..., dict[str, Any]
 
 def test_unique_stream_version(
     engine: Engine, make_event: Callable[..., dict[str, Any]]
-):
+) -> None:
     """(stream_id, version) must be unique."""
     with engine.begin() as conn:
         event = make_event(stream_id="pg-stream", version=1)
@@ -82,7 +82,9 @@ def test_unique_stream_version(
             )
 
 
-def test_unique_event_id(engine: Engine, make_event: Callable[..., dict[str, Any]]):
+def test_unique_event_id(
+    engine: Engine, make_event: Callable[..., dict[str, Any]]
+) -> None:
     """event_id must be globally unique."""
     with engine.begin() as conn:
         event = make_event()
@@ -94,7 +96,9 @@ def test_unique_event_id(engine: Engine, make_event: Callable[..., dict[str, Any
             )
 
 
-def test_ulid_length_check(engine: Engine, make_event: Callable[..., dict[str, Any]]):
+def test_ulid_length_check(
+    engine: Engine, make_event: Callable[..., dict[str, Any]]
+) -> None:
     """event_id length must be exactly 26 chars (ULID)."""
     with engine.begin() as conn:
         with pytest.raises(IntegrityError):
@@ -133,7 +137,7 @@ def test_recorded_at_is_tz_aware(
         assert_strict_utc(timestamp)
 
 
-def test_constraints_present(engine: Engine):
+def test_constraints_present(engine: Engine) -> None:
     """Check schema via SQLAlchemy inspector to ensure expected constraint names/columns exist."""
     inspector = inspect(engine)
 
@@ -172,7 +176,9 @@ def test_constraints_present(engine: Engine):
     )
 
 
-def test_payload_not_null(engine: Engine, make_event: Callable[..., dict[str, Any]]):
+def test_payload_not_null(
+    engine: Engine, make_event: Callable[..., dict[str, Any]]
+) -> None:
     """payload must be NOT NULL (None payload should raise IntegrityError)."""
     event = make_event(payload=None)
     assert event["payload"] is None
@@ -184,7 +190,7 @@ def test_payload_not_null(engine: Engine, make_event: Callable[..., dict[str, An
 
 def test_utcdatetime_null_not_allowed(
     engine: Engine, make_event: Callable[..., dict[str, Any]]
-):
+) -> None:
     """recorded_at is NOT NULL → inserting None should raise IntegrityError."""
     with engine.begin() as conn:
         with pytest.raises(IntegrityError):
@@ -215,7 +221,7 @@ def test_utcdatetime_bind_variants(
     given_dt: datetime,
     expected_dt: datetime,
     version: int,
-):
+) -> None:
     """When a value is supplied, UTCDateTime must normalize it to UTC on bind."""
     with engine.begin() as conn:
         pk = conn.execute(
@@ -236,7 +242,7 @@ def test_utcdatetime_bind_variants(
 
 def test_recorded_at_default_is_strict_utc(
     engine: Engine, make_event: Callable[..., dict[str, Any]]
-):
+) -> None:
     """When omitted on insert, recorded_at is set by the DB and must be UTC 'now'."""
     with engine.begin() as conn:
         pk = conn.execute(
@@ -255,7 +261,7 @@ def test_recorded_at_default_is_strict_utc(
     assert abs((now - dt).total_seconds()) < max_time_delay
 
 
-def test_column_nullability_via_inspector(engine: Engine):
+def test_column_nullability_via_inspector(engine: Engine) -> None:
     """Check schema via SQLAlchemy inspector: expected NOT NULL vs NULL columns."""
     insp = inspect(engine)
     cols = {c["name"]: c for c in insp.get_columns("event_store")}
