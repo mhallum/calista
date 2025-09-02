@@ -8,23 +8,17 @@ CALISTA uses **PostgreSQL** by default.
 ## Quick start (PostgreSQL)
 
 1. Point CALISTA at your database:
-
    ```bash
    export CALISTA_DB_URL=postgresql+psycopg://calista:changeme@localhost:5432/calista
    ```
-
    _Optional (omit the password if your system supplies it via `~/.pgpass` or a Postgres service):_
-
    ```bash
    export CALISTA_DB_URL=postgresql+psycopg://calista@localhost:5432/calista
    ```
-
 2. Initialize the schema:
-
    ```bash
    alembic upgrade head
    ```
-
 3. Check status:
    ```bash
    alembic current
@@ -33,21 +27,16 @@ CALISTA uses **PostgreSQL** by default.
 ## If you don’t already have a PostgreSQL database
 
 - macOS (Homebrew)
-
   ```bash
   brew install postgresql@17
   brew services start postgresql@17
   ```
-
   _Note that you may need to update your PATH. Follow homebrew's instructions._
-
 - Ubuntu/Debian
-
   ```bash
   sudo apt-get update && sudo apt-get install -y postgresql
   sudo systemctl enable --now postgresql
   ```
-
 - Docker (quick local database)
   ```bash
   docker run --name calista-pg -e POSTGRES_USER=calista -e POSTGRES_PASSWORD=changeme \
