@@ -60,7 +60,7 @@ def test_alembic_downgrade_upgrade_roundtrip_postgres(
     with PostgresContainer(
         "postgres:17", username="calista", password="changeme", dbname="calista"
     ) as pg:
-        base_url = re.sub(r"\+psycopg2\b", "+psycopg", pg.get_connection_url())
+        base_url = re.sub(r"\+psycopg2(?=:|$|/)", "+psycopg", pg.get_connection_url())
 
         # Use the 'postgres' DB for admin ops (not the DB we’ll drop)
         admin_url = re.sub(r"/[^/]+$", "/postgres", base_url)
