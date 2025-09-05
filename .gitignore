@@ -30,6 +30,7 @@ mutation-report.html
 *.mutation.html
 mutation.svg
 mutations/
+mutants/
 
 # Mutmut cache
 .mutmut-cache/
