@@ -2266,6 +2266,18 @@ files = [
 ]
 
 [[package]]
+name = "types-boltons"
+version = "25.0.0.20250822"
+description = "Typing stubs for boltons"
+optional = false
+python-versions = ">=3.9"
+groups = ["dev"]
+files = [
+    {file = "types_boltons-25.0.0.20250822-py3-none-any.whl", hash = "sha256:137fd8604947ae65e38108f65d91f678dc78a0573e098c73354979380151d4ab"},
+    {file = "types_boltons-25.0.0.20250822.tar.gz", hash = "sha256:854075d9837fc1d01048b92a4f51d628b4a7f1667e087d7fe2156cd510b192fa"},
+]
+
+[[package]]
 name = "types-docker"
 version = "7.1.0.20250907"
 description = "Typing stubs for docker"
@@ -2333,6 +2345,18 @@ files = [
 types-docutils = "*"
 
 [[package]]
+name = "types-pyyaml"
+version = "6.0.12.20250822"
+description = "Typing stubs for PyYAML"
+optional = false
+python-versions = ">=3.9"
+groups = ["dev"]
+files = [
+    {file = "types_pyyaml-6.0.12.20250822-py3-none-any.whl", hash = "sha256:1fe1a5e146aa315483592d292b72a172b65b946a6d98aa6ddd8e4aa838ab7098"},
+    {file = "types_pyyaml-6.0.12.20250822.tar.gz", hash = "sha256:259f1d93079d335730a9db7cff2bcaf65d7e04b4a56b5927d49a612199b59413"},
+]
+
+[[package]]
 name = "types-requests"
 version = "2.32.4.20250809"
 description = "Typing stubs for requests"
@@ -2346,6 +2370,30 @@ files = [
 
 [package.dependencies]
 urllib3 = ">=2"
+
+[[package]]
+name = "types-tabulate"
+version = "0.9.0.20241207"
+description = "Typing stubs for tabulate"
+optional = false
+python-versions = ">=3.8"
+groups = ["dev"]
+files = [
+    {file = "types_tabulate-0.9.0.20241207-py3-none-any.whl", hash = "sha256:b8dad1343c2a8ba5861c5441370c3e35908edd234ff036d4298708a1d4cf8a85"},
+    {file = "types_tabulate-0.9.0.20241207.tar.gz", hash = "sha256:ac1ac174750c0a385dfd248edc6279fa328aaf4ea317915ab879a2ec47833230"},
+]
+
+[[package]]
+name = "types-xmltodict"
+version = "0.15.0.20250907"
+description = "Typing stubs for xmltodict"
+optional = false
+python-versions = ">=3.9"
+groups = ["dev"]
+files = [
+    {file = "types_xmltodict-0.15.0.20250907-py3-none-any.whl", hash = "sha256:9a9407b0c46fd2c3b7cb37c39a07333fc22f722bf24292ada9ff393f244e6fc7"},
+    {file = "types_xmltodict-0.15.0.20250907.tar.gz", hash = "sha256:6d800239bd120cabcd6d6880550c54fdeb39759e128c81c0ff5507546c127c2a"},
+]
 
 [[package]]
 name = "typing-extensions"
@@ -2602,4 +2650,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<4.0.0"
-content-hash = "f4317f130aeb74404dd37fb2dad8e2de55d2d2ed4c216943619f13a2c099b388"
+content-hash = "46559bfba1f10c315db6c832d758f312c0952ef9c39baf7a80e804681a006718"
