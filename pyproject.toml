@@ -72,6 +72,9 @@ markers = [
     "integration: mark test as integration",
     "slow: mark test as slow"
 ]
+filterwarnings = [
+    "ignore:'MultiCommand' is deprecated:DeprecationWarning:cloup"
+]
 
 [tool.mypy]
 python_version = "3.13"
