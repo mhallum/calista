@@ -76,6 +76,14 @@ filterwarnings = [
     "ignore:'MultiCommand' is deprecated:DeprecationWarning:cloup"
 ]
 
+[tool.coverage.run]
+branch = true
+source = ["calista"]
+omit = [
+  "src/calista/infrastructure/db/alembic/versions/*",
+  "src/calista/infrastructure/db/alembic/env.py"
+]
+
 [tool.mypy]
 python_version = "3.13"
 mypy_path = ["src"] # src/ layout
