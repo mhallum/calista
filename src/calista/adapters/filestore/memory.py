@@ -22,13 +22,13 @@ Key behaviors
 - **Deduplication**: Only a single copy of bytes exists per digest.
 - **Thread-safety**: All installs/lookups happen under an `RLock`, making
   `commit()` atomic with respect to concurrent writers/readers.
-- **Durability**: `fsync` hints are ignored (there’s nothing to fsync).
+- **Durability**: `fsync` hints are ignored (there's nothing to fsync).
 
 Hash algorithms
 ---------------
 `MemoryFileStore(hash_algorithm="sha256")` selects the algorithm passed to
 `hashlib.new()`. If the algorithm is unavailable, construction will fail.
-For CALISTA’s default policy, use `"sha256"`.
+For CALISTA's default policy, use `"sha256"`.
 
 Typical usage
 -------------
@@ -201,7 +201,8 @@ class _MemWriter(AbstractWriter):  # pylint: disable=too-many-instance-attribute
 
         with self._store._lock:  # pyright: ignore[reportPrivateUsage] # pylint: disable=protected-access
             # pylint: disable=protected-access
-            existing = self._store._objects.setdefault(digest, data)  # pyright: ignore[reportPrivateUsage]
+            # pyright: ignore[reportPrivateUsage]
+            existing = self._store._objects.setdefault(digest, data)
             size = len(
                 existing
             )  # if we inserted, existing is `data`; else it’s prior bytes
