@@ -56,6 +56,12 @@ pythonpath = ["src"]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
+markers = [
+    "functional: mark test as functional",
+    "unit: mark test as unit",
+    "integration: mark test as integration",
+    "slow: mark test as slow"
+]
 
 [tool.mypy]
 python_version = "3.13"
