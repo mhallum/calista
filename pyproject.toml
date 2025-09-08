@@ -101,7 +101,10 @@ module = [
   "testcontainers",
   "testcontainers.*",
   "rich.*",
-  "docker"
+  "docker",
+  "click",
+  "click.*",
+  "click_extra"
 ]
 ignore_missing_imports = true
 
