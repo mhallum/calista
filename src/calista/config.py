@@ -4,10 +4,10 @@ This module centralizes small helpers and constants related to application confi
 """
 
 import sys
+from importlib.resources import files
 from pathlib import Path
 from typing import TextIO
 
-# from importlib.resources import files
 from alembic.config import Config
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -36,7 +36,6 @@ def build_alembic_config(db_url: str, stdout: TextIO = sys.stdout) -> Config:
     cfg.set_main_option(ALEMBIC_URL_KEY, db_url)
     cfg.set_main_option(
         ALEMBIC_SCRIPT_LOCATION_KEY,
-        str(ROOT / "alembic"),
-        # str(files("calista.infrastructure.db.alembic")), # soon: use this when we package
+        str(files("calista.infrastructure.db.alembic")),
     )
     return cfg
