@@ -6,7 +6,7 @@ plus small helpers for building valid `event_store` rows.
 PostgreSQL engines are backed by a temporary Postgres 17 instance launched with
 Testcontainers and **migrated to Alembic head** (migrations are the source of truth).
 SQLite engines are ephemeral and use `metadata.create_all()` for narrow unit-style
-tests where running Alembic isn’t necessary.
+tests where running Alembic isn't necessary.
 
 Why:
   - Keep schema creation consistent (PG via Alembic).
@@ -35,6 +35,7 @@ from collections.abc import Callable, Iterator
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+import docker
 import pytest
 from sqlalchemy import text
 from sqlalchemy.engine import URL
@@ -45,7 +46,9 @@ from calista.infrastructure.db.engine import make_engine
 from calista.infrastructure.db.metadata import metadata
 
 try:
-    from testcontainers.postgres import PostgresContainer  # pyright: ignore[reportMissingTypeStubs]
+    from testcontainers.postgres import (
+        PostgresContainer,  # pyright: ignore[reportMissingTypeStubs]
+    )
 except Exception:  # pragma: no cover # pylint: disable=broad-except
     PostgresContainer = (  # pylint: disable=invalid-name
         None  # will skip if not installed
@@ -56,6 +59,33 @@ if TYPE_CHECKING:
 
 ## adjust pylint to deal with fixtures
 # pylint: disable=redefined-outer-name
+
+# --- Auto-skip Docker/Testcontainers-backed tests when Docker daemon is unavailable ---
+
+
+def _docker_available() -> bool:
+    try:
+        docker.from_env().ping()
+    except Exception:  # pylint: disable=broad-except
+        return False
+    return True
+
+
+DOCKER_UP = _docker_available()
+
+
+def pytest_collection_modifyitems(items):
+    """Skip Postgres/Testcontainers tests if Docker is unavailable."""
+    # pylint: disable=magic-value-comparison
+    if DOCKER_UP:
+        return
+    skip = pytest.mark.skip(reason="Docker/Testcontainers backend not available")
+    for item in items:
+        if "postgres_engine" in getattr(item, "fixturenames", ()):
+            item.add_marker(skip)
+        elif "testcontainers" in item.nodeid or "postgres" in item.nodeid:
+            item.add_marker(skip)
+
 
 # --- Engines ------------------------------------------------------------------
 

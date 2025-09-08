@@ -81,6 +81,10 @@ check_untyped_defs = true
 disallow_incomplete_defs = true
 no_implicit_optional = true
 
+[mypy-docker]
+ignore_missing_imports = true
+
+
 # Focused “missing import” ignores for 3rd party libs with weak stubs
 [[tool.mypy.overrides]]
 module = [
@@ -89,7 +93,8 @@ module = [
   "alembic.*",
   "testcontainers",
   "testcontainers.*",
-  "rich.*"
+  "rich.*",
+  "docker"
 ]
 ignore_missing_imports = true
 
