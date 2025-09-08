@@ -2266,6 +2266,88 @@ files = [
 ]
 
 [[package]]
+name = "types-docker"
+version = "7.1.0.20250907"
+description = "Typing stubs for docker"
+optional = false
+python-versions = ">=3.9"
+groups = ["dev"]
+files = [
+    {file = "types_docker-7.1.0.20250907-py3-none-any.whl", hash = "sha256:aa415c62591eeaabfaa59481d4264f378938cc54e0c7ae645211cd1b451261d5"},
+    {file = "types_docker-7.1.0.20250907.tar.gz", hash = "sha256:148654b2749914b6b5a0776bec7fbfa700cfcc5028add5f2c55e396509e4fda3"},
+]
+
+[package.dependencies]
+types-requests = "*"
+urllib3 = ">=2"
+
+[[package]]
+name = "types-docutils"
+version = "0.22.0.20250822"
+description = "Typing stubs for docutils"
+optional = false
+python-versions = ">=3.9"
+groups = ["dev"]
+files = [
+    {file = "types_docutils-0.22.0.20250822-py3-none-any.whl", hash = "sha256:890d5986045b8a532b56e7f0d4979de3afc23b4543de40910ec8c71ec5f3ba99"},
+    {file = "types_docutils-0.22.0.20250822.tar.gz", hash = "sha256:40efebeef8467ae7648a33f3fa6f778bd94d338ca1f4a1c924b206d2f687f60a"},
+]
+
+[[package]]
+name = "types-pexpect"
+version = "4.9.0.20250809"
+description = "Typing stubs for pexpect"
+optional = false
+python-versions = ">=3.9"
+groups = ["dev"]
+files = [
+    {file = "types_pexpect-4.9.0.20250809-py3-none-any.whl", hash = "sha256:d19d206b8a7c282dac9376f26f072e036d22e9cf3e7d8eba3f477500b1f39101"},
+    {file = "types_pexpect-4.9.0.20250809.tar.gz", hash = "sha256:17a53c785b847c90d0be9149b00b0254e6e92c21cd856e853dac810ddb20101f"},
+]
+
+[[package]]
+name = "types-psycopg2"
+version = "2.9.21.20250809"
+description = "Typing stubs for psycopg2"
+optional = false
+python-versions = ">=3.9"
+groups = ["dev"]
+files = [
+    {file = "types_psycopg2-2.9.21.20250809-py3-none-any.whl", hash = "sha256:59b7b0ed56dcae9efae62b8373497274fc1a0484bdc5135cdacbe5a8f44e1d7b"},
+    {file = "types_psycopg2-2.9.21.20250809.tar.gz", hash = "sha256:b7c2cbdcf7c0bd16240f59ba694347329b0463e43398de69784ea4dee45f3c6d"},
+]
+
+[[package]]
+name = "types-pygments"
+version = "2.19.0.20250809"
+description = "Typing stubs for Pygments"
+optional = false
+python-versions = ">=3.9"
+groups = ["dev"]
+files = [
+    {file = "types_pygments-2.19.0.20250809-py3-none-any.whl", hash = "sha256:8e813e5fc25f741b81cadc1e181d402ebd288e34a9812862ddffee2f2b57db7c"},
+    {file = "types_pygments-2.19.0.20250809.tar.gz", hash = "sha256:01366fd93ef73c792e6ee16498d3abf7a184f1624b50b77f9506a47ed85974c2"},
+]
+
+[package.dependencies]
+types-docutils = "*"
+
+[[package]]
+name = "types-requests"
+version = "2.32.4.20250809"
+description = "Typing stubs for requests"
+optional = false
+python-versions = ">=3.9"
+groups = ["dev"]
+files = [
+    {file = "types_requests-2.32.4.20250809-py3-none-any.whl", hash = "sha256:f73d1832fb519ece02c85b1f09d5f0dd3108938e7d47e7f94bbfa18a6782b163"},
+    {file = "types_requests-2.32.4.20250809.tar.gz", hash = "sha256:d8060de1c8ee599311f56ff58010fb4902f462a1470802cf9f6ed27bc46c4df3"},
+]
+
+[package.dependencies]
+urllib3 = ">=2"
+
+[[package]]
 name = "typing-extensions"
 version = "4.14.1"
 description = "Backported and Experimental Type Hints for Python 3.9+"
@@ -2520,4 +2602,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<4.0.0"
-content-hash = "32c868d3fc8d5c8412095990389b1045a065dffe3392b3662ce13b41e43ea103"
+content-hash = "f4317f130aeb74404dd37fb2dad8e2de55d2d2ed4c216943619f13a2c099b388"
