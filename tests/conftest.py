@@ -37,10 +37,10 @@ from typing import TYPE_CHECKING, Any
 
 import docker
 import pytest
+from alembic import command
 from sqlalchemy import text
 from sqlalchemy.engine import URL
 
-from alembic import command
 from calista import config
 from calista.infrastructure.db.engine import make_engine
 from calista.infrastructure.db.metadata import metadata
@@ -109,6 +109,31 @@ def sqlite_engine_memory() -> Iterator[Engine]:
     yield test_engine
     metadata.drop_all(test_engine)
     test_engine.dispose()
+
+
+@pytest.fixture
+def pg_url_base() -> Iterator[str]:
+    """Session Postgres 17 container URL, unmigrated.
+
+    Spawns a Testcontainers `postgres:17` instance and yields its connection URL
+    for the remainder of the test session. The container is torn down automatically.
+
+    Skips if Testcontainers is not available.
+    """
+
+    if PostgresContainer is None:
+        pytest.skip("testcontainers not installed")
+
+    with PostgresContainer(
+        image="postgres:17",
+        username="calista",
+        password="abc123",
+        dbname="calista",
+    ) as pg:
+        # testcontainers returns psycopg2 URLs by default; normalize to psycopg v3
+        url = pg.get_connection_url()  # e.g., postgresql+psycopg2://...
+        url = re.sub(r"\+psycopg2\b", "+psycopg", url)
+        yield url
 
 
 @pytest.fixture(scope="session")

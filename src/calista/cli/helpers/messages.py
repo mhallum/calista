@@ -49,12 +49,10 @@ def success_glyph(stream: TextIO | None = None) -> str:
     Tries a green check emoji first, then the Unicode check mark, then ASCII.
 
     Returns:
-        str: One of "✅", "✓", or "[OK]" depending on stream support.
+        str: "✅" or "[OK]" depending on stream support.
     """
     if _supports_character("✅", stream):
         return "✅"
-    if _supports_character("✓", stream):
-        return "✓"
     return "[OK]"
 
 

@@ -21,7 +21,7 @@ import click_extra as clickx
 
 from calista import __version__
 
-# from .db import db as db_group
+from .db import db as db_group
 from .helpers import hyperlink
 
 HELP = """CALISTA command-line interface.
@@ -51,4 +51,4 @@ def calista():
     """CALISTA command-line interface."""
 
 
-# calista.add_command(db_group) # will be added soon
+calista.add_command(db_group)
