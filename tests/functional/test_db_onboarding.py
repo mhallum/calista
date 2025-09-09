@@ -24,7 +24,13 @@ import re
 import pytest
 from click.testing import CliRunner
 
-from calista.cli.db import MISSING_DB_URL_MSG
+from calista.cli.db import (
+    CANNOT_CONNECT_MSG,
+    INVALID_URL_FORMAT_MSG,
+    MISSING_DB_URL_MSG,
+    UPGRADE_SCHEMA_INSTRUCTIONS,
+    UPGRADE_SCHEMA_WARNING,
+)
 from calista.cli.main import calista as calista_cli
 
 BASE_REVISION = "be411457bc58"
@@ -125,8 +131,11 @@ def test_new_user_initial_db_setup(pg_url_base: str):
 
     # The user decide to upgrade the database to the latest revision.
     result = runner.invoke(calista_cli, ["db", "upgrade"])
-    # They see the confirmation prompt and decide not to proceed.
+    # They see the confirmation prompt, including a warning about creating a backup,
+    # and decide not to proceed.
     assert result.exit_code == 1, result.output
+    assert UPGRADE_SCHEMA_WARNING in result.output
+    assert "backup" in result.output.lower()  # pylint: disable=magic-value-comparison
     assert "Are you sure you want to proceed?" in result.output  # pylint: disable=magic-value-comparison
     # The database is still at the empty revision.
     result = runner.invoke(calista_cli, ["db", "current"])
@@ -156,5 +165,66 @@ def test_new_user_initial_db_setup(pg_url_base: str):
     assert result.exit_code == 0, result.output
     # This time they see the current revision indicated.
     assert "(current)" in result.output  # pylint: disable=magic-value-comparison
+
+    # The user has successfully set up their database and can now use Calista.
+
+
+@pytest.mark.slow
+def test_new_user_initial_db_setup2(pg_url_base: str):
+    # Another user is now going through the same process.
+    # This user has also set up a postgres database, and has
+    # set the CALISTA_DB_URL environment variable.
+    # However, they have unkowningly set it to a malformed value.
+    invalid_url = "not a valid url"
+    runner = CliRunner(env={"CALISTA_DB_URL": invalid_url})
+
+    # They try to run `calista db upgrade` per the quickstart guide.
+    result = runner.invoke(calista_cli, ["db", "upgrade"])
+    # They see an error message indicating that the database URL is invalid.
+    assert result.exit_code != 0, result.output
+    assert INVALID_URL_FORMAT_MSG in result.output
+
+    # The user realizes they set the environment variable incorrectly.
+    # They check the value of CALISTA_DB_URL and see that it is indeed malformed.
+    # They attempt to correct the value to point to their postgres database,
+    # but make a typo and set it to another invalid value.
+    # This one has the right format, but the wrong values.
+    invalid_url2 = "postgresql+psycopg://user:pass@localhost:5432/wrongdb"
+    runner = CliRunner(env={"CALISTA_DB_URL": invalid_url2})
+
+    # The user tries to verify the database connection using `calista db status`.
+    # (The docs say to try this if there are problems.)
+    result = runner.invoke(calista_cli, ["db", "status"])
+    # The status command indicates that it cannot connect to the database.
+    assert "Cannot connect to database" in result.output  # pylint: disable=magic-value-comparison
+    assert CANNOT_CONNECT_MSG in result.output
+
+    # The user checks their environment variable again and realizes their mistake.
+    # They correct the value to point to their postgres database.
+    runner = CliRunner(env={"CALISTA_DB_URL": pg_url_base})
+
+    # They run `calista db status` again to check the status of the database.
+    result = runner.invoke(calista_cli, ["db", "status"])
+    # This time, they see that the database is reachable, but is uninitialized.
+    assert result.exit_code == 0, result.output
+    assert "uninitialized" in result.output  # pylint: disable=magic-value-comparison
+    # They also see that helpful information about the database (i.e. url, backend) is displayed,
+    # confirming that CALISTA is connecting to the correct database.
+    assert "Backend : postgresql" in result.output  # pylint: disable=magic-value-comparison
+    assert "URL     : postgresql+psycopg://" in result.output  # pylint: disable=magic-value-comparison
+    # They also see the instructions on how to initialize the database.
+    assert UPGRADE_SCHEMA_INSTRUCTIONS in result.output
+
+    # Following the instructions, the user runs `calista db upgrade`
+    # and confirms the prompt to proceed.
+    result = runner.invoke(calista_cli, ["db", "upgrade"], input="y\n")
+
+    # They run `calista db status` again to check the status of the database.
+    result = runner.invoke(calista_cli, ["db", "status"])
+    # This time, they see that the database is up to date.
+    assert result.exit_code == 0, result.output
+    assert "Database reachable" in result.output  # pylint: disable=magic-value-comparison
+    assert "Schema  :" in result.output  # pylint: disable=magic-value-comparison
+    assert "up to date" in result.output  # pylint: disable=magic-value-comparison
 
     # The user has successfully set up their database and can now use Calista.
