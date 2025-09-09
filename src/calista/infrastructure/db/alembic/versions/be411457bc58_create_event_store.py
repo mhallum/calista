@@ -9,8 +9,8 @@ Create Date: 2025-09-01
 from collections.abc import Sequence
 
 import sqlalchemy as sa
-
 from alembic import op
+
 from calista.infrastructure.db.sa_types import BIGINT_PK, PORTABLE_JSON, UTCDateTime
 
 # deal with alembic stuff

@@ -10,13 +10,12 @@ then:
   3) runs `alembic downgrade base`,
   4) asserts `event_store` is dropped.
 
-We operate on a per-test scratch DB so the container’s default DB remains intact.
+We operate on a per-test scratch DB so the container's default DB remains intact.
 """
 
 import re
 import uuid
 from collections.abc import Callable
-from pathlib import Path
 from typing import Any
 
 from sqlalchemy import create_engine, insert, text
@@ -25,24 +24,10 @@ from testcontainers.postgres import (  # pyright: ignore[reportMissingTypeStubs]
 )
 
 from alembic import command
-from alembic.config import Config
-from calista.adapters.eventstore.schema import event_store  # <-- use your Table
+from calista import config
+from calista.adapters.eventstore.schema import event_store
 
 # mypy: disable-error-code=no-untyped-def
-
-
-def _cfg(url: str) -> Config:
-    """Build an Alembic Config pointed at this repo’s `alembic.ini`, overriding the URL.
-
-    Args:
-        url: Full SQLAlchemy database URL that Alembic should target.
-
-    Returns:
-        Config: An Alembic configuration object with `sqlalchemy.url` set.
-    """
-    cfg = Config(str(Path(__file__).resolve().parents[2] / "alembic.ini"))
-    cfg.set_main_option("sqlalchemy.url", url)
-    return cfg
 
 
 def test_alembic_downgrade_upgrade_roundtrip_postgres(
@@ -84,7 +69,7 @@ def test_alembic_downgrade_upgrade_roundtrip_postgres(
         url = re.sub(r"/[^/]+$", f"/{scratch}", base_url)
 
         # upgrade -> assert -> downgrade -> assert
-        command.upgrade(_cfg(url), "head")
+        command.upgrade(config.build_alembic_config(url), "head")
         eng = create_engine(url, future=True, pool_pre_ping=True)
         with eng.begin() as c:
             exists = c.execute(
@@ -100,7 +85,7 @@ def test_alembic_downgrade_upgrade_roundtrip_postgres(
             # Use typed insert so JSON/JSONB adapts correctly
             c.execute(insert(event_store).values(make_event()))
 
-        command.downgrade(_cfg(url), "base")
+        command.downgrade(config.build_alembic_config(url), "base")
         with eng.begin() as c:
             exists = c.execute(
                 text("SELECT to_regclass('public.event_store') IS NOT NULL")

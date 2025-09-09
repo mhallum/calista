@@ -37,11 +37,11 @@ from typing import TYPE_CHECKING, Any
 
 import docker
 import pytest
+from alembic import command
 from sqlalchemy import text
 from sqlalchemy.engine import URL
 
-from alembic import command
-from alembic.config import Config
+from calista import config
 from calista.infrastructure.db.engine import make_engine
 from calista.infrastructure.db.metadata import metadata
 
@@ -111,22 +111,29 @@ def sqlite_engine_memory() -> Iterator[Engine]:
     test_engine.dispose()
 
 
-def _alembic_cfg(url: str) -> Config:
-    """Build an Alembic `Config` using the repo’s `alembic.ini`, overriding the URL.
+@pytest.fixture
+def pg_url_base() -> Iterator[str]:
+    """Session Postgres 17 container URL, unmigrated.
 
-    Args:
-        url: Full SQLAlchemy URL to run migrations against.
+    Spawns a Testcontainers `postgres:17` instance and yields its connection URL
+    for the remainder of the test session. The container is torn down automatically.
 
-    Returns:
-        Config: Alembic configuration object.
+    Skips if Testcontainers is not available.
     """
 
-    root = Path(__file__).resolve().parents[1]  # repo root (parent of tests/)
-    config_file = root / "alembic.ini"
-    assert config_file.exists(), f"Missing {config_file}"
-    cfg = Config(str(config_file))
-    cfg.set_main_option("sqlalchemy.url", url)
-    return cfg
+    if PostgresContainer is None:
+        pytest.skip("testcontainers not installed")
+
+    with PostgresContainer(
+        image="postgres:17",
+        username="calista",
+        password="abc123",
+        dbname="calista",
+    ) as pg:
+        # testcontainers returns psycopg2 URLs by default; normalize to psycopg v3
+        url = pg.get_connection_url()  # e.g., postgresql+psycopg2://...
+        url = re.sub(r"\+psycopg2\b", "+psycopg", url)
+        yield url
 
 
 @pytest.fixture(scope="session")
@@ -152,7 +159,7 @@ def pg_url() -> Iterator[str]:
         # testcontainers returns psycopg2 URLs by default; normalize to psycopg v3
         url = pg.get_connection_url()  # e.g., postgresql+psycopg2://...
         url = re.sub(r"\+psycopg2\b", "+psycopg", url)
-        command.upgrade(_alembic_cfg(url), "head")
+        command.upgrade(config.build_alembic_config(url), "head")
         yield url
 
 
@@ -165,9 +172,9 @@ def postgres_engine(pg_url: str) -> Iterator[Engine]:
     (resetting sequences) and disposing the engine.
 
     Yields:
-        Engine: SQLAlchemy engine connected to the session’s Postgres.
+        Engine: SQLAlchemy engine connected to the session's Postgres.
     """
-    command.upgrade(_alembic_cfg(pg_url), "head")
+    command.upgrade(config.build_alembic_config(pg_url), "head")
     eng = make_engine(pg_url)
     try:
         yield eng
@@ -184,7 +191,7 @@ def sqlite_engine_file(tmp_path: Path) -> Iterator[Engine]:
 
     For SQLite we prefer a temp *file* (not :memory:) so Alembic's schema
     changes persist across connections. This fixture:
-      - builds a sqlite+pysqlite URL under the test’s temp dir,
+      - builds a sqlite+pysqlite URL under the test's temp dir,
       - runs `alembic upgrade head` for that URL,
       - returns an Engine from `make_engine()` (so PRAGMAs apply),
       - disposes the engine at teardown.
@@ -195,7 +202,7 @@ def sqlite_engine_file(tmp_path: Path) -> Iterator[Engine]:
         Engine: SQLAlchemy engine pointing at a temp file DB.
     """
     url = str(URL.create("sqlite+pysqlite", database=str(tmp_path / "test.db")))
-    cfg = _alembic_cfg(url)
+    cfg = config.build_alembic_config(url)
     command.upgrade(cfg, "head")
     test_engine = make_engine(url)
     try:
