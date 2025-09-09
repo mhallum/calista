@@ -5,29 +5,44 @@ It disables Click/color styling so mkdocs-click renders plain text.
 
 from __future__ import annotations
 
+from typing import IO, Any
+
 import click
 
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument,too-many-arguments,too-many-positional-arguments
+
 
 # --- hard-disable styling before importing CLI objects -----------------
 
 
-def _noop_style(text, *args, **kwargs):
-    # ignore fg/bg/bold/underline/etc.
+def _noop_style(
+    text: str,
+    fg: str | None = None,
+    bg: str | None = None,
+    bold: bool | None = None,
+    dim: bool | None = None,
+    underline: bool | None = None,
+    overline: bool | None = None,
+    italic: bool | None = None,
+    blink: bool | None = None,
+    reverse: bool | None = None,
+    strikethrough: bool | None = None,
+    reset: bool = True,
+) -> str:
+    # ignore all styling; return text unchanged
     return text
 
 
-def _noop_secho(message=None, **kwargs):
-    # force no color; preserve other kwargs like err/nl
-    return click.echo(
-        message,
-        color=False,
-        **{
-            k: v
-            for k, v in kwargs.items()
-            if k not in {"fg", "bg", "bold", "underline", "err", "nl", "file", "color"}
-        },
-    )
+def _noop_secho(
+    message: str | None = None,
+    file: IO[str] | None = None,
+    nl: bool = True,
+    err: bool = False,
+    color: bool | None = None,
+    **styles: Any,
+) -> None:
+    # forward to echo but force no color; preserve file/nl/err
+    click.echo(message, file=file, nl=nl, err=err, color=False)
 
 
 # Turn off color globally for any Context created during help rendering.
