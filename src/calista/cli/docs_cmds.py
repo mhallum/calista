@@ -8,7 +8,7 @@ from __future__ import annotations
 import importlib
 from collections.abc import Callable
 from types import ModuleType
-from typing import IO, Any, TypeAlias, cast
+from typing import IO, Any, AnyStr, TypeAlias, cast
 
 import click
 
@@ -39,7 +39,7 @@ def _noop_style(
 
 def _noop_secho(
     message: Any | None = None,
-    file: IO[str] | None = None,
+    file: IO[AnyStr] | None = None,
     nl: bool = True,
     err: bool = False,
     color: bool | None = None,
