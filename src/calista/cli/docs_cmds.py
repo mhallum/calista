@@ -5,7 +5,10 @@ It disables Click/color styling so mkdocs-click renders plain text.
 
 from __future__ import annotations
 
-from typing import IO, Any
+import importlib
+from collections.abc import Callable
+from types import ModuleType
+from typing import IO, Any, TypeAlias, cast
 
 import click
 
@@ -14,11 +17,13 @@ import click
 
 # --- hard-disable styling before importing CLI objects -----------------
 
+Color: TypeAlias = int | tuple[int, int, int] | str
+
 
 def _noop_style(
-    text: str,
-    fg: str | None = None,
-    bg: str | None = None,
+    text: Any,
+    fg: Color | None = None,
+    bg: Color | None = None,
     bold: bool | None = None,
     dim: bool | None = None,
     underline: bool | None = None,
@@ -28,20 +33,18 @@ def _noop_style(
     reverse: bool | None = None,
     strikethrough: bool | None = None,
     reset: bool = True,
-) -> str:
-    # ignore all styling; return text unchanged
+) -> Any:
     return text
 
 
 def _noop_secho(
-    message: str | None = None,
+    message: Any | None = None,
     file: IO[str] | None = None,
     nl: bool = True,
     err: bool = False,
     color: bool | None = None,
     **styles: Any,
 ) -> None:
-    # forward to echo but force no color; preserve file/nl/err
     click.echo(message, file=file, nl=nl, err=err, color=False)
 
 
@@ -52,16 +55,20 @@ click.style = _noop_style
 click.secho = _noop_secho
 
 # Neutralize click-extra styling too.
+_cx: ModuleType | None
 try:
-    # pylint: disable=import-outside-toplevel
-    import click_extra as _cx
+    _cx = importlib.import_module("click_extra")
 except Exception:  # pylint: disable=broad-except
     _cx = None  # pylint: disable=invalid-name
 
 if _cx is not None:
-    _cx.style = _noop_style
-    _cx.secho = _noop_secho
+    style_attr = getattr(_cx, "style", None)
+    if callable(style_attr):
+        setattr(_cx, "style", cast(Callable[..., Any], _noop_style))
 
+    secho_attr = getattr(_cx, "secho", None)
+    if callable(secho_attr):
+        setattr(_cx, "secho", cast(Callable[..., None], _noop_secho))
 
 # --- now import and re-export real CLI objects -------------------------
 # pylint: disable=wrong-import-position,import-outside-toplevel
