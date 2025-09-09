@@ -82,7 +82,8 @@ branch = true
 source = ["calista"]
 omit = [
   "src/calista/infrastructure/db/alembic/versions/*",
-  "src/calista/infrastructure/db/alembic/env.py"
+  "src/calista/infrastructure/db/alembic/env.py",
+  "src/calista/cli/docs_cmds.py"
 ]
 
 [tool.mypy]
