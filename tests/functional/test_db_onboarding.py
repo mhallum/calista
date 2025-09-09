@@ -42,10 +42,11 @@ def _revs(text: str) -> set[str]:
 
 
 @pytest.mark.parametrize(
-    "cmd", [["db", "current"], ["db", "heads"], ["db", "history"], ["db", "upgrade"]]
+    "cmd",
+    [["db", "current"], ["db", "history", "-i"], ["db", "upgrade"]],
 )
 def test_db_no_url(cmd):
-    """db commands without CALISTA_DB_URL set should error"""
+    """db commands requiring db connection should error if CALISTA_DB_URL is not set"""
     runner = CliRunner(env={"CALISTA_DB_URL": ""})
 
     result = runner.invoke(calista_cli, cmd)
@@ -76,27 +77,33 @@ def test_new_user_initial_db_setup(pg_url_base: str):
     # The user is new to Calista and has just installed it.
     # They have set up a postgres database, but have not yet set
     # the CALISTA_DB_URL environment variable.
-    # They try to run a db command and get an error message.
     runner = CliRunner(env={"CALISTA_DB_URL": ""})
+
+    # The user is familiar with Alembic and wants to check the
+    # current state of the database and apply migrations.
+    # They decide to use the `calista db` CLI commands to do this.
+
+    # They user checks the available migrations heads.
     result = runner.invoke(calista_cli, ["db", "heads"])
+    assert result.exit_code == 0, result.output
+
+    # Forgetting that they haven't set CALISTA_DB_URL, the user runs
+    # the `db current` command to check the current revision.
+    result = runner.invoke(calista_cli, ["db", "current"])
+    # They see an error message indicating that CALISTA_DB_URL is not set.
     assert result.exit_code == 1
     assert MISSING_DB_URL_MSG in result.output
 
     # They set the environment variable and try again.
-    # This time, the command runs successfully.
     runner = CliRunner(env={"CALISTA_DB_URL": pg_url_base})
-    result = runner.invoke(calista_cli, ["db", "heads"])
-    assert result.exit_code == 0, result.output
-    # They see the available head revisions, including the base revision.
-    assert BASE_REVISION in result.output
-
-    # They check the current revision, which should be empty.
     result = runner.invoke(calista_cli, ["db", "current"])
-    assert result.exit_code == 0, result.output
+    # This time, the command runs successfully.
+    assert result.exit_code == 0
+    # They see no current revision because the database is empty.
     assert result.output == ""
     # If they include the verbose flag, they see more details.
     result = runner.invoke(calista_cli, ["db", "current", "-v"])
-    assert result.exit_code == 0, result.output
+    assert result.exit_code == 0
     ## one of the extra fields displayed in verbose mode
     assert "Current revision(s) for postgresql+psycopg://" in result.output  # pylint: disable=magic-value-comparison
 

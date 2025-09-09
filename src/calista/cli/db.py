@@ -41,7 +41,8 @@ Future Work (separate PRs)
 - `calista db status` and `calista db doctor` for connectivity & invariant checks.
 """
 
-import os
+from __future__ import annotations
+
 import sys
 
 import click
@@ -61,16 +62,17 @@ MISSING_DB_URL_MSG = (
 )
 
 
+def _get_url() -> str:
+    try:
+        url = config.get_db_url()
+    except config.DatabaseUrlNotSetError as e:
+        raise click.ClickException(MISSING_DB_URL_MSG) from e
+    return url
+
+
 @click.group(cls=clickx.ExtraGroup)
-@click.pass_context
-def db(ctx: click.Context) -> None:
+def db() -> None:
     """Database management commands."""
-    if not (url := os.environ.get("CALISTA_DB_URL")):
-        raise click.ClickException(MISSING_DB_URL_MSG)
-
-    cfg = config.build_alembic_config(url, stdout=sys.stdout)
-
-    ctx.obj = {"url": url, "cfg": cfg}
 
 
 @db.command()
@@ -81,10 +83,12 @@ def db(ctx: click.Context) -> None:
     is_flag=True,
     help="Show alembic's more verbose output.",
 )
-@click.pass_context
-def current(ctx: click.Context, verbose: bool) -> None:
+def current(verbose: bool) -> None:
     """Show current DB revision."""
-    command.current(ctx.obj["cfg"], verbose=verbose)
+
+    url = _get_url()
+    cfg = config.build_alembic_config(url, stdout=sys.stdout)
+    command.current(cfg, verbose=verbose)
 
 
 @db.command()
@@ -95,10 +99,10 @@ def current(ctx: click.Context, verbose: bool) -> None:
     is_flag=True,
     help="Show alembic's more verbose output.",
 )
-@click.pass_context
-def heads(ctx: click.Context, verbose: bool) -> None:
+def heads(verbose: bool) -> None:
     """Show available head revisions."""
-    command.heads(ctx.obj["cfg"], verbose=verbose)
+    cfg = config.build_alembic_config(stdout=sys.stdout)
+    command.heads(cfg, verbose=verbose)
 
 
 @db.command()  # pyright: ignore[reportFunctionMemberAccess]
@@ -116,24 +120,30 @@ def heads(ctx: click.Context, verbose: bool) -> None:
     is_flag=True,
     help="Indicate the current revision.",
 )
-@click.pass_context
-def history(ctx: click.Context, verbose: bool, indicate_current: bool) -> None:
+def history(verbose: bool, indicate_current: bool) -> None:
     """Show revision history."""
-    command.history(ctx.obj["cfg"], verbose=verbose, indicate_current=indicate_current)
+    cfg = (
+        config.build_alembic_config(db_url=_get_url(), stdout=sys.stdout)
+        if indicate_current
+        else config.build_alembic_config(stdout=sys.stdout)
+    )
+
+    command.history(cfg, verbose=verbose, indicate_current=indicate_current)
 
 
 @db.command()  # pyright: ignore[reportFunctionMemberAccess]
 @click.option("--sql", is_flag=True, help="Generate SQL without executing.")
 @click.option("--force", is_flag=True, help="Upgrade without confirmation.")
-@click.pass_context
-def upgrade(ctx: click.Context, sql: bool, force: bool) -> None:
+def upgrade(sql: bool, force: bool) -> None:
     """Upgrade the database to the head revision."""
+    url = _get_url()
+    cfg = config.build_alembic_config(db_url=url, stdout=sys.stdout)
     if not force and not sql:
         warn("This will upgrade the database at:")
-        click.secho(f"  {click.style(sanitize_url(ctx.obj['url']), underline=True)}")
+        click.secho(f"  {click.style(sanitize_url(url), underline=True)}")
         click.confirm(
             click.style("  Are you sure you want to proceed?", fg="yellow"),
             abort=True,
         )
-    command.upgrade(ctx.obj["cfg"], revision="head", sql=sql)
+    command.upgrade(cfg, revision="head", sql=sql)
     success("Upgrade complete!")
