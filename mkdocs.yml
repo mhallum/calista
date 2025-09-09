@@ -58,6 +58,8 @@ markdown_extensions:
   - pymdownx.highlight
   - pymdownx.tasklist:
       custom_checkbox: true
+  - attr_list
+  - mkdocs-click
 
 extra:
   social:
@@ -70,7 +72,8 @@ nav:
       - Overview: user/index.md
       - Installation:
           - Database: user/install/database.md
-        # - Configuration: user/configuration.md
+      - CLI:
+          - Database CLI: user/cli/db.md
   - Developer Guide:
       - Overview: dev/index.md
       - Tooling: dev/tooling.md
