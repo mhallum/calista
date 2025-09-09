@@ -48,8 +48,11 @@ import sys
 import click
 import click_extra as clickx
 from alembic import command
+from sqlalchemy import text
+from sqlalchemy.exc import ArgumentError, OperationalError
 
 from calista import config
+from calista.infrastructure.db.engine import make_engine
 
 from .helpers import sanitize_url, success, warn
 
@@ -62,11 +65,33 @@ MISSING_DB_URL_MSG = (
 )
 
 
+def _check_connection(url: str) -> None:
+    engine = make_engine(url)
+    with engine.connect() as conn:
+        conn.execute(text("SELECT 1"))
+
+
+def _ensure_database_reachable(url: str) -> None:
+    """Ensure that the database is reachable."""
+    try:
+        _check_connection(url)
+    except ArgumentError as e:
+        raise click.ClickException(
+            "Sqlalchemy does not recognize the database URL. Please check the format."
+        ) from e
+    except OperationalError as e:
+        raise click.ClickException(
+            "Cannot connect to the database. "
+            "Please ensure the database is running and the URL is correct."
+        ) from e
+
+
 def _get_url() -> str:
     try:
         url = config.get_db_url()
     except config.DatabaseUrlNotSetError as e:
         raise click.ClickException(MISSING_DB_URL_MSG) from e
+    _ensure_database_reachable(url)
     return url
 
 
@@ -85,9 +110,8 @@ def db() -> None:
 )
 def current(verbose: bool) -> None:
     """Show current DB revision."""
-
     url = _get_url()
-    cfg = config.build_alembic_config(url, stdout=sys.stdout)
+    cfg = config.build_alembic_config(db_url=url, stdout=sys.stdout)
     command.current(cfg, verbose=verbose)
 
 
