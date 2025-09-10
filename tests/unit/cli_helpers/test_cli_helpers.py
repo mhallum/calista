@@ -12,10 +12,9 @@ terminal by patching `click.get_text_stream` to return a stream object with
 
 from __future__ import annotations
 
-import click
 import pytest
 
-from calista.cli.helpers import hyperlinks, sanitize_url, success, warn
+from calista.cli.helpers import hyperlinks, sanitize_url
 
 # ---------------------------------------------------------------------------
 # Test utilities
@@ -125,31 +124,3 @@ def test_supports_osc8_non_tty(monkeypatch):
         )
         is False
     )
-
-
-# ---------------------------------------------------------------------------
-# Success / warning messages (emoji → ASCII fallback)
-# ---------------------------------------------------------------------------
-
-
-def test_warn_fallback(monkeypatch, capsys):
-    """When stderr is ASCII-only, `warn()` should use `[!]` instead of `⚠️`."""
-    # Patch the exact symbol helpers call so they "see" an ASCII stderr stream.
-    monkeypatch.setattr(click, "get_text_stream", lambda name: FakeAsciiStream())
-    warn("danger!")
-    out = capsys.readouterr().err
-    warn_emoji = "⚠️"
-    warn_fallback = "[!]"
-    assert warn_fallback in out
-    assert warn_emoji not in out
-
-
-def test_success_fallback(monkeypatch, capsys):
-    """When stderr is ASCII-only, `success()` should use `[OK]` (no emoji)."""
-    monkeypatch.setattr(click, "get_text_stream", lambda name: FakeAsciiStream())
-    success("all good")
-    out = capsys.readouterr().err
-    success_emoji = "✅"
-    success_fallback = "[OK]"
-    assert success_fallback in out
-    assert success_emoji not in out

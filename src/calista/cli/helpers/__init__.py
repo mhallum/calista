@@ -7,6 +7,6 @@ stderr with emoji→ASCII fallbacks.
 
 from .db_url import sanitize_url
 from .hyperlinks import hyperlink
-from .messages import success, warn
+from .messages import error, success, warn
 
-__all__ = ["sanitize_url", "warn", "success", "hyperlink"]
+__all__ = ["sanitize_url", "warn", "success", "error", "hyperlink"]

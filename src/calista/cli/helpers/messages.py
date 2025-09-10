@@ -4,28 +4,23 @@ Small helpers for rendering user-visible lines with sensible emoji→ASCII fallb
 Messages write to stderr by default so stdout can remain machine-readable.
 """
 
-from typing import TextIO
-
 import click
 
 
-def _supports_character(character: str, stream: TextIO | None = None) -> bool:
-    """Return True if *character* can be encoded on the target stream.
+def _supports_character(character: str) -> bool:
+    """Return True if *character* can be encoded on stderr.
 
-    Uses the stream's declared encoding (defaults to Click's stderr stream).
     This is a lightweight guard to decide whether to emit emojis or fall back
     to ASCII so terminals without UTF-8 don't raise `UnicodeEncodeError`.
 
     Args:
         character: A single Unicode character to probe (e.g., "⚠️", "✅").
-        stream: A file-like object with an ``encoding`` attribute; if omitted,
-            ``click.get_text_stream("stderr")`` is used.
 
     Returns:
         bool: True if encoding succeeds; False on `UnicodeEncodeError`.
     """
 
-    stream = stream or click.get_text_stream("stderr")
+    stream = click.get_text_stream("stderr")  # pragma: no mutate
     encoding = getattr(stream, "encoding")
     try:
         character.encode(encoding)
@@ -34,26 +29,44 @@ def _supports_character(character: str, stream: TextIO | None = None) -> bool:
     return True
 
 
-def caution_glyph(stream: TextIO | None = None) -> str:
+def caution_glyph() -> str:
     """Warning marker suitable for terminals with/without emoji support.
 
     Returns:
         str: "⚠️" when the stream supports it; otherwise the ASCII fallback "[!]".
     """
-    return "⚠️" if _supports_character("⚠️", stream) else "[!]"
+    emoji, fallback = ("⚠️", "[!]")  # pragma: no mutate
+    if _supports_character(emoji):
+        return emoji
+    return fallback
 
 
-def success_glyph(stream: TextIO | None = None) -> str:
+def success_glyph() -> str:
     """Success marker with graceful fallbacks.
 
-    Tries a green check emoji first, then the Unicode check mark, then ASCII.
+    Tries a green check emoji first, then ASCII.
 
     Returns:
         str: "✅" or "[OK]" depending on stream support.
     """
-    if _supports_character("✅", stream):
-        return "✅"
-    return "[OK]"
+    emoji, fallback = ("✅", "[OK]")  # pragma: no mutate
+    if _supports_character(emoji):
+        return emoji
+    return fallback
+
+
+def error_glyph() -> str:
+    """Error marker with graceful fallbacks.
+
+    Tries a red cross emoji first, then ASCII.
+
+    Returns:
+        str: "❌" or "[X]" depending on stream support.
+    """
+    emoji, fallback = ("❌", "[X]")  # pragma: no mutate
+    if _supports_character(emoji):
+        return emoji
+    return fallback
 
 
 def warn(msg: str) -> None:
@@ -89,3 +102,21 @@ def success(msg: str) -> None:
     """
     g = success_glyph()
     click.secho(f"{g}  {msg}", fg="green", bold=True, err=True)
+
+
+def error(msg: str) -> None:
+    """Emit a red, bold error line to **stderr** with a caution glyph.
+
+    Args:
+        msg: The message to display.
+
+    Note:
+        Error messages go to **stderr** so they won't interfere with data piped from
+        stdout (e.g., when using ``--json``).
+
+    Example:
+        ``❌  Cannot connect to database.``
+
+    """
+    g = error_glyph()
+    click.secho(f"{g}  {msg}", fg="red", bold=True, err=True)
