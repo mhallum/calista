@@ -42,8 +42,8 @@ from sqlalchemy import text
 from sqlalchemy.engine import URL
 
 from calista import config
-from calista.infrastructure.db.engine import make_engine
-from calista.infrastructure.db.metadata import metadata
+from calista.adapters.db.engine import make_engine
+from calista.adapters.db.metadata import metadata
 
 try:
     from testcontainers.postgres import (

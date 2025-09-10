@@ -19,7 +19,7 @@ dependencies = [
 ]
 
 [project.scripts]
-calista = "calista.cli.main:calista"
+calista = "calista.entrypoints.cli.main:calista"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
@@ -71,7 +71,8 @@ markers = [
     "functional: mark test as functional",
     "unit: mark test as unit",
     "integration: mark test as integration",
-    "slow: mark test as slow"
+    "slow: mark test as slow",
+    "property: mark tests as property"
 ]
 filterwarnings = [
     "ignore:'MultiCommand' is deprecated:DeprecationWarning:cloup"
@@ -81,9 +82,9 @@ filterwarnings = [
 branch = true
 source = ["calista"]
 omit = [
-  "src/calista/infrastructure/db/alembic/versions/*",
-  "src/calista/infrastructure/db/alembic/env.py",
-  "src/calista/cli/docs_cmds.py"
+  "src/calista/adapters/db/alembic/versions/*",
+  "src/calista/adapters/db/alembic/env.py",
+  "src/calista/entrypoints/cli/docs_cmds.py"
 ]
 
 [tool.mypy]

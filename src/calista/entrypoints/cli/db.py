@@ -39,7 +39,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import ArgumentError, OperationalError
 
 from calista import config
-from calista.infrastructure.db.engine import make_engine
+from calista.adapters.db.engine import make_engine
 
 from .helpers import error, sanitize_url, success, warn
 

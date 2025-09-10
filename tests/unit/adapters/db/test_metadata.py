@@ -26,7 +26,7 @@ from sqlalchemy import (
     inspect,
 )
 
-from calista.infrastructure.db.metadata import metadata
+from calista.adapters.db.metadata import metadata
 
 if TYPE_CHECKING:
     from sqlalchemy.engine import Engine

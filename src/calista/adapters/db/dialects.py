@@ -24,7 +24,7 @@ class DialectName(str, Enum):
     Example:
         ```
         >>> from sqlalchemy import create_engine
-        >>> from calista.infrastructure.db.dialects import DialectName
+        >>> from calista.adapters.db.dialects import DialectName
         >>> engine = create_engine("postgresql+psycopg://user:pass@host/db")
         >>> DialectName(engine.dialect.name) is DialectName.POSTGRES
         True

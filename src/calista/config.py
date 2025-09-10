@@ -59,6 +59,6 @@ def build_alembic_config(
         cfg.set_main_option(ALEMBIC_URL_KEY, db_url)
     cfg.set_main_option(
         ALEMBIC_SCRIPT_LOCATION_KEY,
-        str(files("calista.infrastructure.db.alembic")),
+        str(files("calista.adapters.db.alembic")),
     )
     return cfg

@@ -18,12 +18,12 @@ import uuid
 from collections.abc import Callable
 from typing import Any
 
+from alembic import command
 from sqlalchemy import create_engine, insert, text
 from testcontainers.postgres import (  # pyright: ignore[reportMissingTypeStubs]
     PostgresContainer,
 )
 
-from alembic import command
 from calista import config
 from calista.adapters.eventstore.schema import event_store
 

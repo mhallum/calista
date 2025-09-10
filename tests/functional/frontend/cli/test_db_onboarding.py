@@ -31,14 +31,14 @@ import re
 import pytest
 from click.testing import CliRunner
 
-from calista.cli.db import (
+from calista.entrypoints.cli.db import (
     CANNOT_CONNECT_MSG,
     INVALID_URL_FORMAT_MSG,
     MISSING_DB_URL_MSG,
     UPGRADE_SCHEMA_INSTRUCTIONS,
     UPGRADE_SCHEMA_WARNING,
 )
-from calista.cli.main import calista as calista_cli
+from calista.entrypoints.cli.main import calista as calista_cli
 
 BASE_REVISION = "be411457bc58"
 REV_RE = re.compile(r"\b[0-9a-f]{12,}\b")  # Alembic rev ids are 12+ hex chars

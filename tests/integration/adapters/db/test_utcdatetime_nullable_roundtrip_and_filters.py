@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING
 import pytest
 import sqlalchemy as sa
 
-from calista.infrastructure.db.sa_types import UTCDateTime
+from calista.adapters.db.sa_types import UTCDateTime
 
 if TYPE_CHECKING:
     from sqlalchemy.engine import Engine

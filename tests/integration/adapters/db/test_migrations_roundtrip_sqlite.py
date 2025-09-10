@@ -13,9 +13,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from alembic import command
 from sqlalchemy import create_engine, text
 
-from alembic import command
 from calista import config
 
 # mypy: disable-error-code=no-untyped-def

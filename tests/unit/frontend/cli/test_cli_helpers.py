@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import pytest
 
-from calista.cli.helpers import hyperlinks, sanitize_url
+from calista.entrypoints.cli.helpers import hyperlinks, sanitize_url
 
 # ---------------------------------------------------------------------------
 # Test utilities

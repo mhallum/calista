@@ -20,8 +20,8 @@ import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import dialect as PostgresDialect
 from sqlalchemy.dialects.sqlite import dialect as SQLiteDialect
 
-from calista.infrastructure.db.dialects import DialectName
-from calista.infrastructure.db.sa_types import UTCDateTime
+from calista.adapters.db.dialects import DialectName
+from calista.adapters.db.sa_types import UTCDateTime
 
 if TYPE_CHECKING:
     from sqlalchemy.engine.interfaces import Dialect

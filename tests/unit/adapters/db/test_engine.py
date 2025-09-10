@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy.engine import make_url
 
-from calista.infrastructure.db.engine import is_sqlite
+from calista.adapters.db.engine import is_sqlite
 
 if TYPE_CHECKING:
     from sqlalchemy.engine import Engine

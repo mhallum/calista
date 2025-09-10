@@ -16,7 +16,7 @@ import sys
 import click
 import pytest
 
-from calista.cli.helpers.messages import (
+from calista.entrypoints.cli.helpers.messages import (
     _supports_character,
     caution_glyph,
     error,

@@ -9,7 +9,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-import calista  # ensures dotted names like calista.infrastructure... resolve
+import calista  # ensures dotted names like calista.adapters... resolve
 ${imports if imports else ""}
 
 # revision identifiers, used by Alembic.

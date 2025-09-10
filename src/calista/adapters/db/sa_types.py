@@ -13,7 +13,7 @@ from sqlalchemy import JSON, BigInteger, Integer
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.types import DateTime, TypeDecorator
 
-from calista.infrastructure.db.dialects import DialectName
+from calista.adapters.db.dialects import DialectName
 
 if TYPE_CHECKING:
     from sqlalchemy.engine.interfaces import Dialect

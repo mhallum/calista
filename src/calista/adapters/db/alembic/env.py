@@ -15,7 +15,7 @@ from sqlalchemy import engine_from_config, pool
 
 # Ensure models/metadata are imported so autogenerate sees them
 import calista.adapters.eventstore.schema  # noqa: F401 # pylint: disable=unused-import
-from calista.infrastructure.db.metadata import metadata
+from calista.adapters.db.metadata import metadata
 
 # disable warning to deal with alembic context
 # pylint: disable=no-member

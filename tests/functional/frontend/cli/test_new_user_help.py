@@ -24,7 +24,7 @@ import pytest
 from click.testing import CliRunner
 
 import calista
-import calista.cli.main as main  # pylint: disable=consider-using-from-import # need it like this for patching
+import calista.entrypoints.cli.main as main  # pylint: disable=consider-using-from-import # need it like this for patching
 
 if TYPE_CHECKING:
     from click.testing import Result
@@ -137,7 +137,8 @@ class TestNewCalistaUser:
         # and runs `calista --help` again.
         ## (We simulate this by monkeypatching the `supports_osc8` function.)
         monkeypatch.setattr(
-            "calista.cli.helpers.hyperlinks.supports_osc8", lambda stream=None: True
+            "calista.entrypoints.cli.helpers.hyperlinks.supports_osc8",
+            lambda stream=None: True,
         )
 
         importlib.reload(main)
