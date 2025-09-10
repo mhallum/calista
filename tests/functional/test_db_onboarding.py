@@ -1,22 +1,29 @@
-"""Functional tests for ``calista db`` commands.
+"""Functional tests for the ``calista db`` subcommands.
 
-This module exercises the end-to-end behavior of Calista's database CLI:
-``current``, ``heads``, ``history``, and ``upgrade``. It verifies both
-the failure mode when ``CALISTA_DB_URL`` is missing and the happy path
-against a scratch Postgres instance (via the ``pg_url_base`` fixture).
+Scope
+-----
+End-to-end verification of CALISTA's database CLI via ``click.testing.CliRunner``.
+Commands covered: ``current``, ``heads``, ``history``, ``status``, and ``upgrade``.
 
-Key assertions:
-  * When ``CALISTA_DB_URL`` is unset or empty, commands fail with exit code 1
-    and emit :data:`calista.cli.db.MISSING_DB_URL_MSG`.
-  * ``db heads`` includes the base Alembic revision for this project.
-  * ``db current`` is empty prior to upgrade, verbose output shows extra context.
-  * ``db history`` lists the lineage; ``-i`` annotates the current revision.
-  * ``db upgrade`` prompts for confirmation, supports ``--sql`` dry-run, and
-    applies migrations when confirmed.
+What these tests assert
+-----------------------
+* When ``CALISTA_DB_URL`` is unset/empty, commands that require a connection fail
+  with exit code ``1`` and emit :data:`calista.cli.db.MISSING_DB_URL_MSG`.
+* ``db heads`` includes the project's base Alembic revision.
+* ``db current`` is empty before any upgrade; ``-v`` adds contextual details.
+* ``db history`` lists the lineage; ``-i`` annotates the active ``(current)`` rev.
+* ``db upgrade``:
+  - prompts with a safety warning (backup guidance),
+  - supports ``--sql`` dry-run output,
+  - applies migrations when the user confirms.
+* ``db status`` reports connectivity, backend, URL (masked), and schema state.
 
-These are functional tests (not unit tests): the CLI is invoked through
-``click.testing.CliRunner`` so output, prompts, and exit codes are exercised
-as a user would experience them.
+Notes
+-----
+These are functional (black-box) tests, not unit tests. They execute the CLI as a
+user would, exercising prompts, output, and exit codes. Tests that talk to a
+database are marked ``@pytest.mark.slow`` and rely on the ``pg_url_base`` fixture
+to provide a scratch PostgreSQL instance.
 """
 
 import re
@@ -63,17 +70,6 @@ def test_db_no_url(cmd):
 @pytest.mark.slow
 def test_new_user_initial_db_setup(pg_url_base: str):
     """Simulate a new user setting up CALISTA's database step by step.
-
-    This test traces the path a first-time user might follow:
-
-      1. Invoke a db command without ``CALISTA_DB_URL`` → expect a clear error.
-      2. Set the environment variable → ``db heads`` shows the base revision.
-      3. Check ``db current`` → empty at first; verbose mode adds details.
-      4. Explore ``db history`` → shows lineage; ``-i`` highlights current rev.
-      5. Run ``db upgrade``:
-         * first without confirming (prompt declines → DB unchanged),
-         * with ``--sql`` to preview statements,
-         * finally confirming → migrations applied and ``current`` shows a rev.
 
     The intent is to cover the *typical onboarding flow*: encountering and
     resolving initial errors, verifying state at each step, and successfully
@@ -171,6 +167,13 @@ def test_new_user_initial_db_setup(pg_url_base: str):
 
 @pytest.mark.slow
 def test_new_user_initial_db_setup2(pg_url_base: str):
+    """Simulate another new user setting up CALISTA's database step by step.
+
+    The intent is to cover a less alembic heavy *typical onboarding flow*: confirming connectivity with
+    ``calista db status``, addressing a couple of URL/connection issues, applying
+    ``calista db upgrade``, and verifying the schema is up to date.
+    """
+
     # Another user is now going through the same process.
     # This user has also set up a postgres database, and has
     # set the CALISTA_DB_URL environment variable.

@@ -1,44 +1,26 @@
-"""Calista DB CLI — forward-only Alembic wrappers.
+"""CALISTA DB CLI — forward-only Alembic wrappers.
 
-This module provides the `calista db` command group with a minimal, *forward-only*
-interface over Alembic. It intentionally **does not** expose destructive operations
-like `downgrade` or `stamp`, matching the event store's append-only posture.
+Provides a minimal, forward-only interface over Alembic aligned with CALISTA's
+append-only posture. Destructive operations (e.g., ``downgrade``, ``stamp``)
+are intentionally omitted.
 
-Commands
-- `current`  : Show the current DB revision.
-- `heads`    : Show available head revisions.
-- `history`  : Show migration history (supports `-v` and `-i`).
-- `upgrade`  : Apply migrations up to a target revision (default: `head`).
-               Prompts for confirmation unless `--force` is provided.
-               Supports `--sql` to generate SQL without executing.
+Behavior
+- Uses programmatic Alembic configuration; human-oriented notices go to **stderr**,
+  Alembic output to **stdout** to keep machine-readable flows intact.
+- Schema-changing actions prompt for confirmation unless explicitly bypassed.
 
 Requirements
-- Environment variable **`CALISTA_DB_URL`** must be set (no resolver here).
-  Example (bash):
-      export CALISTA_DB_URL='postgresql+psycopg://USER:PASS@localhost:5432/calista'
-  Example (PowerShell):
-      $env:CALISTA_DB_URL='postgresql+psycopg://USER:PASS@localhost:5432/calista'
-- Alembic configuration file **`alembic.ini`** is discovered by walking upward
-  from this module's path; it should set:
-      [alembic]
-      script_location = src/calista/infrastructure/db/alembic
+- ``CALISTA_DB_URL`` must be set (no resolver here).
+- Alembic config is discovered via ``config.build_alembic_config``; its
+  ``[alembic] script_location`` should point to
+  ``src/calista/infrastructure/db/alembic``.
 
+Failure modes
+- Missing/invalid ``CALISTA_DB_URL`` or unreachable DB → ``ClickException`` with guidance.
+- Missing Alembic config → ``ClickException`` describing how to supply config.
 
-Examples
-    $ calista db current
-    $ calista db heads -v
-    $ calista db history -vi
-    $ calista db upgrade                     # upgrade to head, with confirmation
-    $ calista db upgrade head --sql          # dry-run SQL
-    $ calista db upgrade --force             # upgrade without confirmation
-
-Failure Modes
-- Missing `CALISTA_DB_URL` → ClickException with a setup hint.
-- Missing `alembic.ini` → ClickException instructing to keep a root ini or
-  configure programmatically.
-
-Future Work (separate PRs)
-- `calista db status` and `calista db doctor` for connectivity & invariant checks.
+Notes
+- A future “doctor” command may add deeper health/invariant checks (separate PR).
 """
 
 from __future__ import annotations
@@ -59,7 +41,7 @@ from sqlalchemy.exc import ArgumentError, OperationalError
 from calista import config
 from calista.infrastructure.db.engine import make_engine
 
-from .helpers import sanitize_url, success, warn
+from .helpers import error, sanitize_url, success, warn
 
 if TYPE_CHECKING:
     from sqlalchemy.engine import Engine
@@ -216,7 +198,7 @@ def status() -> None:
     try:
         engine = make_engine(_get_url())
     except Exception as e:  # pylint: disable=broad-except
-        click.secho("❌ Cannot connect to database", fg="red")
+        error("Cannot connect to database")
         click.echo(str(e))
     else:
         success("Database reachable")
