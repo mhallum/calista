@@ -26,7 +26,7 @@ def _supports_character(character: str, stream: TextIO | None = None) -> bool:
     """
 
     stream = stream or click.get_text_stream("stderr")
-    encoding = getattr(stream, "encoding", None) or "utf-8"
+    encoding = getattr(stream, "encoding")
     try:
         character.encode(encoding)
     except UnicodeEncodeError:
