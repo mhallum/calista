@@ -16,16 +16,43 @@ CALISTA uses **PostgreSQL** by default.
     export CALISTA_DB_URL=postgresql+psycopg://calista@localhost:5432/calista
     ```
 
-2. Initialize the schema:
+2. Check database status:
+
+    Before applying migrations, verify CALISTA can reach your database:
+
+    ```bash
+    calista db status
+    ```
+
+    **Typical output**
+
+    _Uninitialized (fresh database):_
+
+    ```bash
+    ✅  Database reachable
+    Backend : postgresql
+    URL     : postgresql+psycopg://USER:***@localhost:5432/calista
+    Schema  : uninitialized
+    ```
+
+    If you see " Cannot connect to database", double-check `CALISTA_DB_URL` and that your DB is running.
+
+3. Initialize the schema:
 
     ```bash
     calista db upgrade
     ```
 
-3. (Optional) Verify the current revision:
+4. (Optional) Verify the current revision:
 
     ```bash
     calista db current
+    ```
+
+    or
+
+    ```bash
+    calista db status
     ```
 
 ## If you don’t already have a PostgreSQL database
@@ -79,26 +106,3 @@ calista db upgrade
 SQLite is supported for quick local runs and CI, but it lacks some PostgreSQL features (e.g., JSONB indexes, certain CHECK constraints).
 
 For more advanced database commands, see the [CLI reference](../cli/db.md).
-
----
-
-## CLI Reference — `calista db`
-
-The `calista db` command is a thin wrapper around Alembic migrations.
-It provides convenient subcommands for initializing and inspecting the CALISTA schema.
-
-Typical first-run usage:
-
-```bash
-calista db upgrade
-```
-
-This upgrades your database to the latest schema revision.
-
-Advanced users may also use:
-
-- `current` — show the current revision
-- `heads` — list head revisions
-- `history` — show migration history
-
-## Command reference
