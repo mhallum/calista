@@ -42,8 +42,8 @@ from sqlalchemy import (
     text,
 )
 
-from calista.infrastructure.db.metadata import metadata
-from calista.infrastructure.db.sa_types import BIGINT_PK, PORTABLE_JSON, UTCDateTime
+from calista.adapters.db.metadata import metadata
+from calista.adapters.db.sa_types import BIGINT_PK, PORTABLE_JSON, UTCDateTime
 
 __all__ = ["event_store"]
 

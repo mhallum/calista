@@ -2,24 +2,22 @@
 name = "calista"
 version = "0.1.0"
 description = "CALISTA: A Traceable Pipeline for CCD Photometry and Spectroscopy"
-authors = [
-    {name = "mhallum",email = "mkhallum92@gmail.com"}
-]
-license = {text = "MIT"}
+authors = [{ name = "mhallum", email = "mkhallum92@gmail.com" }]
+license = { text = "MIT" }
 readme = "README.md"
 packages = [{ include = "calista", from = "src" }]
 requires-python = ">=3.13,<4.0.0"
 dependencies = [
-    "click (>=8.2.1,<9.0.0)",
-    "rich (>=14.1.0,<15.0.0)",
-    "sqlalchemy (>=2.0.42,<3.0.0)",
-    "click-extra (==5.0.2)",
-    "psycopg[binary] (>=3.2.9,<4.0.0)",
-    "alembic (>=1.16.5,<2.0.0)",
+  "click (>=8.2.1,<9.0.0)",
+  "rich (>=14.1.0,<15.0.0)",
+  "sqlalchemy (>=2.0.42,<3.0.0)",
+  "click-extra (==5.0.2)",
+  "psycopg[binary] (>=3.2.9,<4.0.0)",
+  "alembic (>=1.16.5,<2.0.0)",
 ]
 
 [project.scripts]
-calista = "calista.cli.main:calista"
+calista = "calista.entrypoints.cli.main:calista"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
@@ -47,13 +45,13 @@ types-pyyaml = "^6.0.12.20250822"
 types-boltons = "^25.0.0.20250822"
 types-tabulate = "^0.9.0.20241207"
 types-xmltodict = "^0.15.0.20250907"
-
+import-linter = "^2.4"
 
 
 [tool.poetry.group.docs.dependencies]
 mkdocs = "^1.6.1"
 mkdocs-material = "^9.6.17"
-mkdocstrings = {extras = ["python"], version = "^0.30.0"}
+mkdocstrings = { extras = ["python"], version = "^0.30.0" }
 pymdown-extensions = "^10.16.1"
 mkdocs-mermaid2-plugin = "^1.2.2"
 griffe-inherited-docstrings = "^1.1.1"
@@ -62,43 +60,57 @@ mkdocs-gen-files = "^0.5.0"
 mkdocs-exclude = "^1.0.2"
 mkdocs-click = "^0.9.0"
 
+
+# ============================================================================
+#   Pytest/Coverage Config
+# ============================================================================
+
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
 markers = [
-    "functional: mark test as functional",
-    "unit: mark test as unit",
-    "integration: mark test as integration",
-    "slow: mark test as slow"
+  "unit: Unit tests (fast, isolated, no real I/O)",
+  "integration: Integration tests (real external systems)",
+  "functional: Functional tests at the boundary (CLI/API flows)",
+  "contract: Contract/invariant tests across implementations",
+  "property: Property-based tests",
+  "slow: Slow tests",
 ]
 filterwarnings = [
-    "ignore:'MultiCommand' is deprecated:DeprecationWarning:cloup"
+  "ignore:'MultiCommand' is deprecated:DeprecationWarning:cloup",
 ]
 
 [tool.coverage.run]
 branch = true
 source = ["calista"]
 omit = [
-  "src/calista/infrastructure/db/alembic/versions/*",
-  "src/calista/infrastructure/db/alembic/env.py",
-  "src/calista/cli/docs_cmds.py"
+  "src/calista/adapters/db/alembic/versions/*",
+  "src/calista/adapters/db/alembic/env.py",
+  "src/calista/entrypoints/cli/docs_cmds.py",
 ]
+
+
+# ============================================================================
+#   mypy Config
+# ============================================================================
+
 
 [tool.mypy]
 python_version = "3.13"
-mypy_path = ["src"] # src/ layout
+mypy_path = ["src"]                      # src/ layout
 files = ["src", "tests"]
-exclude=["^docs/"]
-plugins = ["sqlalchemy.ext.mypy.plugin"]  # improves SA typing
+exclude = ["^docs/"]
+plugins = ["sqlalchemy.ext.mypy.plugin"] # improves SA typing
 warn_unused_ignores = true
 # Be strict where it matters
 check_untyped_defs = true
 disallow_incomplete_defs = true
 no_implicit_optional = true
 
-[mypy-docker]
+[tool.mypy-docker]
 ignore_missing_imports = true
 
 
@@ -114,7 +126,7 @@ module = [
   "docker",
   "click",
   "click.*",
-  "click_extra"
+  "click_extra",
 ]
 ignore_missing_imports = true
 
@@ -122,14 +134,64 @@ ignore_missing_imports = true
 module = ["tests.*"]
 disable_error_code = ["no-untyped-def"]
 
+# ============================================================================
+#   Ruff Config
+# ============================================================================
+
 
 [tool.ruff]
-target-version="py313"
-exclude=["docs"]
+target-version = "py313"
+exclude = ["docs"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["calista"]
 
+# ============================================================================
+#   Mutmut Config
+# ============================================================================
+
+
 [tool.mutmut]
-paths_to_mutate = [ "src/" ]
-tests_dir = [ "tests/" ]
+paths_to_mutate = ["src/"]
+tests_dir = ["tests/"]
+
+# ============================================================================
+#   import-linter Config
+# ============================================================================
+
+[tool.importlinter]
+root_package = "calista"
+# Optional:
+# include_external_packages = true
+exclude_type_checking_imports = true
+
+[[tool.importlinter.contracts]]
+id = "domain_pure"
+name = "Domain must not depend on outer layers"
+type = "forbidden"
+source_modules = ["calista.domain"]
+forbidden_modules = ["calista.adapters", "calista.entrypoints"]
+
+[[tool.importlinter.contracts]]
+id = "service_no_entrypoints"
+name = "Service layer must not depend on entrypoints"
+type = "forbidden"
+source_modules = ["calista.service_layer"]
+forbidden_modules = ["calista.entrypoints"]
+
+[[tool.importlinter.contracts]]
+id = "adapters_no_app_layers"
+name = "Adapters must not depend on service layer or entrypoints"
+type = "forbidden"
+source_modules = ["calista.adapters"]
+forbidden_modules = ["calista.service_layer", "calista.entrypoints"]
+
+[[tool.importlinter.contracts]]
+id = "entrypoints_no_adapters"
+name = "Entrypoints must not import adapters directly"
+type = "forbidden"
+source_modules = ["calista.entrypoints"]
+forbidden_modules = ["calista.adapters"]
+ignore_imports = [
+  "calista.entrypoints.cli.db -> calista.adapters.db.engine",
+] # temporary until next PR
