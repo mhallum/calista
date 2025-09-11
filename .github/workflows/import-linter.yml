@@ -1,0 +1,29 @@
+name: import-linter
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+jobs:
+  import-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+
+      - name: Install import-linter and project
+        run: |
+          python -m pip install --upgrade pip
+          pip install import-linter
+          pip install -e .
+
+      - name: Enforce architectural import rules
+        run: lint-imports
