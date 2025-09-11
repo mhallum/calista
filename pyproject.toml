@@ -72,11 +72,12 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
 markers = [
-  "functional: mark test as functional",
-  "unit: mark test as unit",
-  "integration: mark test as integration",
-  "slow: mark test as slow",
-  "property: mark tests as property",
+  "unit: Unit tests (fast, isolated, no real I/O)",
+  "integration: Integration tests (real external systems)",
+  "functional: Functional tests at the boundary (CLI/API flows)",
+  "contract: Contract/invariant tests across implementations",
+  "property: Property-based tests",
+  "slow: Slow tests",
 ]
 filterwarnings = [
   "ignore:'MultiCommand' is deprecated:DeprecationWarning:cloup",

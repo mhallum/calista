@@ -1,4 +1,4 @@
-"""Unit tests for calista.infrastructure.db.sa_types.UTCDateTime.
+"""Unit tests for calista.adapters.db.sa_types.UTCDateTime.
 
 These tests exercise the type decorator directly, without creating tables
 or running against a real database engine. They verify:

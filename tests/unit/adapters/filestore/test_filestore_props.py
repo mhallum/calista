@@ -29,7 +29,7 @@ from hypothesis import strategies as st
 from calista.adapters.filestore.interface import AbstractFileStore, IntegrityError
 from calista.adapters.filestore.memory import MemoryFileStore
 
-pytestmark = [pytest.mark.unit, pytest.mark.property]
+pytestmark = [pytest.mark.property]
 
 ## Adjust pylint to deal with fixtures
 # pylint: disable=redefined-outer-name
