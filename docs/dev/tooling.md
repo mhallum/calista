@@ -12,6 +12,7 @@ Tool configuration is centralized in `pyproject.toml` whenever possible, so sett
     - `pytest`
     - `pyright` (used by Pylance)
     - `mutmut` (mutation testing)
+    - `import-linter`
 
 - **Separate files**
     - `.pylintrc` → Pylint rules
@@ -43,5 +44,5 @@ Editor-only preferences (e.g. VS Code’s `settings.json`) are kept local and no
 
 ## CI Alignment
 
-- CI runs the same tooling (ruff, mypy, pytest, mutmut) using `pyproject.toml`.
+- CI runs the same tooling (ruff, mypy, pytest, import-linter) using `pyproject.toml`.
 - Python version matrix matches the version declared locally.
