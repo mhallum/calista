@@ -103,3 +103,4 @@ nav:
           - "ADR 0016: Adopt Mutmut for Mutation Testing (supersedes Cosmic Ray)": dev/adr/0016-adopt-mutmut-for-mutation-testing.md
           - "ADR 0017: Remove Mutation Testing from CI (Mutmut remains optional)": dev/adr/0017-remove-mutation-testing-from-ci.md
           - "ADR 0018: Adopt Ports & Adapters (Hexagonal) Package Structure": dev/adr/0018-adopt-hexagonal-package-structure.md
+          - "ADR 0019: Introduce interfaces and bootstrap Layers": dev/adr/0019-introduce-interfaces-and-bootstrap-layers.md
