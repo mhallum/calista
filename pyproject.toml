@@ -161,37 +161,78 @@ tests_dir = ["tests/"]
 
 [tool.importlinter]
 root_package = "calista"
-# Optional:
-# include_external_packages = true
 exclude_type_checking_imports = true
 
 [[tool.importlinter.contracts]]
-id = "domain_pure"
-name = "Domain must not depend on outer layers"
-type = "forbidden"
-source_modules = ["calista.domain"]
-forbidden_modules = ["calista.adapters", "calista.entrypoints"]
+name = "Layered architecture"
+type = "layers"
+layers = [
+  "calista.entrypoints",
+  "calista.bootstrap",
+  "calista.adapters",
+  "calista.service_layer",
+  "calista.interfaces",
+  "calista.domain",
+]
 
+# 1) One-way layers (outer -> inner)
 [[tool.importlinter.contracts]]
-id = "service_no_entrypoints"
-name = "Service layer must not depend on entrypoints"
-type = "forbidden"
-source_modules = ["calista.service_layer"]
-forbidden_modules = ["calista.entrypoints"]
+id = "layers"
+name = "Layered architecture (outer to inner)"
+type = "layers"
+layers = [
+  "calista.entrypoints",
+  "calista.bootstrap",
+  "calista.adapters",
+  "calista.service_layer",
+  "calista.interfaces",
+  "calista.domain",
+]
 
+# 2) Entrypoints only talk to bootstrap (not adapters/service_layer/interfaces/domain)
 [[tool.importlinter.contracts]]
-id = "adapters_no_app_layers"
-name = "Adapters must not depend on service layer or entrypoints"
-type = "forbidden"
-source_modules = ["calista.adapters"]
-forbidden_modules = ["calista.service_layer", "calista.entrypoints"]
-
-[[tool.importlinter.contracts]]
-id = "entrypoints_no_adapters"
-name = "Entrypoints must not import adapters directly"
+id = "entrypoints_no_internals"
+name = "Entrypoints must not depend on application or inner layers"
 type = "forbidden"
 source_modules = ["calista.entrypoints"]
-forbidden_modules = ["calista.adapters"]
-ignore_imports = [
-  "calista.entrypoints.cli.db -> calista.adapters.db.engine",
-] # temporary until next PR
+forbidden_modules = [
+  "calista.adapters",
+  "calista.service_layer",
+  "calista.interfaces",
+  "calista.domain",
+]
+
+# 3) Adapters must not depend on service layer
+[[tool.importlinter.contracts]]
+id = "adapters_no_service_layer"
+name = "Adapters must not depend on service layer"
+type = "forbidden"
+source_modules = ["calista.adapters"]
+forbidden_modules = ["calista.service_layer"]
+
+# 4) Interfaces is a neutral boundary (no deps on app packages or domain)
+[[tool.importlinter.contracts]]
+id = "interfaces_independent"
+name = "Interfaces must not depend on application packages or domain"
+type = "forbidden"
+source_modules = ["calista.interfaces"]
+forbidden_modules = [
+  "calista.entrypoints",
+  "calista.bootstrap",
+  "calista.adapters",
+  "calista.service_layer",
+  "calista.domain",
+]
+
+[[tool.importlinter.contracts]]
+id = "only_bootstrap_reads_config"
+name = "Only bootstrap may import calista.config"
+type = "forbidden"
+source_modules = [
+  "calista.adapters",
+  "calista.service_layer",
+  "calista.interfaces",
+  "calista.domain",
+  "calista.entrypoints",
+]
+forbidden_modules = ["calista.config"]
