@@ -45,6 +45,13 @@ EPILOG = "\b\n" + "\n".join(
 @clickx.extra_group(
     version=__version__,
     help=HELP,
+    params=[
+        clickx.VerbosityOption(),
+        clickx.VerboseOption(),
+        clickx.ColorOption(),
+        clickx.TimerOption(),
+        clickx.ExtraVersionOption(),
+    ],
     epilog=EPILOG,
 )
 def calista():
