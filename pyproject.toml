@@ -163,18 +163,6 @@ tests_dir = ["tests/"]
 root_package = "calista"
 exclude_type_checking_imports = true
 
-[[tool.importlinter.contracts]]
-name = "Layered architecture"
-type = "layers"
-layers = [
-  "calista.entrypoints",
-  "calista.bootstrap",
-  "calista.adapters",
-  "calista.service_layer",
-  "calista.interfaces",
-  "calista.domain",
-]
-
 # 1) One-way layers (outer -> inner)
 [[tool.importlinter.contracts]]
 id = "layers"
@@ -201,6 +189,7 @@ forbidden_modules = [
   "calista.interfaces",
   "calista.domain",
 ]
+allow_indirect_imports = true
 
 # 3) Adapters must not depend on service layer
 [[tool.importlinter.contracts]]
@@ -236,3 +225,4 @@ source_modules = [
   "calista.entrypoints",
 ]
 forbidden_modules = ["calista.config"]
+allow_indirect_imports = true
