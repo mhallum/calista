@@ -124,6 +124,23 @@ class EventEnvelope:
                 "stream_id, stream_type, and event_type must be non-empty."
             )
 
+    def as_insertable_row(self) -> dict[str, Any]:
+        """Return a dict suitable for insertion into the event_store table.
+
+        Excludes `global_seq` (assigned by DB) and `recorded_at` (assigned by DB).
+        """
+        return {
+            "stream_id": self.stream_id,
+            "stream_type": self.stream_type,
+            "version": self.version,
+            "event_id": self.event_id,
+            "event_type": self.event_type,
+            "payload": self.payload,
+            "metadata": self.metadata,
+            # 'recorded_at': self.recorded_at,  # Exclude; assigned by DB
+            # 'global_seq': self.global_seq,  # Exclude; assigned by DB
+        }
+
 
 @dataclass(frozen=True, slots=True)
 class EventEnvelopeBatch:
