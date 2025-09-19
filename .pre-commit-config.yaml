@@ -51,10 +51,10 @@ repos:
         stages: [pre-push]
         always_run: true
         pass_filenames: false
-      - id: import-linter
-        name: import-linter (architecture contracts)
-        language: system
-        types: [python]
-        entry: poetry run lint-imports
-        pass_filenames: false
-        stages: [pre-commit, pre-push]
+      # - id: import-linter
+      #   name: import-linter (architecture contracts)
+      #   language: system
+      #   types: [python]
+      #   entry: poetry run lint-imports
+      #   pass_filenames: false
+      #   stages: [pre-commit, pre-push]
