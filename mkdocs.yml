@@ -108,3 +108,4 @@ nav:
           - "ADR 0020: EventStore.append Return Semantics": dev/adr/0020-eventstore-append-return-semantics.md
           - "ADR 0021: Event Store Error Semantics & Read Behavior": dev/adr/0021-eventstore-errors-and-read-behavior.md
           - "ADR 0022: Logging & Flight Recorder": dev/adr/0022-logging-and-flight-recorder.md
+          - "ADR 0023: Introduce `calista.utils` for cross-cutting, dependency-light helpers": dev/adr/0023-introduce-utils-subpackage-for-cross-cutting-helpers.md
