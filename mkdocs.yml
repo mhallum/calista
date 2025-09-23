@@ -107,3 +107,4 @@ nav:
           - "ADR 0019: Introduce interfaces and bootstrap Layers": dev/adr/0019-introduce-interfaces-and-bootstrap-layers.md
           - "ADR 0020: EventStore.append Return Semantics": dev/adr/0020-eventstore-append-return-semantics.md
           - "ADR 0021: Event Store Error Semantics & Read Behavior": dev/adr/0021-eventstore-errors-and-read-behavior.md
+          - "ADR 0022: Logging & Flight Recorder": dev/adr/0022-logging-and-flight-recorder.md
