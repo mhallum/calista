@@ -175,7 +175,9 @@ layers = [
   "calista.service_layer",
   "calista.interfaces",
   "calista.domain",
+  "calista.utils",
 ]
+allow_indirect_imports = true
 
 # 2) Entrypoints only talk to bootstrap (not adapters/service_layer/interfaces/domain)
 [[tool.importlinter.contracts]]
@@ -188,6 +190,7 @@ forbidden_modules = [
   "calista.service_layer",
   "calista.interfaces",
   "calista.domain",
+  "calista.utils",
 ]
 allow_indirect_imports = true
 
