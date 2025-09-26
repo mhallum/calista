@@ -83,6 +83,10 @@ def pytest_collection_modifyitems(items):
     for item in items:
         if "postgres_engine" in getattr(item, "fixturenames", ()):
             item.add_marker(skip)
+        elif "pg_url" in getattr(item, "fixturenames", ()):
+            item.add_marker(skip)
+        elif "pg_url_base" in getattr(item, "fixturenames", ()):
+            item.add_marker(skip)
         elif "testcontainers" in item.nodeid or "postgres" in item.nodeid:
             item.add_marker(skip)
 

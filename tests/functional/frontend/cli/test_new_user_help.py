@@ -19,6 +19,7 @@ import importlib
 import re
 from textwrap import dedent
 from typing import TYPE_CHECKING
+from unittest.mock import patch
 
 import pytest
 from click.testing import CliRunner
@@ -28,7 +29,6 @@ import calista.entrypoints.cli.main as main  # pylint: disable=consider-using-fr
 
 if TYPE_CHECKING:
     from click.testing import Result
-    from pytest import MonkeyPatch
 
 ANSI_RE = re.compile(r"\x1b\[[0-9;]*[A-Za-z]")  # strip SGR styling only
 
@@ -131,18 +131,17 @@ class TestNewCalistaUser:
         assert calista.__version__ in result.output
 
     @staticmethod
-    def test_osc8_links(monkeypatch: MonkeyPatch):
+    def test_osc8_links():
         """With OSC-8 support, user sees BEL-terminated hyperlink sequences."""
         # The user switches to a terminal that supports OSC-8 hyperlinks
         # and runs `calista --help` again.
-        ## (We simulate this by monkeypatching the `supports_osc8` function.)
-        monkeypatch.setattr(
+        ## (We simulate this by patching the `supports_osc8` function.)
+        with patch(
             "calista.entrypoints.cli.helpers.hyperlinks.supports_osc8",
             lambda stream=None: True,
-        )
+        ):
+            importlib.reload(main)  # reload while patched -> OSC-8 HELP
+            result = CliRunner().invoke(main.calista, ["--help"])
+            _assert_links_displayed_osc8(result)
 
         importlib.reload(main)
-        runner = CliRunner()
-        result = runner.invoke(main.calista, ["--help"])
-
-        _assert_links_displayed_osc8(result)
