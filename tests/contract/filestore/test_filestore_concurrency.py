@@ -14,10 +14,10 @@ from threading import Barrier, BrokenBarrierError, Event
 
 import pytest
 
-from calista.adapters.filestore.interface import AbstractFileStore
+from calista.interfaces.filestore import FileStore
 
 
-def test_concurrent_commit_dedup(store: AbstractFileStore, arbitrary_bytes: bytes):
+def test_concurrent_commit_dedup(store: FileStore, arbitrary_bytes: bytes):
     """Concurrent writers committing identical bytes deduplicate to one object.
 
     Setup:

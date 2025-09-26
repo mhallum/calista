@@ -160,7 +160,7 @@ class AbstractWriter(abc.ABC):
             self.close()
 
 
-class AbstractFileStore(abc.ABC):
+class FileStore(abc.ABC):
     """Pure CAS interface.
 
     Identity is the digest; blobs are immutable.

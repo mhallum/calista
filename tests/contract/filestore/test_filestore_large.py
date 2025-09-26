@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 if TYPE_CHECKING:
-    from calista.adapters.filestore.interface import AbstractFileStore
+    from calista.interfaces.filestore import FileStore
 
 # Payload sizes (~5 MiB and ~20 MiB)
 SIZES = [5 * 1024 * 1024, 20 * 1024 * 1024]
@@ -44,7 +44,7 @@ def _pattern_bytes(n: int) -> bytes:
 
 @pytest.mark.slow
 @pytest.mark.parametrize("size", SIZES)
-def test_large_blob_put_bytes_and_stream_read(store: AbstractFileStore, size: int):
+def test_large_blob_put_bytes_and_stream_read(store: FileStore, size: int):
     """Ingest a large payload via `put_bytes` and verify streamed reads.
 
     - Confirms the returned digest equals the SHA-256 of the data.
@@ -73,7 +73,7 @@ def test_large_blob_put_bytes_and_stream_read(store: AbstractFileStore, size: in
 @pytest.mark.parametrize("size", SIZES)
 @pytest.mark.parametrize("put_chunk", PUT_CHUNKS)
 def test_large_blob_put_path_and_put_stream_variants(
-    store: AbstractFileStore, tmp_path: Path, size: int, put_chunk: int
+    store: FileStore, tmp_path: Path, size: int, put_chunk: int
 ):
     """Ingest large payloads via `put_path` and `put_stream` with odd chunk sizes.
 

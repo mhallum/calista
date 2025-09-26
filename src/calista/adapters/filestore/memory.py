@@ -59,10 +59,10 @@ import hashlib
 import io
 import threading
 
-from .interface import (
-    AbstractFileStore,
+from ...interfaces.filestore import (
     AbstractWriter,
     BlobStat,
+    FileStore,
     IntegrityError,
     NotFound,
 )
@@ -70,7 +70,7 @@ from .interface import (
 __all__ = ["MemoryFileStore"]
 
 
-class MemoryFileStore(AbstractFileStore):
+class MemoryFileStore(FileStore):
     """In-memory Content-Addressed Store (CAS) backend.
 
     Stores immutable blobs **entirely in RAM** and addresses them by their

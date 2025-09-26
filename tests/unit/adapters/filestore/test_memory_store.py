@@ -19,8 +19,8 @@ from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 
-from calista.adapters.filestore.interface import IntegrityError, NotFound
 from calista.adapters.filestore.memory import MemoryFileStore
+from calista.interfaces.filestore import IntegrityError, NotFound
 
 ## Adjust pylint to deal with fixtures
 # pylint: disable=redefined-outer-name
