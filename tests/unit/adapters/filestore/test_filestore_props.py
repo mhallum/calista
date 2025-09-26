@@ -26,8 +26,8 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from calista.adapters.filestore.interface import AbstractFileStore, IntegrityError
 from calista.adapters.filestore.memory import MemoryFileStore
+from calista.interfaces.filestore import FileStore, IntegrityError
 
 pytestmark = [pytest.mark.property]
 
@@ -81,7 +81,7 @@ def chunk_by_sizes(b: bytes, sizes: list[int]) -> list[bytes]:
 def store_factory():
     """Factory that returns a **fresh** filestore instance per Hypothesis example."""
 
-    def make() -> AbstractFileStore:
+    def make() -> FileStore:
         # Add other backends when added
         return MemoryFileStore()
 
@@ -104,7 +104,7 @@ _PROPSET = settings(max_examples=50, deadline=None)
     chunk=st.integers(min_value=1, max_value=16_384),
 )
 def test_digest_stability_across_methods(
-    store_factory: Callable[[], AbstractFileStore], data: bytes, chunk: int
+    store_factory: Callable[[], FileStore], data: bytes, chunk: int
 ):
     """Same bytes → same digest across all ingest methods and chunkings."""
     store = store_factory()
@@ -132,7 +132,7 @@ def test_digest_stability_across_methods(
     sizes=st.lists(st.integers(min_value=0, max_value=8_192), min_size=0, max_size=20),
 )
 def test_writer_chunk_partition_invariance(
-    store_factory: Callable[[], AbstractFileStore], data: bytes, sizes: list[int]
+    store_factory: Callable[[], FileStore], data: bytes, sizes: list[int]
 ):
     """Writing any partition of chunks yields the same digest as writing once."""
     store = store_factory()
@@ -151,7 +151,7 @@ def test_writer_chunk_partition_invariance(
 @_PROPSET
 @given(data=st.binary(min_size=0, max_size=64_000))
 def test_expected_digest_guard_property(
-    store_factory: Callable[[], AbstractFileStore], data: bytes
+    store_factory: Callable[[], FileStore], data: bytes
 ):
     """Integrity guard accepts exact match and rejects a one-nibble mismatch."""
     store = store_factory()
@@ -181,7 +181,7 @@ def test_expected_digest_guard_property(
 @_PROPSET
 @given(data=st.binary(min_size=0, max_size=64_000))
 def test_exists_and_stat_consistency(
-    store_factory: Callable[[], AbstractFileStore], data: bytes
+    store_factory: Callable[[], FileStore], data: bytes
 ):
     """After ingest, `exists()` is true and `stat()` metadata matches digest/size."""
     store = store_factory()

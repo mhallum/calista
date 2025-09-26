@@ -18,9 +18,9 @@ from pathlib import Path
 
 import pytest
 
-from calista.adapters.filestore.interface import (
-    AbstractFileStore,
+from calista.interfaces.filestore import (
     BlobStat,
+    FileStore,
     IntegrityError,
     NotFound,
 )
@@ -94,7 +94,7 @@ def mk_dir(tmp: Path) -> Path:
 # ===========================================================================
 
 
-def test_put_bytes_and_stat_roundtrip(store: AbstractFileStore, arbitrary_bytes: bytes):
+def test_put_bytes_and_stat_roundtrip(store: FileStore, arbitrary_bytes: bytes):
     """Ingest via `put_bytes`; `stat` matches digest and size (if provided)."""
 
     info = store.put_bytes(arbitrary_bytes)
@@ -109,7 +109,7 @@ def test_put_bytes_and_stat_roundtrip(store: AbstractFileStore, arbitrary_bytes:
         assert info.digest == expected
 
 
-def test_open_read_and_readall(store: AbstractFileStore, arbitrary_bytes: bytes):
+def test_open_read_and_readall(store: FileStore, arbitrary_bytes: bytes):
     """`open_read` stream and `readall` both round-trip the same bytes."""
     info = store.put_bytes(arbitrary_bytes)
     with store.open_read(info.digest) as file:
@@ -120,14 +120,14 @@ def test_open_read_and_readall(store: AbstractFileStore, arbitrary_bytes: bytes)
     assert store.readall(info.digest) == arbitrary_bytes
 
 
-def test_exists_true_false(store: AbstractFileStore, arbitrary_bytes: bytes):
+def test_exists_true_false(store: FileStore, arbitrary_bytes: bytes):
     """`exists` is true for present digests and false for mutated digests."""
     info = store.put_bytes(arbitrary_bytes)
     assert store.exists(info.digest)
     assert not store.exists(mutate_digest(info.digest))
 
 
-def test_not_found_errors(store: AbstractFileStore, arbitrary_bytes: bytes):
+def test_not_found_errors(store: FileStore, arbitrary_bytes: bytes):
     """`stat`/`open_read` raise `NotFound` for missing digests."""
     info = store.put_bytes(arbitrary_bytes)
     missing = mutate_digest(info.digest)
@@ -138,7 +138,7 @@ def test_not_found_errors(store: AbstractFileStore, arbitrary_bytes: bytes):
 
 
 def test_writer_context_abort_on_exit_without_commit(
-    store: AbstractFileStore, arbitrary_bytes: bytes
+    store: FileStore, arbitrary_bytes: bytes
 ):
     """Leaving writer context without `commit()` must not install an object."""
     with store.open_write() as file:
@@ -148,7 +148,7 @@ def test_writer_context_abort_on_exit_without_commit(
 
 
 def test_writer_write_after_commit_or_abort_raises(
-    store: AbstractFileStore, arbitrary_bytes: bytes
+    store: FileStore, arbitrary_bytes: bytes
 ):
     """`write()` after `commit()` or `abort()` raises `ValueError`."""
     with store.open_write() as file:
@@ -166,7 +166,7 @@ def test_writer_write_after_commit_or_abort_raises(
 
 
 def test_commit_idempotent_for_duplicate_bytes(
-    store: AbstractFileStore, arbitrary_bytes: bytes
+    store: FileStore, arbitrary_bytes: bytes
 ):
     """Ingesting identical bytes twice yields the same digest (dedup)."""
     a = store.put_bytes(arbitrary_bytes)
@@ -174,7 +174,7 @@ def test_commit_idempotent_for_duplicate_bytes(
     assert a.digest == b.digest
 
 
-def test_integrity_guard_ok_and_fail(store: AbstractFileStore, arbitrary_bytes: bytes):
+def test_integrity_guard_ok_and_fail(store: FileStore, arbitrary_bytes: bytes):
     """`commit(expected_digest=…)` accepts the right digest and rejects a mismatch."""
     info = store.put_bytes(arbitrary_bytes)
     with store.open_write() as file:
@@ -188,7 +188,7 @@ def test_integrity_guard_ok_and_fail(store: AbstractFileStore, arbitrary_bytes: 
             file.commit(expected_digest=bad_expected)
 
 
-def test_zero_byte_blob_digest_and_roundtrip(store: AbstractFileStore):
+def test_zero_byte_blob_digest_and_roundtrip(store: FileStore):
     """Empty payload produces the known SHA-256 of empty string and round-trips."""
     empty = b""
     info = store.put_bytes(empty)
@@ -201,7 +201,7 @@ def test_zero_byte_blob_digest_and_roundtrip(store: AbstractFileStore):
 
 
 def test_multiple_writes_then_commit_matches_put_bytes(
-    store: AbstractFileStore, arbitrary_bytes: bytes
+    store: FileStore, arbitrary_bytes: bytes
 ):
     """Chunked writes followed by `commit()` equals `put_bytes` digest."""
     mid = len(arbitrary_bytes) // 2
@@ -213,7 +213,7 @@ def test_multiple_writes_then_commit_matches_put_bytes(
     assert info.digest == expected
 
 
-def test_close_then_commit_raises_and_abort_idempotent(store: AbstractFileStore):
+def test_close_then_commit_raises_and_abort_idempotent(store: FileStore):
     """`commit()` after `close()` raises; `abort()` is idempotent and safe."""
     file = store.open_write()
     file.write(b"abc")
@@ -224,7 +224,7 @@ def test_close_then_commit_raises_and_abort_idempotent(store: AbstractFileStore)
     file.abort()
 
 
-def test_commit_then_abort_is_noop(store: AbstractFileStore, arbitrary_bytes: bytes):
+def test_commit_then_abort_is_noop(store: FileStore, arbitrary_bytes: bytes):
     """`abort()` after a successful `commit()` is a no-op (no deletion)."""
     with store.open_write() as file:
         file.write(arbitrary_bytes)
@@ -240,7 +240,7 @@ def test_commit_then_abort_is_noop(store: AbstractFileStore, arbitrary_bytes: by
     ],
 )
 def test_put_path_error_branches(
-    store: AbstractFileStore,
+    store: FileStore,
     tmp_path: Path,
     make_path: Callable[[Path], Path],
     exc: type[BaseException],

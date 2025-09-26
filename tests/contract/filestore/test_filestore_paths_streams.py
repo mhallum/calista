@@ -15,11 +15,11 @@ from pathlib import Path
 
 import pytest
 
-from calista.adapters.filestore.interface import AbstractFileStore
+from calista.interfaces.filestore import FileStore
 
 
 def test_put_path_and_symlink_policy(
-    store: AbstractFileStore, tmp_path: Path, arbitrary_bytes: bytes
+    store: FileStore, tmp_path: Path, arbitrary_bytes: bytes
 ):
     """`put_path` accepts regular files, refuses symlinks by default, and allows
     them only with `follow_symlinks=True`."""
@@ -41,7 +41,7 @@ def test_put_path_and_symlink_policy(
 
 
 def test_put_path_chunking_and_str_path(
-    store: AbstractFileStore, tmp_path: Path, arbitrary_bytes: bytes
+    store: FileStore, tmp_path: Path, arbitrary_bytes: bytes
 ):
     """`put_path` honors custom chunk sizes and accepts both `Path` and `str`."""
     p = tmp_path / "chunk.bin"
@@ -53,7 +53,7 @@ def test_put_path_chunking_and_str_path(
 
 
 def test_put_path_unicode_and_expected_digest(
-    store: AbstractFileStore, tmp_path: Path, arbitrary_bytes: bytes
+    store: FileStore, tmp_path: Path, arbitrary_bytes: bytes
 ):
     """`put_path` handles Unicode/spacey paths and respects `expected_digest`."""
     p = tmp_path / "dir with spaces" / "unicodé_📄.bin"
@@ -66,7 +66,7 @@ def test_put_path_unicode_and_expected_digest(
     assert guarded.digest == expected
 
 
-def test_put_stream_keeps_stream_open(store: AbstractFileStore, arbitrary_bytes: bytes):
+def test_put_stream_keeps_stream_open(store: FileStore, arbitrary_bytes: bytes):
     """`put_stream` must consume the stream to EOF but not close it."""
     bio = io.BytesIO(arbitrary_bytes)
     info = store.put_stream(bio, chunk_size=7)
@@ -74,9 +74,7 @@ def test_put_stream_keeps_stream_open(store: AbstractFileStore, arbitrary_bytes:
     assert store.exists(info.digest)
 
 
-def test_open_read_is_streamlike_and_seek(
-    store: AbstractFileStore, arbitrary_bytes: bytes
-):
+def test_open_read_is_streamlike_and_seek(store: FileStore, arbitrary_bytes: bytes):
     """`open_read` returns a file-like stream where `read(0)` is a no-op; if
     seekable, `seek` + `read` returns the expected slice.
     """

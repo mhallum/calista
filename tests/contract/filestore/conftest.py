@@ -21,11 +21,11 @@ import pytest
 from calista.adapters.filestore.memory import MemoryFileStore
 
 if TYPE_CHECKING:
-    from calista.adapters.filestore.interface import AbstractFileStore
+    from calista.interfaces.filestore import FileStore
 
 
 @pytest.fixture(params=["memory"])
-def store(request: pytest.FixtureRequest) -> AbstractFileStore:
+def store(request: pytest.FixtureRequest) -> FileStore:
     """Return a fresh filestore instance for the requested backend.
 
     Current params:
