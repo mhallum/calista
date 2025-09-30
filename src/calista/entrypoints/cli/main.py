@@ -34,7 +34,6 @@ from .helpers.log_level_parser import parse_log_level
 if TYPE_CHECKING:
     from logging import Handler
 
-# pylint: disable=
 
 logger = logging.getLogger(__name__)
 
