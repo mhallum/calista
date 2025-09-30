@@ -163,6 +163,7 @@ def log_startup(  # pylint: disable=too-many-arguments
     flight_capacity: int | None,
     force_flush_fr: bool,
     logger_levels: dict[str, int],
+    redactor_mode: str,
 ) -> None:
     """Log human-friendly startup info and detailed diagnostics.
 
@@ -183,6 +184,7 @@ def log_startup(  # pylint: disable=too-many-arguments
         flight_capacity: Configured capacity of the flight recorder buffer, or None.
         force_flush_fr: Whether the flight recorder is configured to flush on close.
         logger_levels: Mapping of logger names to their configured numeric levels.
+        redactor_mode: The active redaction mode for logs and error messages.
     """
 
     # Human-friendly one-liner
@@ -219,3 +221,5 @@ def log_startup(  # pylint: disable=too-many-arguments
     else:
         # This should never happen because of defaults, but is here as a fallback.
         logger.debug("Per-logger overrides: <none>")  # pragma: no cover.
+
+    logger.debug("Redactor mode: %s", redactor_mode)

@@ -28,6 +28,8 @@ class RedactorMode(Enum):
 class Redactor(abc.ABC):
     """Interface for sanitizing sensitive information from strings."""
 
+    _mode: RedactorMode
+
     @abc.abstractmethod
     def sanitize_db_url(self, raw_url: str) -> str:
         """Return a display-safe DB URL.
@@ -38,3 +40,8 @@ class Redactor(abc.ABC):
         Returns:
             A sanitized database URL with sensitive information redacted.
         """
+
+    @property
+    def mode(self) -> RedactorMode:
+        """Return the redaction mode."""
+        return self._mode

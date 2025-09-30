@@ -224,3 +224,4 @@ def test_startup_logging(registered_log_demo, runner, fs):
         r"Per-logger overrides: {'sqlalchemy': 'WARNING', 'alembic': 'WARNING'}",
         content,
     )
+    assert_in_output(r"Redactor mode: \w+", content)
