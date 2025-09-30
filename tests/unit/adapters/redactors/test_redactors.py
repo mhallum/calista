@@ -135,3 +135,12 @@ def test_safe_db_url(case):
         f"{input_url}"
     )
     assert strict_result == expected_strict, strict_msg
+
+
+def test_redactor_mode_property():
+    """Verify that Redactor.mode property returns the correct mode."""
+    lenient_redactor = Redactor(mode=RedactorMode.LENIENT)
+    assert lenient_redactor.mode == RedactorMode.LENIENT
+
+    strict_redactor = Redactor(mode=RedactorMode.STRICT)
+    assert strict_redactor.mode == RedactorMode.STRICT
