@@ -29,6 +29,7 @@ SECRET_KEYWORDS = [
     "sig",
     "signature",
 ]
+STRICT_MODE_ADDITIONAL_KEYWORDS = ["user", "username", "uid"]
 BEARER_PATTERN = re.compile(r"(?i)Bearer\s[0-9a-zA-Z\.]*")
 
 
@@ -64,7 +65,7 @@ class Redactor(redactor.Redactor):
         keywords_pattern = "|".join(
             kw.replace("_", "[-_]?")
             for kw in (
-                SECRET_KEYWORDS + ["user", "username", "uid"]
+                SECRET_KEYWORDS + STRICT_MODE_ADDITIONAL_KEYWORDS
                 if self._mode == RedactorMode.STRICT
                 else SECRET_KEYWORDS
             )
