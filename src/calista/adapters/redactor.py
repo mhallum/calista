@@ -31,6 +31,8 @@ SECRET_KEYWORDS = [
 ]
 STRICT_MODE_ADDITIONAL_KEYWORDS = ["user", "username", "uid"]
 BEARER_PATTERN = re.compile(r"(?i)Bearer\s[0-9a-zA-Z\.]*")
+PWD_PATTERN = re.compile(r"\bpwd=\S+", re.IGNORECASE)
+UID_PATTERN = re.compile(r"\buid=[^;]+", re.IGNORECASE)
 
 
 class Redactor(redactor.Redactor):
@@ -77,10 +79,10 @@ class Redactor(redactor.Redactor):
         )
 
         # 5) ODBC-ish pairs: Pwd=... (leave Uid alone unless strict)
-        sanitized = re.sub(r"(?i)\bPwd=\S+", f"Pwd={PLACEHOLDER}", sanitized)
+        sanitized = re.sub(PWD_PATTERN, f"Pwd={PLACEHOLDER}", sanitized)
         if self._mode == RedactorMode.STRICT:
             sanitized = re.sub(
-                r"(?i)\bUid=[^;]+",
+                UID_PATTERN,
                 f"Uid={PLACEHOLDER}",
                 sanitized,
             )
