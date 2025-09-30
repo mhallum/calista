@@ -34,6 +34,8 @@ from .helpers.log_level_parser import parse_log_level
 if TYPE_CHECKING:
     from logging import Handler
 
+# pylint: disable=
+
 logger = logging.getLogger(__name__)
 
 
@@ -157,6 +159,19 @@ EPILOG = "\b\n" + "\n".join(
     show_default=True,
     show_envvar=True,
 )
+@click.option(
+    "--redactor-mode",
+    "redactor_mode",
+    type=click.Choice(["lenient", "strict"], case_sensitive=False),
+    help=(
+        "Set the redaction mode for logs and error messages. "
+        "'lenient' (default) redact passwords/tokens but keep usernames/ids visible; "
+        "'strict' redact passwords/tokens and also usernames/ids."
+    ),
+    default="lenient",
+    show_envvar=True,
+    show_default=True,
+)
 @clickx.pass_context
 def calista(  # pylint: disable=too-many-arguments, too-many-locals, too-many-positional-arguments
     ctx: click.Context,
@@ -168,6 +183,7 @@ def calista(  # pylint: disable=too-many-arguments, too-many-locals, too-many-po
     flight_recorder: bool,
     force_flush_flight_recorder: bool,
     logger_levels: dict[str, int],
+    redactor_mode: str,
 ) -> None:
     """CALISTA command-line interface."""
 
@@ -216,6 +232,7 @@ def calista(  # pylint: disable=too-many-arguments, too-many-locals, too-many-po
         flight_capacity=flight_recorder_capacity if flight_recorder else None,
         force_flush_fr=force_flush_flight_recorder,
         logger_levels=logger_levels,
+        redactor_mode=redactor_mode,
     )
 
     # 6) Ensure logging is cleanly shutdown on program exit
