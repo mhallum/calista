@@ -54,6 +54,8 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
 
+ULID_LENGTH = 26  # Enforced in EventEnvelope and DB schema
+
 # --- Exceptions to standardize adapter behavior ---
 
 
@@ -104,7 +106,7 @@ class EventEnvelope:
     global_seq: int | None = None  # Assigned by the event store
 
     def __post_init__(self) -> None:
-        if len(self.event_id) != 26:
+        if len(self.event_id) != ULID_LENGTH:
             raise InvalidEnvelopeError("event_id must be a 26-character ULID.")
         if self.version < 1:
             raise InvalidEnvelopeError("version must be >= 1")
