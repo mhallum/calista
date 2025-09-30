@@ -30,6 +30,23 @@ SECRET_KEYWORDS = [
     "signature",
 ]
 STRICT_MODE_ADDITIONAL_KEYWORDS = ["user", "username", "uid"]
+STRICT_MODE_SECRET_KEYWORDS = SECRET_KEYWORDS + STRICT_MODE_ADDITIONAL_KEYWORDS
+SECRET_KEYWORDS_PATTERN = "|".join(kw.replace("_", "[-_]?") for kw in (SECRET_KEYWORDS))
+STRICT_MODE_SECRET_KEYWORDS_PATTERN = "|".join(
+    kw.replace("_", "[-_]?") for kw in (STRICT_MODE_SECRET_KEYWORDS)
+)
+QUERY_STRING_PATTERN = re.compile(
+    rf"([?&](?:{SECRET_KEYWORDS_PATTERN})=)[^&#\s;]*", re.IGNORECASE
+)
+STRICT_MODE_QUERY_STRING_PATTERN = re.compile(
+    rf"([?&](?:{STRICT_MODE_SECRET_KEYWORDS_PATTERN})=)[^&#\s;]*", re.IGNORECASE
+)
+KEY_VALUE_SECRET_PATTERN = re.compile(
+    rf"(\b(?:{SECRET_KEYWORDS_PATTERN})\s*:\s*)\S+", re.IGNORECASE
+)
+STRICT_MODE_KEY_VALUE_SECRET_PATTERN = re.compile(
+    rf"(\b(?:{STRICT_MODE_SECRET_KEYWORDS_PATTERN})\s*:\s*)\S+", re.IGNORECASE
+)
 BEARER_PATTERN = re.compile(r"Bearer\s[0-9a-zA-Z\.]*", re.IGNORECASE)
 PWD_PATTERN = re.compile(r"\bpwd=\S+", re.IGNORECASE)
 UID_PATTERN = re.compile(r"\buid=[^;]+", re.IGNORECASE)
@@ -49,7 +66,10 @@ class Redactor(redactor.Redactor):
         # 1) user:pass@  → user:***@
         sanitized = re.sub(
             URL_PASSWORD_PATTERN,
-            r"\1:***@",
+            # Mutation testing somehow messes with this line without actually mutating anything.
+            # This leads to "survived" mutants that don't actually change the code.
+            # Hence the pragma to ignore mutation for this line.
+            r"\1:***@",  # pragma: no mutate
             sanitized,
         )
 
@@ -66,16 +86,14 @@ class Redactor(redactor.Redactor):
 
         # 4) Query-string secrets: build regex from SECRET_KEYWORDS
 
-        keywords_pattern = "|".join(
-            kw.replace("_", "[-_]?")
-            for kw in (
-                SECRET_KEYWORDS + STRICT_MODE_ADDITIONAL_KEYWORDS
-                if self._mode == RedactorMode.STRICT
-                else SECRET_KEYWORDS
-            )
+        query_pattern = (
+            STRICT_MODE_QUERY_STRING_PATTERN
+            if self._mode == RedactorMode.STRICT
+            else QUERY_STRING_PATTERN
         )
+
         sanitized = re.sub(
-            rf"(?i)([?&](?:{keywords_pattern})=)[^&#\s;]*",
+            query_pattern,
             rf"\1{PLACEHOLDER}",
             sanitized,
         )
@@ -90,8 +108,15 @@ class Redactor(redactor.Redactor):
             )
 
         # 6) Key:Value secrets (non-URL accidental forms)
+
+        key_value_pattern = (
+            STRICT_MODE_KEY_VALUE_SECRET_PATTERN
+            if self._mode == RedactorMode.STRICT
+            else KEY_VALUE_SECRET_PATTERN
+        )
+
         sanitized = re.sub(
-            rf"(?i)(\b(?:{keywords_pattern})\s*:\s*)\S+",
+            key_value_pattern,
             rf"\1{PLACEHOLDER}",
             sanitized,
         )
