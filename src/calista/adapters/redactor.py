@@ -34,6 +34,7 @@ BEARER_PATTERN = re.compile(r"Bearer\s[0-9a-zA-Z\.]*", re.IGNORECASE)
 PWD_PATTERN = re.compile(r"\bpwd=\S+", re.IGNORECASE)
 UID_PATTERN = re.compile(r"\buid=[^;]+", re.IGNORECASE)
 URL_PASSWORD_PATTERN = re.compile(r"(?<=://)([^:@/]+):([^@/]+)@")
+URL_USER_PATTERN = re.compile(r"(?<=://)([^:@/]+)(?=:(?:\*\*\*|[^@/]*)@)")
 
 
 class Redactor(redactor.Redactor):
@@ -55,7 +56,7 @@ class Redactor(redactor.Redactor):
         # 2) Strict: redact visible username before '@' (but only if one exists)
         if self._mode == RedactorMode.STRICT:
             sanitized = re.sub(
-                r"(?<=://)([^:@/]+)(?=:(?:\*\*\*|[^@/]*)@)",
+                URL_USER_PATTERN,
                 PLACEHOLDER,
                 sanitized,
             )
