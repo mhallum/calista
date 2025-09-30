@@ -33,6 +33,7 @@ STRICT_MODE_ADDITIONAL_KEYWORDS = ["user", "username", "uid"]
 BEARER_PATTERN = re.compile(r"Bearer\s[0-9a-zA-Z\.]*", re.IGNORECASE)
 PWD_PATTERN = re.compile(r"\bpwd=\S+", re.IGNORECASE)
 UID_PATTERN = re.compile(r"\buid=[^;]+", re.IGNORECASE)
+URL_PASSWORD_PATTERN = re.compile(r"(?<=://)([^:@/]+):([^@/]+)@")
 
 
 class Redactor(redactor.Redactor):
@@ -46,7 +47,7 @@ class Redactor(redactor.Redactor):
 
         # 1) user:pass@  → user:***@
         sanitized = re.sub(
-            r"(?<=://)([^:@/]+):([^@/]+)@",
+            URL_PASSWORD_PATTERN,
             r"\1:***@",
             sanitized,
         )
