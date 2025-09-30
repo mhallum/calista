@@ -30,7 +30,7 @@ SECRET_KEYWORDS = [
     "signature",
 ]
 STRICT_MODE_ADDITIONAL_KEYWORDS = ["user", "username", "uid"]
-BEARER_PATTERN = re.compile(r"(?i)Bearer\s[0-9a-zA-Z\.]*")
+BEARER_PATTERN = re.compile(r"Bearer\s[0-9a-zA-Z\.]*", re.IGNORECASE)
 PWD_PATTERN = re.compile(r"\bpwd=\S+", re.IGNORECASE)
 UID_PATTERN = re.compile(r"\buid=[^;]+", re.IGNORECASE)
 
