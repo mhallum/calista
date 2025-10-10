@@ -1,6 +1,4 @@
-"""Pytest fixtures for EventStore contract tests."""
-
-from __future__ import annotations
+"""Fixtures for generating test data."""
 
 import itertools
 from collections.abc import Callable
@@ -13,13 +11,45 @@ from calista.interfaces.eventstore import (
     EventEnvelope,
 )
 
-# Simple deterministic 26-char "ULID-like" generator (length-only; not real ULID)
-_counter = itertools.count(1)
+# pylint: disable=too-many-arguments
+
+_counter = itertools.count(1)  # for ulid_like()
 
 
-def make_ulid() -> str:
-    """Return a deterministic 26-character ULID-like string (not a real ULID)."""
+def ulid_like() -> str:
+    """Return a deterministic 26-character ULID-like string.
+
+    Good enough for tests that assert length/uniqueness; not lexicographically sortable.
+    """
     return f"{next(_counter):026d}"
+
+
+@pytest.fixture
+def make_event() -> Callable[..., dict[str, Any]]:
+    """Factory fixture: produce a valid event_store row dict.
+
+    Accepts keyword overrides to adjust any field; for example:
+        make_event(stream_id="s-123", version=2, payload={"x": 1})
+        make_event(recorded_at=<datetime>)  # only for tests that explicitly exercise bind logic
+
+    Returns:
+        Callable[..., dict[str, Any]]: A builder function that returns a row dict.
+    """
+
+    def _make_event(**overrides: dict[str, Any]) -> dict[str, Any]:
+        base: dict[str, Any] = {
+            "stream_id": "test-stream",
+            "stream_type": "TestAggregate",
+            "version": 1,
+            "event_id": ulid_like(),
+            "event_type": "TestEvent",
+            "payload": {"kind": "TEST", "value": 42},
+            "metadata": {"source": "pytest"},
+        }
+        base.update(overrides)
+        return base
+
+    return _make_event
 
 
 @pytest.fixture
@@ -52,7 +82,7 @@ def make_envelope() -> Callable[..., EventEnvelope]:
             stream_id=stream_id,
             stream_type=stream_type,
             version=version,
-            event_id=event_id or make_ulid(),
+            event_id=event_id or ulid_like(),
             event_type=event_type,
             payload=payload or {},
             metadata=metadata,
