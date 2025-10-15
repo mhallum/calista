@@ -46,7 +46,7 @@ def upgrade() -> None:
             nullable=False,
             comment="Unique stream identifier.",
         ),
-        sa.Column("version", sa.Integer(), nullable=False, comment="Stream version."),
+        sa.Column("version", sa.Integer(), nullable=False, comment="Stream version.", server_default="0"),
         sa.PrimaryKeyConstraint("kind", "key", name=op.f("pk_stream_index")),
         sa.UniqueConstraint("stream_id", name=op.f("uq_stream_index_stream_id")),
     )
