@@ -37,14 +37,16 @@ def stream_index(
     sqlite_engine_file,
     postgres_engine,
 ) -> Iterable[StreamIndex]:
-    """Return a fresh filestore instance for the requested backend.
+    """Return a fresh StreamIndex instance for the requested backend.
 
-    Current params:
-      - `"memory"` → `MemoryFileStore` (non-durable, in-memory CAS)
+    Supported params:
+      - `"sql_memory"` → in-memory SQLite StreamIndex
+      - `"sql_file"` → file-based SQLite StreamIndex
+      - `"postgres"` → PostgreSQL StreamIndex
 
     Extend by adding new identifiers to `params` and branching below to
     construct the corresponding backend. Each invocation yields a brand-new
-    store instance for isolation.
+    StreamIndex instance for isolation.
     """
 
     match request.param:
