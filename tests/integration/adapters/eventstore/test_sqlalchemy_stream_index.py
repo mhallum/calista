@@ -10,7 +10,7 @@ from calista.adapters.eventstore.stream_index import (
 from calista.interfaces.stream_index import NaturalKey
 
 
-def test_lookup_by_stream_non_existant(sqlite_engine_memory):
+def test_lookup_by_stream_non_existent(sqlite_engine_memory):
     """Test that looking up by stream ID that does not exist returns None."""
 
     with sqlite_engine_memory.connect() as connection:
