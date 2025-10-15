@@ -73,6 +73,7 @@ class StreamIndex(abc.ABC):
                 different natural key.
         """
 
+    @abc.abstractmethod
     def update_version(self, stream_id: str, version: int) -> None:
         """Advance the stored version fence for a stream.
 
