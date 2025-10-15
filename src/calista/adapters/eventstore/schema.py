@@ -126,7 +126,7 @@ stream_index = Table(
     "stream_index",
     metadata,
     Column(
-        "kind", String(length=64), primary_key=True, comment="Stream category/type."
+        "kind", String(length=64), primary_key=True, comment="Stream kind/category."
     ),
     Column(
         "key",
