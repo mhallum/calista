@@ -45,7 +45,7 @@ from sqlalchemy import (
 from calista.adapters.db.metadata import metadata
 from calista.adapters.db.sa_types import BIGINT_PK, PORTABLE_JSON, UTCDateTime
 
-__all__ = ["event_store"]
+__all__ = ["event_store", "stream_index"]
 
 event_store = Table(
     "event_store",
@@ -119,4 +119,27 @@ event_store = Table(
     Index(None, "stream_id", "global_seq"),
     Index(None, "event_type"),
     comment="Append-only event log. One row per domain event.",
+)
+
+# --- Natural key → stream identity (write-side auxiliary) -------------------
+stream_index = Table(
+    "stream_index",
+    metadata,
+    Column(
+        "kind", String(length=64), primary_key=True, comment="Stream kind/category."
+    ),
+    Column(
+        "key",
+        String(length=512),
+        primary_key=True,
+        comment="Natural key for the stream.",
+    ),
+    Column(
+        "stream_id",
+        String(length=26),
+        nullable=False,
+        unique=True,
+        comment="Unique stream identifier.",
+    ),
+    Column("version", Integer, nullable=False, default=0, comment="Stream version."),
 )
