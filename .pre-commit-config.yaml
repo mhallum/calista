@@ -25,6 +25,7 @@ repos:
           - alembic
           - hypothesis
           - platformdirs>=4.4,<5
+          - ulid-py
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
