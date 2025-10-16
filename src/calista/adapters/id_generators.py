@@ -44,7 +44,7 @@ class SimpleIdGenerator(IdGenerator):
     """A simple ID generator that produces sequential IDs.
 
     Note:
-        Not suitable for production use; primarily for testing and demos.
+        Not thread safe; not suitable for production use; primarily for testing and demos.
     """
 
     def __init__(self, length: int = 26) -> None:
