@@ -15,7 +15,7 @@ def test_monotonic_order_single_thread(monotonic_id_generators, count):
 
 def test_monotonic_order_under_threads(monotonic_id_generators):
     """IDs are lexicographically non-decreasing when generated from multiple threads."""
-    n = 8000
+    num_ids = 8000
     with cf.ThreadPoolExecutor(max_workers=16) as ex:
         # record generation timestamp immediately after new_id() returns
         futures = [
@@ -25,7 +25,7 @@ def test_monotonic_order_under_threads(monotonic_id_generators):
                     time.time_ns(),
                 )
             )
-            for _ in range(n)
+            for _ in range(num_ids)
         ]
         results = [f.result() for f in cf.as_completed(futures)]
 

@@ -19,7 +19,7 @@ def test_returns_str_and_not_empty(id_generator: IdGenerator) -> None:
 def test_returns_unique_ids(id_generator: IdGenerator) -> None:
     """new_id() returns unique IDs."""
     ids = {id_generator.new_id() for _ in range(5000)}
-    assert len(ids) == len(set(ids))  # all IDs are unique
+    assert len(ids) == 5000  # all IDs are unique
 
 
 def test_threaded_uniqueness_single_instance(id_generator: IdGenerator) -> None:
@@ -28,8 +28,8 @@ def test_threaded_uniqueness_single_instance(id_generator: IdGenerator) -> None:
     def _next(_: int) -> str:
         return id_generator.new_id()
 
-    n = 8000
+    num_ids = 8000
     with cf.ThreadPoolExecutor(max_workers=16) as ex:
-        ids = list(ex.map(_next, range(n)))
+        ids = list(ex.map(_next, range(num_ids)))
 
     assert len(ids) == len(set(ids))
