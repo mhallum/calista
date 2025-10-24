@@ -50,10 +50,6 @@ class CustomCommand(Command):
     """A custom command for testing."""
 
 
-def custom_handler(cmd: CustomCommand, uow: AbstractUnitOfWork):
-    """A custom command handler for testing."""
-
-
 class TestBuildWriteUoW:
     """Tests for the build_write_uow function."""
 
