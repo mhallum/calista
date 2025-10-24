@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import abc
-from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -38,7 +37,7 @@ class SiteSnapshot:
 
 
 class SiteCatalog(abc.ABC):
-    """Interface for accessing site catalog entries."""
+    """Interface for managing the site catalog."""
 
     @abc.abstractmethod
     def get(self, site_code: str, version: int | None = None) -> SiteSnapshot | None:
@@ -63,28 +62,4 @@ class SiteCatalog(abc.ABC):
 
         Returns:
             The latest version number if found, otherwise None.
-        """
-
-    @abc.abstractmethod
-    def list(
-        self,
-        search: str | None = None,
-        heads_only: bool = True,
-        limit: int | None = 100,
-        offset: int = 0,
-    ) -> Iterable[SiteSnapshot]:
-        """List site snapshots, optionally filtered by a case-insensitive search string
-        matching the site code or name.
-
-        Args:
-            search: Optional case-insensitive substring to filter site codes or names.
-            heads_only: If True, only return the latest version of each site.
-            limit: Maximum number of results to return. If None, no limit is applied.
-            offset: Number of results to skip before returning the remaining results.
-
-        Returns:
-            An iterable of site snapshots matching the criteria.
-
-        Note:
-            The results are ordered by `site_code` ascending, then `version` descending.
         """
