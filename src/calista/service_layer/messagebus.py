@@ -3,6 +3,8 @@
 import logging
 from collections.abc import Callable
 
+from calista.interfaces.unit_of_work import AbstractUnitOfWork
+
 from .commands import Command
 
 logger = logging.getLogger(__name__)
@@ -20,7 +22,15 @@ class NoHandlerForCommand(LookupError):
 class MessageBus:
     """A simple message bus for handling commands.
 
+    The main responsibility of the message bus is to route commands to their
+    appropriate handlers. It also manages logging and error handling during the
+    dispatch process. Additionally, it provides access to the unit of work used for
+    transactional operations for convenience.
+
     Args:
+        uow: An instance of AbstractUnitOfWork for managing transactional operations.
+            This uow should still have been injected into the command handlers, it is
+            just also available here for convenience.
         command_handlers: A mapping of command types to their handlers.
             Note that handlers should be callables that accept a single command argument.
             Additional dependencies (i.e. uow) should be injected via closures or other means.
@@ -33,8 +43,10 @@ class MessageBus:
 
     def __init__(
         self,
+        uow: AbstractUnitOfWork,
         command_handlers: dict[type[Command], Callable[..., None]],
     ) -> None:
+        self.uow = uow
         self._command_handlers = command_handlers
 
     def handle(self, cmd: Command) -> None:
