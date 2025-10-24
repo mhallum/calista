@@ -58,7 +58,7 @@ def bootstrap() -> AppContainer:
     )
 
 
-def inject_dependencies(handler, dependencies):
+def inject_dependencies(handler: Callable, dependencies: dict[str, object]) -> Callable:
     """Inject dependencies into a handler function based on its parameters."""
     params = inspect.signature(handler).parameters
     deps = {
