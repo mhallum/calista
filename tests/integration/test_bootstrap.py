@@ -55,7 +55,7 @@ class TestBuildWriteUoW:
 
     @staticmethod
     def test_build_write_uow_returns_uow():
-        """Test that build_write_uow returns an concrete UOW instance."""
+        """Test that build_write_uow returns a concrete UOW instance."""
         uow = build_write_uow(url="sqlite:///:memory:")
         assert isinstance(uow, SqlAlchemyUnitOfWork)
         assert str(uow.engine.url) == "sqlite:///:memory:"
