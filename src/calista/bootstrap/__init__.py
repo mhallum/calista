@@ -15,3 +15,7 @@ Public surface:
 - Re-export composition factories from this module; keep wiring helpers internal.
 - No business rules live here; this is assembly and lifecycle only.
 """
+
+from .bootstrap import bootstrap
+
+__all__ = ["bootstrap"]
