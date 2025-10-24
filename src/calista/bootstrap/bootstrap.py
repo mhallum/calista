@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import inspect
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -58,7 +58,9 @@ def bootstrap() -> AppContainer:
     )
 
 
-def inject_dependencies(handler: Callable, dependencies: dict[str, object]) -> Callable:
+def inject_dependencies(
+    handler: Callable, dependencies: Mapping[str, object]
+) -> Callable:
     """Inject dependencies into a handler function based on its parameters."""
     params = inspect.signature(handler).parameters
     deps = {
