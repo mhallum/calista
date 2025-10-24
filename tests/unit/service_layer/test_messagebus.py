@@ -7,6 +7,7 @@ from functools import partial
 
 import pytest
 
+from calista.interfaces.unit_of_work import AbstractUnitOfWork
 from calista.service_layer.commands import Command
 from calista.service_layer.messagebus import MessageBus, NoHandlerForCommand
 
@@ -14,6 +15,16 @@ from calista.service_layer.messagebus import MessageBus, NoHandlerForCommand
 
 
 # --- Fakes ---
+
+
+class FakeUoW(AbstractUnitOfWork):
+    """A fake unit of work for testing purposes."""
+
+    def commit(self):
+        """Fake commit method."""
+
+    def rollback(self):
+        """Fake rollback method."""
 
 
 @dataclass(frozen=True)
@@ -55,7 +66,9 @@ def test_dispatches_to_specific_handler_once(caplog):
     def handle_b(cmd: CommandB) -> None:
         calls.append(cmd)
 
-    bus = MessageBus(command_handlers={CommandA: handle_a, CommandB: handle_b})
+    bus = MessageBus(
+        FakeUoW(), command_handlers={CommandA: handle_a, CommandB: handle_b}
+    )
     a = CommandA(42)
 
     with caplog.at_level("DEBUG"):
@@ -74,7 +87,7 @@ def test_dispatches_to_specific_handler_once(caplog):
 
 def test_message_bus_no_handler_logs_error(caplog):
     """Test that MessageBus logs an error and raises when no handler is found."""
-    bus = MessageBus(command_handlers={})
+    bus = MessageBus(FakeUoW(), command_handlers={})
     with caplog.at_level("ERROR"):
         with pytest.raises(
             NoHandlerForCommand,
@@ -100,7 +113,7 @@ def test_message_bus_handler_exception_logs(caplog):
         CommandA: faulty_handler,
     }
 
-    bus = MessageBus(command_handlers=handlers)
+    bus = MessageBus(FakeUoW(), command_handlers=handlers)
     with caplog.at_level("ERROR"):
         with pytest.raises(RuntimeError):
             cmd = CommandA()
@@ -121,7 +134,7 @@ def test_handler_name_falls_back_to_repr(caplog):
         def __call__(self, x):
             pass
 
-    bus = MessageBus(command_handlers={CommandA: CallableObj()})
+    bus = MessageBus(FakeUoW(), command_handlers={CommandA: CallableObj()})
     with caplog.at_level("DEBUG"):
         bus.handle(cmd=CommandA())
     logs = " ".join(rec.message for rec in caplog.records)
@@ -138,7 +151,7 @@ def test_handler_name_with_closure(caplog):
 
     sink: list[CommandA] = []
     injected_handler = partial(record_handler, sink=sink)
-    bus = MessageBus(command_handlers={CommandA: injected_handler})
+    bus = MessageBus(FakeUoW(), command_handlers={CommandA: injected_handler})
     with caplog.at_level("DEBUG"):
         cmd = CommandA(0)
         bus.handle(cmd)
@@ -148,3 +161,10 @@ def test_handler_name_with_closure(caplog):
         f"Handling command {cmd} with handler {injected_handler.func.__name__}",  # pylint: disable=no-member
         "DEBUG",
     )
+
+
+def test_message_bus_exposes_uow():
+    """Test that MessageBus exposes the unit of work instance."""
+    uow = FakeUoW()
+    bus = MessageBus(uow, command_handlers={})
+    assert bus.uow is uow
