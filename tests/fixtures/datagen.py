@@ -1,8 +1,8 @@
 """Fixtures for generating test data."""
 
+import datetime
 import itertools
 from collections.abc import Callable
-from datetime import datetime, timezone
 from typing import Any
 
 import pytest
@@ -76,7 +76,7 @@ def make_envelope() -> Callable[..., EventEnvelope]:
         event_id: str | None = None,
         payload: dict[str, Any] | None = None,
         metadata: dict[str, Any] | None = None,
-        recorded_at: datetime | None = None,
+        recorded_at: datetime.datetime | None = None,
     ) -> EventEnvelope:
         return EventEnvelope(
             stream_id=stream_id,
@@ -86,7 +86,47 @@ def make_envelope() -> Callable[..., EventEnvelope]:
             event_type=event_type,
             payload=payload or {},
             metadata=metadata,
-            recorded_at=recorded_at or datetime.now(timezone.utc),
+            recorded_at=recorded_at or datetime.datetime.now(datetime.timezone.utc),
         )
+
+    return _make
+
+
+@pytest.fixture
+def make_site_params():
+    """Factory for site parameters with sensible defaults.
+
+    Args (defaults):
+        - source: str | None = "Some Test Source"
+        - timezone: str | None = "America/New_York"
+        - lat_deg: float | None = 90.0
+        - lon_deg: float | None = 30.0
+        - elevation_m: float | None = 100.0
+        - mpc_code: str | None = "XXX"
+
+    defaults can be overridden by keyword arguments.
+    """
+
+    def _make(
+        site_code: str,
+        name: str,
+        *,
+        source: str | None = "Some Test Source",
+        timezone: str | None = "America/New_York",
+        lat_deg: float | None = 90.0,
+        lon_deg: float | None = 30.0,
+        elevation_m: float | None = 100.0,
+        mpc_code: str | None = "XXX",
+    ) -> dict:
+        return {
+            "site_code": site_code,
+            "name": name,
+            "source": source,
+            "timezone": timezone,
+            "lat_deg": lat_deg,
+            "lon_deg": lon_deg,
+            "elevation_m": elevation_m,
+            "mpc_code": mpc_code,
+        }
 
     return _make
