@@ -51,7 +51,7 @@ def test_resolve_none_clears_value_when_clearable():
         None,
         "XXX",
         clearable=True,
-        field="mcp_code",
+        field="mpc_code",
         kind="site",
         key="LDT",
     )
