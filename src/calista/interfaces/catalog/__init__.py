@@ -1,0 +1,1 @@
+"""Catalog interface package"""
