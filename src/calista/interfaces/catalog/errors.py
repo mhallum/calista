@@ -19,3 +19,21 @@ class InvalidRevisionError(RevisionError):
 
     def __init__(self, kind: str, key: str, reason: str) -> None:
         super().__init__(kind, key, f"Invalid {kind} ({key}) revision: {reason}")
+
+
+class VersionConflictError(RevisionError):
+    """Raised when optimistic concurrency check fails."""
+
+    def __init__(self, kind: str, key: str, head: int, expected: int | None) -> None:
+        super().__init__(
+            kind,
+            key,
+            f"{kind} ({key}) version conflict: head={head}, expected={expected}",
+        )
+
+
+class NoChangeError(RevisionError):
+    """Raised when a patch or revision introduces no changes."""
+
+    def __init__(self, kind: str, key: str) -> None:
+        super().__init__(kind, key, f"{kind} ({key}) revision introduces no changes")
