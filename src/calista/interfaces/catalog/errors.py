@@ -6,7 +6,7 @@ class CatalogError(Exception):
 
     def __init__(self, kind: str, key: str, message: str | None = None) -> None:
         if message is None:
-            message = f"{kind} ({key}) revision error"
+            message = f"{kind} ({key}) catalog error"
         super().__init__(message)
 
 
