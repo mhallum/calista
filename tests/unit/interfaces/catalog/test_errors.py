@@ -2,6 +2,7 @@
 
 from calista.interfaces.catalog.errors import (
     CatalogError,
+    InvalidSnapshotError,
     NoChangeError,
     VersionConflictError,
 )
@@ -33,3 +34,13 @@ def test_no_change_error_message():
         key="LDT",
     )
     assert str(error) == "site (LDT) revision introduces no changes"
+
+
+def test_invalid_snapshot_error_message():
+    """InvalidSnapshotError constructs the correct error message."""
+    error = InvalidSnapshotError(
+        kind="site",
+        key="LDT",
+        reason="missing required field 'name'",
+    )
+    assert str(error) == "Invalid site (LDT) snapshot: missing required field 'name'"

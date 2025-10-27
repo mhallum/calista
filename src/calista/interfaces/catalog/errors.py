@@ -10,6 +10,17 @@ class CatalogError(Exception):
         super().__init__(message)
 
 
+class SnapshotError(CatalogError):
+    """Base class for errors related to invalid or inconsistent snapshots."""
+
+
+class InvalidSnapshotError(SnapshotError):
+    """Raised when a snapshot is malformed or violates domain invariants."""
+
+    def __init__(self, kind: str, key: str, reason: str) -> None:
+        super().__init__(kind, key, f"Invalid {kind} ({key}) snapshot: {reason}")
+
+
 class RevisionError(CatalogError):
     """Base class for errors related to invalid or inconsistent revisions."""
 
