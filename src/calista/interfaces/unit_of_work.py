@@ -17,7 +17,7 @@ from .eventstore import EventStore
 class CatalogBundle:
     """A bundle of catalogs used in a unit of work."""
 
-    site: catalog.SiteCatalog
+    sites: catalog.SiteCatalog
 
 
 class AbstractUnitOfWork(abc.ABC):
