@@ -55,3 +55,10 @@ class SiteNotFoundError(CatalogError):
 
     def __init__(self, key: str) -> None:
         super().__init__("site", key, f"Site ({key}) not found in catalog")
+
+
+class TelescopeNotFoundError(CatalogError):
+    """Raised when a telescope entry cannot be found in the catalog."""
+
+    def __init__(self, key: str) -> None:
+        super().__init__("telescope", key, f"Telescope ({key}) not found in catalog")

@@ -18,6 +18,7 @@ class CatalogBundle:
     """A bundle of catalogs used in a unit of work."""
 
     sites: catalog.SiteCatalog
+    telescopes: catalog.TelescopeCatalog
 
 
 class AbstractUnitOfWork(abc.ABC):

@@ -130,3 +130,33 @@ def make_site_params():
         }
 
     return _make
+
+
+@pytest.fixture
+def make_telescope_params():
+    """Factory for telescope parameters with sensible defaults.
+
+    Args (defaults):
+        - source: str | None = "Some Test Source"
+        - aperture_m: float | None = 1.0
+
+    defaults can be overridden by keyword arguments.
+    """
+
+    def _make(
+        telescope_code: str,
+        name: str,
+        site_code: str,
+        *,
+        source: str | None = "Some Test Source",
+        aperture_m: float | None = 1.0,
+    ) -> dict:
+        return {
+            "telescope_code": telescope_code,
+            "name": name,
+            "site_code": site_code,
+            "source": source,
+            "aperture_m": aperture_m,
+        }
+
+    return _make

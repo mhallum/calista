@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from calista.interfaces.catalog.site_catalog import SiteSnapshot
+from calista.interfaces.catalog.telescope_catalog import TelescopeSnapshot
 
 
 @dataclass(slots=True)
@@ -23,6 +24,6 @@ class InMemoryCatalogData:
     """
 
     sites: dict[str, list[SiteSnapshot]]  # keyed by site_code
-    telescopes: dict[str, list[Any]]  # keyed by telescope_code
+    telescopes: dict[str, list[TelescopeSnapshot]]  # keyed by telescope_code
     instruments: dict[str, list[Any]]  # keyed by instrument_code
     facilities: dict[str, list[Any]]  # keyed by facility_code

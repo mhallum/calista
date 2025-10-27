@@ -1,5 +1,6 @@
 from calista.adapters.catalog.memory_store import InMemoryCatalogData
 from calista.adapters.catalog.site_catalog.memory import InMemorySiteCatalog
+from calista.adapters.catalog.telescope_catalog.memory import InMemoryTelescopeCatalog
 from calista.adapters.eventstore.memory import MemoryEventStore
 from calista.bootstrap.bootstrap import build_message_bus
 from calista.interfaces.unit_of_work import AbstractUnitOfWork, CatalogBundle
@@ -16,7 +17,10 @@ class FakeUoW(AbstractUnitOfWork):
             sites={}, telescopes={}, instruments={}, facilities={}
         )
         self.eventstore = MemoryEventStore()
-        self.catalogs = CatalogBundle(sites=InMemorySiteCatalog(catalog_data))
+        self.catalogs = CatalogBundle(
+            sites=InMemorySiteCatalog(catalog_data),
+            telescopes=InMemoryTelescopeCatalog(catalog_data),
+        )
         self.committed = False
 
     def commit(self):

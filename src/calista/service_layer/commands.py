@@ -38,3 +38,25 @@ class PatchSite(Command):
     lon_deg: float | None | Unsettable = UNSET
     elevation_m: float | None | Unsettable = UNSET
     mpc_code: str | None | Unsettable = UNSET
+
+
+@dataclass(frozen=True)
+class PublishTelescopeRevision(Command):
+    """Command to publish a telescope revision to the catalog."""
+
+    telescope_code: str
+    name: str
+    site_code: str
+    source: str | None
+    aperture_m: float | None
+
+
+@dataclass(frozen=True)
+class PatchTelescope(Command):
+    """Command to publish a patch revision to an existing telescope head in the catalog."""
+
+    telescope_code: str
+    name: str | None | Unsettable = UNSET
+    site_code: str | None | Unsettable = UNSET
+    source: str | None | Unsettable = UNSET
+    aperture_m: float | None | Unsettable = UNSET
