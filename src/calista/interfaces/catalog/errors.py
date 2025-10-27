@@ -37,3 +37,10 @@ class NoChangeError(RevisionError):
 
     def __init__(self, kind: str, key: str) -> None:
         super().__init__(kind, key, f"{kind} ({key}) revision introduces no changes")
+
+
+class SiteNotFoundError(CatalogError):
+    """Raised when a site entry cannot be found in the catalog."""
+
+    def __init__(self, key: str) -> None:
+        super().__init__("site", key, f"Site ({key}) not found in catalog")
