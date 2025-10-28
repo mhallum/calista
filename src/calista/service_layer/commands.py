@@ -58,3 +58,23 @@ class PatchTelescope(Command):
     name: str | None | Unsettable = UNSET
     source: str | None | Unsettable = UNSET
     aperture_m: float | None | Unsettable = UNSET
+
+
+@dataclass(frozen=True)
+class PublishInstrumentRevision(Command):
+    """Command to publish an instrument revision to the catalog."""
+
+    instrument_code: str
+    name: str
+    source: str | None
+    mode: str | None
+
+
+@dataclass(frozen=True)
+class PatchInstrument(Command):
+    """Command to publish a patch revision to an existing instrument head in the catalog."""
+
+    instrument_code: str
+    name: str | None | Unsettable = UNSET
+    source: str | None | Unsettable = UNSET
+    mode: str | None | Unsettable = UNSET

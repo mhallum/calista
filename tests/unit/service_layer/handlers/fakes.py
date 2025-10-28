@@ -1,3 +1,6 @@
+""" "Fake implementations for testing service layer handlers."""
+
+from calista.adapters.catalog.instrument_catalog.memory import InMemoryInstrumentCatalog
 from calista.adapters.catalog.memory_store import InMemoryCatalogData
 from calista.adapters.catalog.site_catalog.memory import InMemorySiteCatalog
 from calista.adapters.catalog.telescope_catalog.memory import InMemoryTelescopeCatalog
@@ -20,6 +23,7 @@ class FakeUoW(AbstractUnitOfWork):
         self.catalogs = CatalogBundle(
             sites=InMemorySiteCatalog(catalog_data),
             telescopes=InMemoryTelescopeCatalog(catalog_data),
+            instruments=InMemoryInstrumentCatalog(catalog_data),
         )
         self.committed = False
 

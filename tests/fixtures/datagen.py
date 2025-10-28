@@ -158,3 +158,31 @@ def make_telescope_params():
         }
 
     return _make
+
+
+@pytest.fixture
+def make_instrument_params():
+    """Factory for instrument parameters with sensible defaults.
+
+    Args (defaults):
+        - source: str | None = "Some Test Source"
+        - mode: str | None = "Imaging"
+
+    defaults can be overridden by keyword arguments.
+    """
+
+    def _make(
+        instrument_code: str,
+        name: str,
+        *,
+        source: str | None = "Some Test Source",
+        mode: str | None = "Imaging",
+    ) -> dict:
+        return {
+            "instrument_code": instrument_code,
+            "name": name,
+            "source": source,
+            "mode": mode,
+        }
+
+    return _make

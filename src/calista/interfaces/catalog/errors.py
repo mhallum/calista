@@ -62,3 +62,10 @@ class TelescopeNotFoundError(CatalogError):
 
     def __init__(self, key: str) -> None:
         super().__init__("telescope", key, f"Telescope ({key}) not found in catalog")
+
+
+class InstrumentNotFoundError(CatalogError):
+    """Raised when an instrument entry cannot be found in the catalog."""
+
+    def __init__(self, key: str) -> None:
+        super().__init__("instrument", key, f"Instrument ({key}) not found in catalog")
