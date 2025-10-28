@@ -126,33 +126,23 @@ class TestPublishTelescopeRevision:
     """Tests for the publish_telescope_revision handler via the message bus."""
 
     @staticmethod
-    def _seed_site(bus, make_site_params, **site_params):
-        """Helper to seed a site for the telescope tests."""
-        publish_cmd = commands.PublishSiteRevision(**make_site_params(**site_params))
-        bus.handle(publish_cmd)
-
-    def test_commits(self, make_site_params, make_telescope_params):
+    def test_commits(make_telescope_params):
         """Handler commits the unit of work."""
         bus = bootstrap_test_bus()
 
-        # seed a site first (telescope references it)
-        self._seed_site(bus, make_site_params, site_code="S1", name="Site 1")
-
         cmd = commands.PublishTelescopeRevision(
-            **make_telescope_params("T1", "Test Telescope 1", "S1")
+            **make_telescope_params("T1", "Test Telescope 1")
         )
         bus.handle(cmd)
         assert bus.uow.committed is True
 
-    def test_publishes_new_revision(self, make_site_params, make_telescope_params):
+    @staticmethod
+    def test_publishes_new_revision(make_telescope_params):
         """Publishes a new telescope to the catalog."""
         bus = bootstrap_test_bus()
 
-        # seed a site first (telescope references it)
-        self._seed_site(bus, make_site_params, site_code="S1", name="Site 1")
-
         cmd = commands.PublishTelescopeRevision(
-            **make_telescope_params("T1", "Test Telescope 1", "S1")
+            **make_telescope_params("T1", "Test Telescope 1")
         )
         bus.handle(cmd)
 
@@ -161,31 +151,25 @@ class TestPublishTelescopeRevision:
         assert telescope.version == 1
         assert telescope.name == "Test Telescope 1"
 
-    def test_idempotent_on_no_change(self, make_site_params, make_telescope_params):
+    @staticmethod
+    def test_idempotent_on_no_change(make_telescope_params):
         """Re-publishing the same telescope revision does not create a new version."""
         bus = bootstrap_test_bus()
 
-        # seed a site first (telescope references it)
-        self._seed_site(bus, make_site_params, site_code="S1", name="Site 1")
-
         cmd = commands.PublishTelescopeRevision(
-            **make_telescope_params("T1", "Test Telescope 1", "S1")
+            **make_telescope_params("T1", "Test Telescope 1")
         )
         bus.handle(cmd)
         bus.handle(cmd)
         assert bus.uow.catalogs.telescopes.get("T1").version == 1  # still version 1
 
-    def test_logs_noop_on_no_change(
-        self, make_site_params, make_telescope_params, caplog
-    ):
+    @staticmethod
+    def test_logs_noop_on_no_change(make_telescope_params, caplog):
         """Re-publishing the same telescope revision logs a no-op message."""
         bus = bootstrap_test_bus()
 
-        # seed a site first (telescope references it)
-        self._seed_site(bus, make_site_params, site_code="S1", name="Site 1")
-
         cmd = commands.PublishTelescopeRevision(
-            **make_telescope_params("T1", "Test Telescope 1", "S1")
+            **make_telescope_params("T1", "Test Telescope 1")
         )
         bus.handle(cmd)
 
@@ -196,22 +180,18 @@ class TestPublishTelescopeRevision:
                 for message in caplog.messages
             )
 
-    def test_publishes_new_revision_on_change(
-        self, make_site_params, make_telescope_params
-    ):
+    @staticmethod
+    def test_publishes_new_revision_on_change(make_telescope_params):
         """Publishing a changed telescope revision creates a new version."""
         bus = bootstrap_test_bus()
 
-        # seed a site first (telescope references it)
-        self._seed_site(bus, make_site_params, site_code="S1", name="Site 1")
-
         cmd1 = commands.PublishTelescopeRevision(
-            **make_telescope_params("T1", "Test Telescope 1", "S1")
+            **make_telescope_params("T1", "Test Telescope 1")
         )
         bus.handle(cmd1)
 
         cmd2 = commands.PublishTelescopeRevision(
-            **make_telescope_params("T1", "Test Telescope 1 v2", "S1")
+            **make_telescope_params("T1", "Test Telescope 1 v2")
         )
         bus.handle(cmd2)
 
@@ -225,29 +205,9 @@ class TestPublishTelescopeRevision:
         )
         assert bus.uow.catalogs.telescopes.get("T1", version=1).version == 1
 
-    @staticmethod
-    def test_raises_on_publish_with_nonexistent_site(make_telescope_params):
-        """Publishing a telescope referencing a non-existent site raises an error."""
-        bus = bootstrap_test_bus()
-
-        cmd = commands.PublishTelescopeRevision(
-            **make_telescope_params("T1", "Test Telescope 1", "NONEXISTENT")
-        )
-
-        with pytest.raises(
-            SiteNotFoundError,
-            match=re.escape("Site (NONEXISTENT) not found in catalog"),
-        ):
-            bus.handle(cmd)
-
 
 class TestPatchTelescope:
     """Tests for the patch_telescope handler via the message bus."""
-
-    def _seed_site(self, bus, make_site_params, **site_params):
-        """Helper to seed a site for the telescope tests."""
-        publish_cmd = commands.PublishSiteRevision(**make_site_params(**site_params))
-        bus.handle(publish_cmd)
 
     def _seed_telescope(self, bus, make_telescope_params, **telescope_params):
         """Helper to seed a telescope for the patch tests."""
@@ -256,19 +216,16 @@ class TestPatchTelescope:
         )
         bus.handle(publish_cmd)
 
-    def test_commits(self, make_site_params, make_telescope_params):
+    def test_commits(self, make_telescope_params):
         """Handler commits the unit of work."""
         bus = bootstrap_test_bus()
 
-        # seed some data first
-        self._seed_site(bus, make_site_params, site_code="S1", name="Site 1")
-        self._seed_site(bus, make_site_params, site_code="S2", name="Site 2")
+        # seed a telescope to patch first
         self._seed_telescope(
             bus,
             make_telescope_params,
             telescope_code="T1",
             name="Test Telescope 1",
-            site_code="S1",
         )
 
         cmd = commands.PatchTelescope(telescope_code="T1", name="Patched Telescope A")
@@ -276,21 +233,16 @@ class TestPatchTelescope:
 
         assert bus.uow.committed is True
 
-    def test_publishes_new_revision_on_patch(
-        self, make_site_params, make_telescope_params
-    ):
+    def test_publishes_new_revision_on_patch(self, make_telescope_params):
         """Patching a telescope creates a new revision."""
         bus = bootstrap_test_bus()
 
-        # seed some data first
-        self._seed_site(bus, make_site_params, site_code="S1", name="Site 1")
-        self._seed_site(bus, make_site_params, site_code="S2", name="Site 2")
+        # seed a telescope first
         self._seed_telescope(
             bus,
             make_telescope_params,
             telescope_code="T1",
             name="Test Telescope 1",
-            site_code="S1",
         )
 
         patch_cmd = commands.PatchTelescope(
@@ -302,18 +254,16 @@ class TestPatchTelescope:
         assert bus.uow.catalogs.telescopes.get("T1").version == 2
         assert bus.uow.catalogs.telescopes.get("T1").name == "Patched Telescope"
 
-    def test_idempotent_on_no_change(self, make_site_params, make_telescope_params):
+    def test_idempotent_on_no_change(self, make_telescope_params):
         """Re-patching with no changes does not create a new version."""
         bus = bootstrap_test_bus()
 
-        # seed some data first
-        self._seed_site(bus, make_site_params, site_code="S1", name="Site 1")
+        # seed a telescope first
         self._seed_telescope(
             bus,
             make_telescope_params,
             telescope_code="T1",
             name="Test Telescope 1",
-            site_code="S1",
         )
 
         patch_cmd = commands.PatchTelescope(
@@ -333,46 +283,13 @@ class TestPatchTelescope:
         ):
             bus.handle(patch_cmd)
 
-    def test_raises_on_patch_with_nonexistent_site(
-        self, make_site_params, make_telescope_params
-    ):
-        """Patching a telescope to reference a non-existent site raises an error."""
-        bus = bootstrap_test_bus()
-
-        # seed a site and telescope first
-        self._seed_site(bus, make_site_params, site_code="S1", name="Site 1")
-        self._seed_telescope(
-            bus,
-            make_telescope_params,
-            telescope_code="T1",
-            name="Test Telescope 1",
-            site_code="S1",
-        )
-
-        patch_cmd = commands.PatchTelescope(
-            telescope_code="T1", site_code="NONEXISTENT"
-        )
-
-        with pytest.raises(
-            SiteNotFoundError,
-            match=re.escape("Site (NONEXISTENT) not found in catalog"),
-        ):
-            bus.handle(patch_cmd)
-
-    def test_logs_noop_on_no_change(
-        self, make_site_params, make_telescope_params, caplog
-    ):
+    def test_logs_noop_on_no_change(self, make_telescope_params, caplog):
         """Re-patching with no changes logs a no-op message."""
         bus = bootstrap_test_bus()
 
-        # seed some data first
-        self._seed_site(bus, make_site_params, site_code="S1", name="Site 1")
+        # seed a telescope first
         self._seed_telescope(
-            bus,
-            make_telescope_params,
-            telescope_code="T1",
-            name="Test Telescope 1",
-            site_code="S1",
+            bus, make_telescope_params, telescope_code="T1", name="Test Telescope 1"
         )
 
         patch_cmd = commands.PatchTelescope(

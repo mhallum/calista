@@ -85,7 +85,6 @@ def publish_telescope_revision(
     rev = TelescopeRevision(
         telescope_code=telescope_code,
         name=cmd.name,
-        site_code=cmd.site_code,
         source=cmd.source,
         aperture_m=cmd.aperture_m,
     )
@@ -99,11 +98,6 @@ def publish_telescope_revision(
             )
             return
 
-        # If the site does not exist, raise SiteNotFoundError
-        site = uow.catalogs.sites.get(cmd.site_code)
-        if site is None:
-            raise SiteNotFoundError(cmd.site_code)
-
         expected = 0 if head is None else head.version
         uow.catalogs.telescopes.publish(rev, expected_version=expected)
         uow.commit()
@@ -115,7 +109,6 @@ def patch_telescope(cmd: commands.PatchTelescope, uow: AbstractUnitOfWork) -> No
     telescope_code = cmd.telescope_code.upper()
     patch = TelescopePatch(
         name=cmd.name,
-        site_code=cmd.site_code,
         source=cmd.source,
         aperture_m=cmd.aperture_m,
     )
@@ -129,11 +122,6 @@ def patch_telescope(cmd: commands.PatchTelescope, uow: AbstractUnitOfWork) -> No
         if revision.get_diff(head) is None:
             logger.debug("PatchTelescope %s: no changes; noop", telescope_code)
             return
-
-        # If the site does not exist, raise SiteNotFoundError
-        site = uow.catalogs.sites.get(revision.site_code)
-        if site is None:
-            raise SiteNotFoundError(revision.site_code)
 
         uow.catalogs.telescopes.publish(revision, expected_version=head.version)
 

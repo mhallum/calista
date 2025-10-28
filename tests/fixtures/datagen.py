@@ -146,7 +146,6 @@ def make_telescope_params():
     def _make(
         telescope_code: str,
         name: str,
-        site_code: str,
         *,
         source: str | None = "Some Test Source",
         aperture_m: float | None = 1.0,
@@ -154,7 +153,6 @@ def make_telescope_params():
         return {
             "telescope_code": telescope_code,
             "name": name,
-            "site_code": site_code,
             "source": source,
             "aperture_m": aperture_m,
         }

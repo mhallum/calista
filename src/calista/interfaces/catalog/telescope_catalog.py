@@ -21,7 +21,6 @@ class TelescopeSnapshot:
 
     Conventions:
       - `telescope_code` is canonical uppercase (e.g., "LDT-4.3M" or "LDT").
-      - `site_code` is the site this telescope belongs to at this version (uppercase).
       - `aperture_m` is in meters (float), None if unknown.
       - `source` is human-readable provenance (e.g., "LDT wiki", "ops email").
       - `recorded_at` is a UTC tz-aware datetime when this snapshot was recorded.
@@ -31,13 +30,11 @@ class TelescopeSnapshot:
     version: int  # 1..N; head is the max per site_code
     recorded_at: datetime
     name: str
-    site_code: str
     source: str | None = None
     aperture_m: float | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "telescope_code", self.telescope_code.upper())
-        object.__setattr__(self, "site_code", self.site_code.upper())
 
         if self.aperture_m is not None and self.aperture_m <= 0:
             raise InvalidSnapshotError(
@@ -64,12 +61,10 @@ class TelescopeRevision:
 
     telescope_code: str  # canonical uppercase code, e.g. 'LDT'
     name: str
-    site_code: str
     source: str | None = None
     aperture_m: float | None = None
 
     def __post_init__(self) -> None:
-        object.__setattr__(self, "site_code", self.site_code.upper())
         object.__setattr__(self, "telescope_code", self.telescope_code.upper())
 
         if self.aperture_m is not None and self.aperture_m <= 0:
@@ -88,7 +83,6 @@ class TelescopeRevision:
         diffs: dict[str, tuple[object | None, object | None]] = {}
         for field in (
             "name",
-            "site_code",
             "source",
             "aperture_m",
         ):
@@ -104,7 +98,6 @@ class TelescopePatch:
     """Immutable write model for a telescope patch to be applied to an existing telescope head."""
 
     name: Unsettable[str] = UNSET
-    site_code: Unsettable[str] = UNSET
     source: Unsettable[str] = UNSET
     aperture_m: Unsettable[float] = UNSET
 
@@ -125,7 +118,6 @@ class TelescopePatch:
 
         return TelescopeRevision(
             telescope_code=head.telescope_code,
-            site_code=_resolve("site_code", clearable=False),
             name=_resolve("name", clearable=False),
             source=_resolve("source"),
             aperture_m=_resolve("aperture_m"),
@@ -182,5 +174,4 @@ class TelescopeCatalog(abc.ABC):
         Raises:
             VersionConflictError: If the expected_version does not match the current version.
             NoChangeError: If the revision does not introduce any changes.
-            SiteNotFoundError: If the site referenced by the telescope does not exist.
         """

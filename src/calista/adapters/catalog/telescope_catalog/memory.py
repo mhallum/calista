@@ -5,7 +5,6 @@ import datetime
 from calista.adapters.catalog.memory_store import InMemoryCatalogData
 from calista.interfaces.catalog.errors import (
     NoChangeError,
-    SiteNotFoundError,
     VersionConflictError,
 )
 from calista.interfaces.catalog.telescope_catalog import (
@@ -46,9 +45,6 @@ class InMemoryTelescopeCatalog(TelescopeCatalog):
         telescope_revs = self._data.telescopes.setdefault(revision.telescope_code, [])
         head_version = telescope_revs[-1].version if telescope_revs else 0
 
-        if not self._data.sites.get(revision.site_code):
-            raise SiteNotFoundError(revision.site_code)
-
         if expected_version != head_version:
             raise VersionConflictError(
                 "telescope",
@@ -71,7 +67,6 @@ class InMemoryTelescopeCatalog(TelescopeCatalog):
             version=version,
             recorded_at=datetime.datetime.now(datetime.timezone.utc),
             name=revision.name,
-            site_code=revision.site_code,
             aperture_m=revision.aperture_m,
             source=revision.source,
         )

@@ -46,7 +46,6 @@ class PublishTelescopeRevision(Command):
 
     telescope_code: str
     name: str
-    site_code: str
     source: str | None
     aperture_m: float | None
 
@@ -57,6 +56,5 @@ class PatchTelescope(Command):
 
     telescope_code: str
     name: str | None | Unsettable = UNSET
-    site_code: str | None | Unsettable = UNSET
     source: str | None | Unsettable = UNSET
     aperture_m: float | None | Unsettable = UNSET
