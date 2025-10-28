@@ -5,7 +5,9 @@ import re
 import pytest
 
 from calista.interfaces.catalog.errors import (
+    DuplicateFacilityError,
     InstrumentNotFoundError,
+    InvalidFacilityError,
     SiteNotFoundError,
     TelescopeNotFoundError,
 )
@@ -376,7 +378,8 @@ class TestPublishInstrumentRevision:
 class TestPatchInstrument:
     """Tests for the patch_instrument handler via the message bus."""
 
-    def _seed_instrument(self, bus, make_instrument_params, **instrument_params):
+    @staticmethod
+    def _seed_instrument(bus, make_instrument_params, **instrument_params):
         """Helper to seed an instrument for the patch tests."""
         publish_cmd = commands.PublishInstrumentRevision(
             **make_instrument_params(**instrument_params)
@@ -474,3 +477,156 @@ class TestPatchInstrument:
                 "PatchInstrument I1: no changes; noop" in message
                 for message in caplog.messages
             )
+
+
+@pytest.fixture
+def seeded_bus(make_site_params, make_telescope_params, make_instrument_params):
+    """Bootstrap a message bus seeded with a site, telescope, and instrument."""
+    bus = bootstrap_test_bus()
+    bus.handle(commands.PublishSiteRevision(**make_site_params("S1", "Site 1")))
+    bus.handle(
+        commands.PublishTelescopeRevision(**make_telescope_params("T1", "Telescope 1"))
+    )
+    bus.handle(
+        commands.PublishInstrumentRevision(
+            **make_instrument_params("I1", "Instrument 1")
+        )
+    )
+    return bus
+
+
+# pylint: disable=redefined-outer-name
+
+
+class TestRegisterFacility:
+    """Tests for the register_facility handler via the message bus."""
+
+    @staticmethod
+    def test_commits(seeded_bus):
+        """Handler commits the unit of work."""
+        bus = seeded_bus
+
+        cmd = commands.RegisterFacility(
+            facility_code="S1/T1/I1",
+            site_code="S1",
+            telescope_code="T1",
+            instrument_code="I1",
+        )
+        bus.handle(cmd)
+        assert bus.uow.committed is True
+
+    @staticmethod
+    def test_registers_new_facility(seeded_bus):
+        """Registers a new facility in the catalog."""
+        bus = seeded_bus
+
+        cmd = commands.RegisterFacility(
+            facility_code="S1/T1/I1",
+            site_code="S1",
+            telescope_code="T1",
+            instrument_code="I1",
+        )
+        bus.handle(cmd)
+
+        facility = bus.uow.catalogs.facilities.get("S1/T1/I1")
+        assert facility is not None
+        assert facility.facility_code == "S1/T1/I1"
+        assert facility.site_code == "S1"
+        assert facility.telescope_code == "T1"
+        assert facility.instrument_code == "I1"
+
+    @staticmethod
+    def test_raises_on_duplicate_facility(seeded_bus):
+        """Registering a facility with an existing code raises DuplicateFacilityError."""
+        bus = seeded_bus
+
+        cmd = commands.RegisterFacility(
+            facility_code="S1/T1/I1",
+            site_code="S1",
+            telescope_code="T1",
+            instrument_code="I1",
+        )
+        bus.handle(cmd)  # first registration
+
+        with pytest.raises(
+            DuplicateFacilityError,
+            match=re.escape("Facility (S1/T1/I1) already exists in catalog"),
+        ):
+            bus.handle(cmd)  # duplicate registration
+
+    @staticmethod
+    def test_raises_on_invalid_site(seeded_bus):
+        """Registering a facility with an unknown site raises InvalidFacilityError."""
+        bus = seeded_bus
+
+        cmd = commands.RegisterFacility(
+            facility_code="UNKNOWN/T1/I1",
+            site_code="UNKNOWN",
+            telescope_code="T1",
+            instrument_code="I1",
+        )
+
+        with pytest.raises(
+            InvalidFacilityError,
+            match=re.escape(
+                "Invalid facility (UNKNOWN/T1/I1): unknown site code: UNKNOWN"
+            ),
+        ):
+            bus.handle(cmd)  # registration with invalid site
+
+    @staticmethod
+    def test_raises_on_invalid_telescope(seeded_bus):
+        """Registering a facility with an unknown telescope raises InvalidFacilityError."""
+        bus = seeded_bus
+
+        cmd = commands.RegisterFacility(
+            facility_code="S1/UNKNOWN/I1",
+            site_code="S1",
+            telescope_code="UNKNOWN",
+            instrument_code="I1",
+        )
+
+        with pytest.raises(
+            InvalidFacilityError,
+            match=re.escape(
+                "Invalid facility (S1/UNKNOWN/I1): unknown telescope code: UNKNOWN"
+            ),
+        ):
+            bus.handle(cmd)  # registration with invalid telescope
+
+    @staticmethod
+    def test_raises_on_invalid_instrument(seeded_bus):
+        """Registering a facility with an unknown instrument raises InvalidFacilityError."""
+        bus = seeded_bus
+
+        cmd = commands.RegisterFacility(
+            facility_code="S1/T1/UNKNOWN",
+            site_code="S1",
+            telescope_code="T1",
+            instrument_code="UNKNOWN",
+        )
+
+        with pytest.raises(
+            InvalidFacilityError,
+            match=re.escape(
+                "Invalid facility (S1/T1/UNKNOWN): unknown instrument code: UNKNOWN"
+            ),
+        ):
+            bus.handle(cmd)  # registration with invalid instrument
+
+    @staticmethod
+    def test_idempotent_register(seeded_bus):
+        """Re-registering the same facility code is idempotent."""
+        bus = seeded_bus
+        bus.uow.committed = False
+
+        cmd = commands.RegisterFacility(
+            facility_code="S1/T1/I1",
+            site_code="S1",
+            telescope_code="T1",
+            instrument_code="I1",
+        )
+        bus.handle(cmd)
+        bus.uow.committed = False
+        bus.handle(cmd)  # second time should be a noop
+        assert bus.uow.committed is False  # no commit on second registration

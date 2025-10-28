@@ -8,6 +8,7 @@ from calista.interfaces.catalog.errors import (
     SiteNotFoundError,
     TelescopeNotFoundError,
 )
+from calista.interfaces.catalog.facility_catalog import Facility
 from calista.interfaces.catalog.instrument_catalog import (
     InstrumentPatch,
     InstrumentRevision,
@@ -200,6 +201,34 @@ def patch_instrument(cmd: commands.PatchInstrument, uow: AbstractUnitOfWork) -> 
 
 
 # ============================================================================
+#                Facility Catalog Management Handlers
+# ============================================================================
+
+
+def register_facility(cmd: commands.RegisterFacility, uow: AbstractUnitOfWork) -> None:
+    """Register a new facility."""
+
+    facility_code = cmd.facility_code.upper()
+
+    facility = Facility(
+        facility_code=facility_code,
+        site_code=cmd.site_code,
+        telescope_code=cmd.telescope_code,
+        instrument_code=cmd.instrument_code,
+    )
+
+    with uow:
+        if (
+            registered_facility := uow.catalogs.facilities.get(facility_code)
+        ) is not None and registered_facility == facility:
+            logger.debug("RegisterFacility %s: already exists; noop", facility_code)
+            return
+
+        uow.catalogs.facilities.register(facility)
+        uow.commit()
+
+
+# ============================================================================
 #                       Handler Registry
 # ============================================================================
 
@@ -211,4 +240,5 @@ COMMAND_HANDLERS: dict[type, Callable[..., None]] = {
     commands.PatchTelescope: patch_telescope,
     commands.PublishInstrumentRevision: publish_instrument_revision,
     commands.PatchInstrument: patch_instrument,
+    commands.RegisterFacility: register_facility,
 }

@@ -69,3 +69,28 @@ class InstrumentNotFoundError(CatalogError):
 
     def __init__(self, key: str) -> None:
         super().__init__("instrument", key, f"Instrument ({key}) not found in catalog")
+
+
+class DuplicateFacilityError(CatalogError):
+    """Raised when attempting to register a facility that already exists."""
+
+    def __init__(self, key: str) -> None:
+        super().__init__("facility", key, f"Facility ({key}) already exists in catalog")
+
+
+class FacilityNotFoundError(CatalogError):
+    """Raised when a facility entry cannot be found in the catalog."""
+
+    def __init__(self, key: str) -> None:
+        super().__init__("facility", key, f"Facility ({key}) not found in catalog")
+
+
+class InvalidFacilityError(CatalogError):
+    """Raised when a facility references unknown site, telescope, or instrument."""
+
+    def __init__(self, key: str, reason: str) -> None:
+        super().__init__(
+            "facility",
+            key,
+            f"Invalid facility ({key}): {reason}",
+        )

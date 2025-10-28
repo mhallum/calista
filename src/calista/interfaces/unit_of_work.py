@@ -20,6 +20,7 @@ class CatalogBundle:
     sites: catalog.SiteCatalog
     telescopes: catalog.TelescopeCatalog
     instruments: catalog.InstrumentCatalog
+    facilities: catalog.FacilityCatalog
 
 
 class AbstractUnitOfWork(abc.ABC):

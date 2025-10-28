@@ -1,8 +1,8 @@
 """In-memory shared data store for catalog adapters."""
 
 from dataclasses import dataclass
-from typing import Any
 
+from calista.interfaces.catalog.facility_catalog import Facility
 from calista.interfaces.catalog.instrument_catalog import InstrumentSnapshot
 from calista.interfaces.catalog.site_catalog import SiteSnapshot
 from calista.interfaces.catalog.telescope_catalog import TelescopeSnapshot
@@ -27,4 +27,4 @@ class InMemoryCatalogData:
     sites: dict[str, list[SiteSnapshot]]  # keyed by site_code
     telescopes: dict[str, list[TelescopeSnapshot]]  # keyed by telescope_code
     instruments: dict[str, list[InstrumentSnapshot]]  # keyed by instrument_code
-    facilities: dict[str, list[Any]]  # keyed by facility_code
+    facilities: dict[str, Facility]  # keyed by facility_code

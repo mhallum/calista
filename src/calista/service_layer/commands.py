@@ -78,3 +78,13 @@ class PatchInstrument(Command):
     name: str | None | Unsettable = UNSET
     source: str | None | Unsettable = UNSET
     mode: str | None | Unsettable = UNSET
+
+
+@dataclass(frozen=True)
+class RegisterFacility(Command):
+    """Command to register a new facility in the catalog."""
+
+    facility_code: str
+    site_code: str
+    telescope_code: str
+    instrument_code: str
