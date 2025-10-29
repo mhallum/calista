@@ -37,6 +37,7 @@ def publish_site_revision(
     """Publish a site revision to the catalog (create-or-update, idempotent)."""
 
     site_code = cmd.site_code.upper()
+
     rev = SiteRevision(
         site_code=site_code,
         name=cmd.name,
@@ -49,7 +50,7 @@ def publish_site_revision(
     )
 
     with uow:
-        head = uow.catalogs.sites.get(cmd.site_code)
+        head = uow.catalogs.sites.get(site_code)
 
         # If site exists and this would be a no-op, return idempotently.
         if head is not None and rev.get_diff(head) is None:
