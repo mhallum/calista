@@ -1,6 +1,6 @@
 """In-memory shared data store for catalog adapters."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from calista.interfaces.catalog.facility_catalog import Facility
 from calista.interfaces.catalog.instrument_catalog import InstrumentSnapshot
@@ -24,7 +24,14 @@ class InMemoryCatalogData:
     are stored in ascending version order (i.e. head is the last item in the list).
     """
 
-    sites: dict[str, list[SiteSnapshot]]  # keyed by site_code
-    telescopes: dict[str, list[TelescopeSnapshot]]  # keyed by telescope_code
-    instruments: dict[str, list[InstrumentSnapshot]]  # keyed by instrument_code
-    facilities: dict[str, Facility]  # keyed by facility_code
+    # keyed by site_code
+    sites: dict[str, list[SiteSnapshot]] = field(default_factory=dict)
+
+    # keyed by telescope_code
+    telescopes: dict[str, list[TelescopeSnapshot]] = field(default_factory=dict)
+
+    # keyed by instrument_code
+    instruments: dict[str, list[InstrumentSnapshot]] = field(default_factory=dict)
+
+    # keyed by facility_code
+    facilities: dict[str, Facility] = field(default_factory=dict)
