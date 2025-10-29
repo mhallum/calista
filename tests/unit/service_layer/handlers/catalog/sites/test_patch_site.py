@@ -96,6 +96,21 @@ class TestPatchSite(HandlerTestBase):
 
         self.assert_not_committed()
 
+    def test_logs_on_no_change(self, caplog):
+        """Patching with no changes logs a debug message."""
+
+        cmd = commands.PatchSite(site_code="A", name="Site A")
+        self.bus.handle(cmd)
+
+        with caplog.at_level("DEBUG"):
+            self.bus.handle(cmd)
+
+        # Check that a debug message about no-op was logged
+        debug_messages = [
+            record.message for record in caplog.records if record.levelname == "DEBUG"
+        ]
+        assert any(msg == "PatchSite A: no changes; noop" for msg in debug_messages)
+
     def test_raises_on_patch_nonexistent_site(self):
         """Patching a non-existent site raises SiteNotFoundError."""
 
