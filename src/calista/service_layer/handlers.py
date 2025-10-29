@@ -142,6 +142,7 @@ def patch_telescope(cmd: commands.PatchTelescope, uow: AbstractUnitOfWork) -> No
             return
 
         uow.catalogs.telescopes.publish(revision, expected_version=head.version)
+        uow.commit()
 
 
 # ============================================================================

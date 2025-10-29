@@ -3,37 +3,28 @@
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING
 
 import pytest
 
 from calista.interfaces.catalog.errors import TelescopeNotFoundError
 from calista.service_layer import commands
-
-if TYPE_CHECKING:
-    from calista.service_layer.messagebus import MessageBus
+from tests.unit.service_layer.handlers.base import HandlerTestBase
 
 # pylint: disable=magic-value-comparison
 
 
-class TestPatchTelescope:
+class TestPatchTelescope(HandlerTestBase):
     """Tests for the patch_telescope handler via the message bus."""
 
-    bus: MessageBus
-
-    @pytest.fixture(autouse=True)
-    def _attach_bus(self, make_test_bus, make_telescope_params):
-        """Attach a message bus to the test instance and seed with a telescope."""
-        self.bus = make_test_bus()  # available in every test method
+    # Used by BaseHandlerTest to seed the bus with a telescope
+    def _seed_bus(self, request):
+        """Seed the message bus with a telescope."""
+        make_telescope_params = request.getfixturevalue("make_telescope_params")
         self.bus.handle(
             commands.PublishTelescopeRevision(
                 **make_telescope_params("T1", "Test Telescope 1")
             )
         )
-
-    def _assert_committed(self):
-        assert hasattr(self.bus.uow, "committed")
-        assert self.bus.uow.committed is True
 
     def test_commits(self):
         """Handler commits the unit of work."""
@@ -41,7 +32,7 @@ class TestPatchTelescope:
         cmd = commands.PatchTelescope(telescope_code="T1", name="Patched Telescope A")
         self.bus.handle(cmd=cmd)
 
-        self._assert_committed()
+        self.assert_committed()
 
     def test_publishes_new_revision_on_patch(self):
         """Patching a telescope creates a new revision."""

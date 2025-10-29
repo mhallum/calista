@@ -2,30 +2,14 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-import pytest
-
 from calista.service_layer import commands
-
-if TYPE_CHECKING:
-    from calista.service_layer.messagebus import MessageBus
+from tests.unit.service_layer.handlers.base import HandlerTestBase
 
 # pylint: disable=magic-value-comparison
 
 
-class TestPublishTelescopeRevision:
+class TestPublishTelescopeRevision(HandlerTestBase):
     """Tests for the publish_telescope_revision handler via the message bus."""
-
-    bus: MessageBus
-
-    @pytest.fixture(autouse=True)
-    def _attach_bus(self, make_test_bus):
-        self.bus = make_test_bus()  # available in every test method
-
-    def _assert_committed(self):
-        assert hasattr(self.bus.uow, "committed")
-        assert self.bus.uow.committed is True
 
     def test_commits(self, make_telescope_params):
         """Test that the UoW is committed after publishing a telescope revision."""
@@ -33,7 +17,7 @@ class TestPublishTelescopeRevision:
             **make_telescope_params("T1", "Test Telescope 1")
         )
         self.bus.handle(cmd)
-        self._assert_committed()
+        self.assert_committed()
 
     def test_publishes_new_revision(self, make_telescope_params):
         """Test that a new telescope is published."""

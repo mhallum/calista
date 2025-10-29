@@ -1,39 +1,31 @@
 """Tests for the patch_instrument handler"""
 
-from __future__ import annotations
-
 import re
-from typing import TYPE_CHECKING
 
 import pytest
 
 from calista.interfaces.catalog import errors as catalog_errors
 from calista.service_layer import commands
-
-if TYPE_CHECKING:
-    from calista.service_layer.messagebus import MessageBus
+from tests.unit.service_layer.handlers.base import HandlerTestBase
 
 # pylint: disable=magic-value-comparison
 
 
-class TestPatchInstrument:
+class TestPatchInstrument(HandlerTestBase):
     """Tests for the patch_instrument handler via the message bus."""
 
-    bus: MessageBus
+    # --- Setup ----
 
-    @pytest.fixture(autouse=True)
-    def _attach_bus(self, make_test_bus, make_instrument_params):
-        """Attach a message bus to the test instance and seed with an instrument."""
-        self.bus = make_test_bus()  # available in every test method
-        self.bus.handle(
-            commands.PublishInstrumentRevision(
-                **make_instrument_params("I1", "Test Instrument 1")
-            )
+    # Used by BaseHandlerTest
+    def _seed_bus(self, request):
+        """Seed the bus with an initial instrument revision."""
+        make_instrument_params = request.getfixturevalue("make_instrument_params")
+        cmd = commands.PublishInstrumentRevision(
+            **make_instrument_params("I1", "Test Instrument 1")
         )
+        self.bus.handle(cmd)
 
-    def _assert_committed(self):
-        assert hasattr(self.bus.uow, "committed")
-        assert self.bus.uow.committed is True
+    # --- Tests ----
 
     def test_commits(self):
         """Handler commits the unit of work."""
@@ -43,7 +35,7 @@ class TestPatchInstrument:
         )
         self.bus.handle(cmd=cmd)
 
-        self._assert_committed()
+        self.assert_committed()
 
     def test_publishes_new_revision_on_patch(self):
         """Patching a instrument creates a new revision."""

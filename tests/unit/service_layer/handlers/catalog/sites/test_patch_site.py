@@ -6,63 +6,64 @@ import pytest
 
 from calista.interfaces.catalog import errors as catalog_errors
 from calista.service_layer import commands
+from tests.unit.service_layer.handlers.base import HandlerTestBase
+
+# pylint: disable=magic-value-comparison
 
 
-class TestPatchSite:
+class TestPatchSite(HandlerTestBase):
     """Tests for the patch_site handler via the message bus."""
 
-    @staticmethod
-    def test_commits(make_test_bus, make_site_params):
+    # --- Setup ---
+
+    # Used by HandlerTestBase to seed the bus
+    def _seed_bus(self, request) -> None:
+        """Seed the bus with any fixtures declared in seed_uses."""
+        make_site_params = request.getfixturevalue("make_site_params")
+        self.bus.handle(
+            cmd=commands.PublishSiteRevision(**make_site_params("A", "Site A"))
+        )
+
+    # --- Tests ---
+
+    def test_commits(self):
         """Handler commits the unit of work."""
-        bus = make_test_bus()
-        # First publish a site to patch
-        publish_cmd = commands.PublishSiteRevision(
-            **make_site_params("A", "Test Site A")
-        )
-        bus.handle(publish_cmd)
 
-        patch_cmd = commands.PatchSite(site_code="A", name="Patched Site A")
-        bus.handle(patch_cmd)
-        assert bus.uow.committed is True
+        cmd = commands.PatchSite(site_code="A", name="Patched Site A")
+        self.bus.handle(cmd)
+        self.assert_committed()
 
-    @staticmethod
-    def test_publishes_new_revision_on_patch(make_test_bus, make_site_params):
+    def test_publishes_new_revision_on_patch(self):
         """Patching a site creates a new revision."""
-        bus = make_test_bus()
-        # First publish a site to patch
-        publish_cmd = commands.PublishSiteRevision(
-            **make_site_params("A", "Test Site A")
-        )
-        bus.handle(publish_cmd)
 
-        patch_cmd = commands.PatchSite(site_code="A", name="Patched Site A")
-        bus.handle(patch_cmd)
+        cmd = commands.PatchSite(site_code="A", name="Patched Site A")
+        self.bus.handle(cmd)
 
         # updated to version 2
-        assert bus.uow.catalogs.sites.get("A").version == 2
-        assert bus.uow.catalogs.sites.get("A").name == "Patched Site A"
+        site = self.bus.uow.catalogs.sites.get("A")
+        assert site is not None
+        assert site.version == 2
+        assert site.name == "Patched Site A"
 
-    @staticmethod
-    def test_idempotent_on_no_change(make_test_bus, make_site_params):
-        """Re-patching with no changes does not create a new version."""
-        bus = make_test_bus()
-        # First publish a site to patch
-        publish_cmd = commands.PublishSiteRevision(
-            **make_site_params("A", "Test Site A")
-        )
-        bus.handle(publish_cmd)
+    def test_idempotent_on_no_change(self):
+        """Patching with no changes does not create a new version."""
 
-        patch_cmd = commands.PatchSite(site_code="A", name="Test Site A")
-        bus.handle(patch_cmd)
-        assert bus.uow.catalogs.sites.get("A").version == 1  # still version 1
+        cmd = commands.PatchSite(site_code="A", name="Site A")
+        self.bus.handle(cmd)
 
-    @staticmethod
-    def test_raises_on_patch_nonexistent_site(make_test_bus):
+        site = self.bus.uow.catalogs.sites.get("A")
+        assert site is not None
+        assert site.name == "Site A"
+        assert site.version == 1  # still version 1
+
+        self.assert_not_committed()
+
+    def test_raises_on_patch_nonexistent_site(self):
         """Patching a non-existent site raises SiteNotFoundError."""
-        bus = make_test_bus()
-        patch_cmd = commands.PatchSite(site_code="NONEXISTENT", name="No Site")
+
+        cmd = commands.PatchSite(site_code="NONEXISTENT", name="No Site")
         with pytest.raises(
             catalog_errors.SiteNotFoundError,
             match=re.escape("Site (NONEXISTENT) not found in catalog"),
         ):
-            bus.handle(patch_cmd)
+            self.bus.handle(cmd)
