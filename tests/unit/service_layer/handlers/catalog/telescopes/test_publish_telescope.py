@@ -22,7 +22,9 @@ class TestPublishTelescopeRevision(HandlerTestBase):
     def test_publishes_new_revision(self, make_telescope_params):
         """Test that a new telescope is published."""
         cmd = commands.PublishTelescopeRevision(
-            **make_telescope_params("T1", "Test Telescope 1")
+            **make_telescope_params(
+                "T1", "Test Telescope 1", source="Some Source", aperture_m=2.5
+            )
         )
         self.bus.handle(cmd)
         telescope = self.bus.uow.catalogs.telescopes.get("T1")
@@ -30,6 +32,8 @@ class TestPublishTelescopeRevision(HandlerTestBase):
             telescope
             and telescope.version == 1
             and telescope.name == "Test Telescope 1"
+            and telescope.source == "Some Source"
+            and telescope.aperture_m == 2.5
         )
 
     def test_idempotent_on_no_change(self, make_telescope_params):
