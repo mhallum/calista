@@ -77,9 +77,9 @@ def patch_site(cmd: commands.PatchSite, uow: AbstractUnitOfWork) -> None:
     )
 
     with uow:
-        head = uow.catalogs.sites.get(cmd.site_code)
+        head = uow.catalogs.sites.get(site_code)
         if head is None:
-            raise SiteNotFoundError(cmd.site_code)
+            raise SiteNotFoundError(site_code)
 
         revision = patch.apply_to(head)
         if revision.get_diff(head) is None:
