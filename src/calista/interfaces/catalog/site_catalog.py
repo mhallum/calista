@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any, TypeAlias
 
+from .base import VersionedCatalog
 from .errors import InvalidRevisionError, InvalidSnapshotError
 from .unsettable import UNSET, Unsettable, resolve
 
@@ -170,48 +171,5 @@ class SitePatch:
 # --- Interface ---
 
 
-class SiteCatalog(abc.ABC):
+class SiteCatalog(VersionedCatalog[SiteSnapshot, SiteRevision], abc.ABC):
     """Interface for managing the site catalog."""
-
-    @abc.abstractmethod
-    def get(self, site_code: str, version: int | None = None) -> SiteSnapshot | None:
-        """Get a site by its code.
-
-        Args:
-            site_code: The unique code of the site.
-            version: The specific version of the site to retrieve. If None, retrieves the latest version.
-
-        Returns:
-            The site snapshot if found, otherwise None.
-
-        Note:
-            `site_code` lookup is case-insensitive; implementers should uppercase it.
-        """
-
-    @abc.abstractmethod
-    def get_head_version(self, site_code: str) -> int | None:
-        """Get the head version of a site by its code.
-
-        Args:
-            site_code: The unique code of the site.
-
-        Returns:
-            The latest version number if found, otherwise None.
-        """
-
-    @abc.abstractmethod
-    def publish(
-        self,
-        revision: SiteRevision,
-        expected_version: int,
-    ) -> None:
-        """Append a new revision; enforce optimistic lock if expected_version is set.
-
-        Args:
-            revision: The site revision to publish.
-            expected_version: The expected head version of the site for optimistic locking.
-
-        Raises:
-            VersionConflictError: If the expected_version does not match the current version.
-            NoChangeError: If the revision does not introduce any changes.
-        """
