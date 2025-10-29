@@ -18,12 +18,29 @@ class TestPublishSiteRevision(HandlerTestBase):
     def test_publishes_new_revision(self, make_site_params):
         """Publishes a new site revision to the catalog."""
 
-        cmd = commands.PublishSiteRevision(**make_site_params("A", "Test Site A"))
+        cmd = commands.PublishSiteRevision(
+            **make_site_params(
+                "A",
+                "Test Site A",
+                source="Source X",
+                timezone="UTC",
+                lat_deg=12.34,
+                lon_deg=56.78,
+                elevation_m=1000,
+                mpc_code="123",
+            )
+        )
         self.bus.handle(cmd)
         site = self.bus.uow.catalogs.sites.get("A")
         assert site is not None
         assert site.version == 1
         assert site.name == "Test Site A"
+        assert site.source == "Source X"
+        assert site.timezone == "UTC"
+        assert site.lat_deg == 12.34
+        assert site.lon_deg == 56.78
+        assert site.elevation_m == 1000
+        assert site.mpc_code == "123"
 
     def test_idempotent_on_no_change(self, make_site_params):
         """Re-publishing the same revision does not create a new version."""
