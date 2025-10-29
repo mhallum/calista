@@ -169,3 +169,26 @@ class TestRegisterFacility(HandlerTestBase):
         self.reset_committed()
         self.bus.handle(cmd)  # second time should be a noop
         self.assert_not_committed()
+
+    def test_logs_on_no_change(self, caplog):
+        """Re-registering the same facility code logs a debug message."""
+
+        cmd = commands.RegisterFacility(
+            facility_code="S1/T1/I1",
+            site_code="S1",
+            telescope_code="T1",
+            instrument_code="I1",
+        )
+        self.bus.handle(cmd)
+
+        with caplog.at_level("DEBUG"):
+            self.bus.handle(cmd)  # second time should be a noop
+
+        # Check that a debug message about no-op was logged
+        debug_messages = [
+            record.message for record in caplog.records if record.levelname == "DEBUG"
+        ]
+        assert any(
+            msg == "RegisterFacility S1/T1/I1: already exists; noop"
+            for msg in debug_messages
+        )
