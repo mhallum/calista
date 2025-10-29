@@ -44,6 +44,21 @@ class TestPublishInstrumentRevision(HandlerTestBase):
         assert i1.name == "Test Instrument 1"
         assert i1.version == 1  # still version 1
 
+    def test_logs_on_no_change(self, make_instrument_params, caplog):
+        """Re-publishing with no changes logs a debug message."""
+        cmd = commands.PublishInstrumentRevision(
+            **make_instrument_params("I1", "Test Instrument 1")
+        )
+        self.bus.handle(cmd)
+
+        with caplog.at_level("DEBUG"):
+            self.bus.handle(cmd)
+
+        assert any(
+            message == "PublishInstrumentRevision I1: no changes; noop"
+            for message in caplog.messages
+        )
+
     def test_publishes_new_revision_on_change(self, make_instrument_params):
         """Publishing a changed revision creates a new version."""
 
