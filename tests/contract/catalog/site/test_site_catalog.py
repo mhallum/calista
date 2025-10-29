@@ -19,7 +19,7 @@ def test_can_publish_and_retrieve_site(catalog, make_site_params):
     """A site revision can be published and then retrieved as a snapshot."""
     site_rev = SiteRevision(**make_site_params(site_code="TEST", name="Test Site"))
     catalog.publish(site_rev, expected_version=0)
-    site_snapshot = catalog.get(site_code="TEST")
+    site_snapshot = catalog.get("TEST")
 
     assert isinstance(site_snapshot, SiteSnapshot)
     assert not site_rev.get_diff(site_snapshot)
@@ -29,17 +29,17 @@ def test_can_publish_and_retrieve_site(catalog, make_site_params):
 def test_head_version_updates_on_publish(catalog, make_site_params):
     """The head version updates correctly after publishing revisions."""
 
-    assert catalog.get_head_version(site_code="TEST") is None
+    assert catalog.get_head_version("TEST") is None
 
     site_rev1 = SiteRevision(**make_site_params(site_code="TEST", name="Test Site"))
     catalog.publish(site_rev1, expected_version=0)
-    assert catalog.get_head_version(site_code="TEST") == 1
+    assert catalog.get_head_version("TEST") == 1
 
     site_rev2 = SiteRevision(
         **make_site_params(site_code="TEST", name="Updated Test Site")
     )
     catalog.publish(site_rev2, expected_version=1)
-    assert catalog.get_head_version(site_code="TEST") == 2
+    assert catalog.get_head_version("TEST") == 2
 
 
 def test_get_specific_version(catalog, make_site_params):
@@ -52,8 +52,8 @@ def test_get_specific_version(catalog, make_site_params):
     )
     catalog.publish(site_rev2, expected_version=1)
 
-    snapshot_v1 = catalog.get(site_code="TEST", version=1)
-    snapshot_v2 = catalog.get(site_code="TEST", version=2)
+    snapshot_v1 = catalog.get("TEST", version=1)
+    snapshot_v2 = catalog.get("TEST", version=2)
 
     assert snapshot_v1 is not None
     assert snapshot_v1.name == "Test Site"
@@ -74,7 +74,7 @@ def test_get_returns_head_version_by_default(catalog, make_site_params):
     )
     catalog.publish(site_rev2, expected_version=1)
 
-    site_snapshot = catalog.get(site_code="TEST")
+    site_snapshot = catalog.get("TEST")
 
     assert site_snapshot is not None
     assert site_snapshot.name == "Updated Test Site"
@@ -83,7 +83,7 @@ def test_get_returns_head_version_by_default(catalog, make_site_params):
 
 def test_get_head_version_returns_none_for_nonexistent_site(catalog):
     """Getting the head version of a nonexistent site returns None."""
-    assert catalog.get_head_version(site_code="NONEXISTENT") is None
+    assert catalog.get_head_version("NONEXISTENT") is None
 
 
 def test_cannot_publish_with_version_conflict(catalog, make_site_params):
@@ -107,7 +107,7 @@ def test_cannot_publish_with_version_conflict(catalog, make_site_params):
 
 def test_return_none_for_nonexistent_site(catalog):
     """Getting a nonexistent site returns None."""
-    site_snapshot = catalog.get(site_code="NONEXISTENT")
+    site_snapshot = catalog.get("NONEXISTENT")
     assert site_snapshot is None
 
 
@@ -119,7 +119,7 @@ def test_get_is_case_insensitive(code, catalog, make_site_params):
     site_rev = SiteRevision(**make_site_params(site_code="TestSite", name="Test Site"))
     catalog.publish(site_rev, expected_version=0)
 
-    site_snapshot = catalog.get(site_code=code)
+    site_snapshot = catalog.get(code)
     assert site_snapshot is not None
     assert site_snapshot.site_code == "TESTSITE"
 
@@ -142,7 +142,7 @@ def test_publish_no_change_raises_error(catalog, make_site_params):
     assert error.key == "TEST"
 
     # Verify that the head version remains unchanged
-    assert catalog.get_head_version(site_code="TEST") == 1
+    assert catalog.get_head_version("TEST") == 1
 
 
 def test_get_nonexistent_version_returns_none(catalog, make_site_params):
@@ -150,7 +150,7 @@ def test_get_nonexistent_version_returns_none(catalog, make_site_params):
     site_rev = SiteRevision(**make_site_params(site_code="TEST", name="Test Site"))
     catalog.publish(site_rev, expected_version=0)
 
-    assert catalog.get(site_code="TEST", version=99) is None
+    assert catalog.get("TEST", version=99) is None
 
 
 def test_publish_sets_recorded_at_utc(catalog, make_site_params):
@@ -158,7 +158,7 @@ def test_publish_sets_recorded_at_utc(catalog, make_site_params):
     site_rev = SiteRevision(**make_site_params(site_code="TEST", name="Test Site"))
     catalog.publish(site_rev, expected_version=0)
 
-    snapshot = catalog.get(site_code="TEST")
+    snapshot = catalog.get("TEST")
     assert snapshot is not None
     assert snapshot.recorded_at.tzinfo is not None
     assert snapshot.recorded_at.utcoffset() == timedelta(0)
@@ -175,7 +175,7 @@ def test_versions_are_tracked_per_site(catalog, make_site_params):
     rev_a2 = SiteRevision(**make_site_params(site_code="ALPHA", name="Alpha 2"))
     catalog.publish(rev_a2, expected_version=1)
 
-    assert catalog.get_head_version(site_code="ALPHA") == 2
-    assert catalog.get_head_version(site_code="BETA") == 1
+    assert catalog.get_head_version("ALPHA") == 2
+    assert catalog.get_head_version("BETA") == 1
 
-    assert catalog.get(site_code="BETA", version=1).name == "Beta 1"
+    assert catalog.get("BETA", version=1).name == "Beta 1"
