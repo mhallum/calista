@@ -86,7 +86,7 @@ class TestPatchTelescope(HandlerTestBase):
             self.bus.handle(cmd=cmd)
 
         assert any(
-            "PatchTelescope T1: no changes; noop" in message
+            message == "PatchTelescope T1: no changes; noop"
             for message in caplog.messages
         )
 
