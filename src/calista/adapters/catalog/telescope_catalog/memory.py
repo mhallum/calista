@@ -25,25 +25,27 @@ class InMemoryTelescopeCatalog(TelescopeCatalog):
     def get(
         self, telescope_code: str, version: int | None = None
     ) -> TelescopeSnapshot | None:
-        telescope_revs = self._data.telescopes.get(telescope_code, None)
-        if telescope_revs is None:
+        telescope_snapshots = self._data.telescopes.get(telescope_code, None)
+        if telescope_snapshots is None:
             return None
         if version is None:
-            return telescope_revs[-1]
-        for telescope in telescope_revs:
+            return telescope_snapshots[-1]
+        for telescope in telescope_snapshots:
             if telescope.version == version:
                 return telescope
         return None
 
     def get_head_version(self, telescope_code: str) -> int | None:
-        telescope_revs = self._data.telescopes.get(telescope_code, None)
-        if telescope_revs is None or len(telescope_revs) == 0:
+        telescope_snapshots = self._data.telescopes.get(telescope_code, None)
+        if telescope_snapshots is None or len(telescope_snapshots) == 0:
             return None
-        return telescope_revs[-1].version
+        return telescope_snapshots[-1].version
 
     def publish(self, revision: TelescopeRevision, expected_version: int) -> None:
-        telescope_revs = self._data.telescopes.setdefault(revision.telescope_code, [])
-        head_version = telescope_revs[-1].version if telescope_revs else 0
+        telescope_snapshots = self._data.telescopes.setdefault(
+            revision.telescope_code, []
+        )
+        head_version = telescope_snapshots[-1].version if telescope_snapshots else 0
 
         if expected_version != head_version:
             raise VersionConflictError(
@@ -53,10 +55,12 @@ class InMemoryTelescopeCatalog(TelescopeCatalog):
                 expected_version,
             )
 
-        if telescope_revs and revision == telescope_revs[-1]:
+        if telescope_snapshots and not revision.get_diff(telescope_snapshots[-1]):
             raise NoChangeError("telescope", revision.telescope_code)
 
-        telescope_revs.append(self._revision_to_snapshot(revision, head_version + 1))
+        telescope_snapshots.append(
+            self._revision_to_snapshot(revision, head_version + 1)
+        )
 
     @staticmethod
     def _revision_to_snapshot(
