@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any, TypeAlias
 
-from .errors import InvalidRevisionError
+from .errors import InvalidRevisionError, InvalidSnapshotError
 from .unsettable import UNSET, Unsettable, resolve
 
 # pylint: disable=too-many-instance-attributes
@@ -39,7 +39,7 @@ class InstrumentSnapshot:
         if self.recorded_at.tzinfo is None or self.recorded_at.utcoffset() != timedelta(
             0
         ):
-            raise ValueError(
+            raise InvalidSnapshotError(
                 "instrument",
                 self.instrument_code,
                 "recorded_at must be timezone-aware UTC",
