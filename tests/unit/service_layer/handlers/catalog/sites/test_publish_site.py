@@ -53,6 +53,22 @@ class TestPublishSiteRevision(HandlerTestBase):
         assert site.name == "Test Site A"
         assert site.version == 1  # still version 1
 
+    def test_logs_on_no_change(self, make_site_params, caplog):
+        """Re-publishing the same revision logs a debug message."""
+        cmd = commands.PublishSiteRevision(**make_site_params("A", "Test Site A"))
+        self.bus.handle(cmd)
+
+        with caplog.at_level("DEBUG"):
+            self.bus.handle(cmd)
+
+        # Check that a debug message about no-op was logged
+        debug_messages = [
+            record.message for record in caplog.records if record.levelname == "DEBUG"
+        ]
+        assert any(
+            msg == "PublishSiteRevision A: no changes; noop" for msg in debug_messages
+        )
+
     def test_publishes_new_revision_on_change(self, make_site_params):
         """Publishing a changed revision creates a new version."""
         cmd1 = commands.PublishSiteRevision(**make_site_params("A", "Test Site A"))
