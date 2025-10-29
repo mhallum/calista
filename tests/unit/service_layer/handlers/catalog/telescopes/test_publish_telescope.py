@@ -56,7 +56,7 @@ class TestPublishTelescopeRevision(HandlerTestBase):
         with caplog.at_level("DEBUG"):
             self.bus.handle(cmd)
         assert any(
-            "PublishTelescopeRevision T1: no changes; noop" in m
+            m == "PublishTelescopeRevision T1: no changes; noop"
             for m in caplog.messages
         )
 
