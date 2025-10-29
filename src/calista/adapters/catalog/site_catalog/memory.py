@@ -20,25 +20,25 @@ class InMemorySiteCatalog(SiteCatalog):
         self._data = data
 
     def get(self, site_code: str, version: int | None = None) -> SiteSnapshot | None:
-        site_revs = self._data.sites.get(site_code, None)
-        if site_revs is None:
+        site_snapshots = self._data.sites.get(site_code.upper())
+        if site_snapshots is None:
             return None
         if version is None:
-            return site_revs[-1]
-        for site in site_revs:
+            return site_snapshots[-1]
+        for site in site_snapshots:
             if site.version == version:
                 return site
         return None
 
     def get_head_version(self, site_code: str) -> int | None:
-        site_revs = self._data.sites.get(site_code, None)
-        if site_revs is None or len(site_revs) == 0:
+        site_snapshots = self._data.sites.get(site_code.upper())
+        if site_snapshots is None or len(site_snapshots) == 0:
             return None
-        return site_revs[-1].version
+        return site_snapshots[-1].version
 
     def publish(self, revision: SiteRevision, expected_version: int) -> None:
-        site_revs = self._data.sites.setdefault(revision.site_code, [])
-        head_version = site_revs[-1].version if site_revs else 0
+        site_snapshots = self._data.sites.setdefault(revision.site_code, [])
+        head_version = site_snapshots[-1].version if site_snapshots else 0
 
         if expected_version != head_version:
             raise VersionConflictError(
@@ -48,10 +48,10 @@ class InMemorySiteCatalog(SiteCatalog):
                 expected_version,
             )
 
-        if site_revs and revision == site_revs[-1]:
+        if site_snapshots and not revision.get_diff(site_snapshots[-1]):
             raise NoChangeError("site", revision.site_code)
 
-        site_revs.append(self._revision_to_snapshot(revision, head_version + 1))
+        site_snapshots.append(self._revision_to_snapshot(revision, head_version + 1))
 
     @staticmethod
     def _revision_to_snapshot(revision: SiteRevision, version: int) -> SiteSnapshot:
