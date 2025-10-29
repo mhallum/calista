@@ -1,3 +1,5 @@
+"""In-memory SiteCatalog implementation for testing purposes."""
+
 import datetime
 
 from calista.adapters.catalog.memory_store import InMemoryCatalogData
