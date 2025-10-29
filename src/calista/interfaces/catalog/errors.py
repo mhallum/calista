@@ -8,6 +8,8 @@ class CatalogError(Exception):
         if message is None:
             message = f"{kind} ({key}) catalog error"
         super().__init__(message)
+        self.kind = kind
+        self.key = key
 
 
 class SnapshotError(CatalogError):
@@ -19,6 +21,7 @@ class InvalidSnapshotError(SnapshotError):
 
     def __init__(self, kind: str, key: str, reason: str) -> None:
         super().__init__(kind, key, f"Invalid {kind} ({key}) snapshot: {reason}")
+        self.reason = reason
 
 
 class RevisionError(CatalogError):
@@ -30,6 +33,7 @@ class InvalidRevisionError(RevisionError):
 
     def __init__(self, kind: str, key: str, reason: str) -> None:
         super().__init__(kind, key, f"Invalid {kind} ({key}) revision: {reason}")
+        self.reason = reason
 
 
 class VersionConflictError(RevisionError):
@@ -41,6 +45,8 @@ class VersionConflictError(RevisionError):
             key,
             f"{kind} ({key}) version conflict: head={head}, expected={expected}",
         )
+        self.head = head
+        self.expected = expected
 
 
 class NoChangeError(RevisionError):
@@ -94,3 +100,4 @@ class InvalidFacilityError(CatalogError):
             key,
             f"Invalid facility ({key}): {reason}",
         )
+        self.reason = reason
