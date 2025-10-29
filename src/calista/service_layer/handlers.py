@@ -165,7 +165,7 @@ def publish_instrument_revision(
     )
 
     with uow:
-        head = uow.catalogs.instruments.get(cmd.instrument_code)
+        head = uow.catalogs.instruments.get(instrument_code)
 
         # If instrument exists and this would be a no-op, return idempotently.
         if head is not None and rev.get_diff(head) is None:
@@ -189,9 +189,9 @@ def patch_instrument(cmd: commands.PatchInstrument, uow: AbstractUnitOfWork) -> 
     )
 
     with uow:
-        head = uow.catalogs.instruments.get(cmd.instrument_code)
+        head = uow.catalogs.instruments.get(instrument_code)
         if head is None:
-            raise InstrumentNotFoundError(cmd.instrument_code)
+            raise InstrumentNotFoundError(instrument_code)
 
         revision = patch.apply_to(head)
         if revision.get_diff(head) is None:
