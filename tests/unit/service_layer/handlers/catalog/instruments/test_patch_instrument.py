@@ -81,7 +81,7 @@ class TestPatchInstrument(HandlerTestBase):
             self.bus.handle(cmd=cmd)
 
         assert any(
-            "PatchInstrument I1: no changes; noop" in message
+            message == "PatchInstrument I1: no changes; noop"
             for message in caplog.messages
         )
 
