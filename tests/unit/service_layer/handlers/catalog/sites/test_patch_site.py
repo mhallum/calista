@@ -105,3 +105,49 @@ class TestPatchSite(HandlerTestBase):
             match=re.escape("Site (NONEXISTENT) not found in catalog"),
         ):
             self.bus.handle(cmd)
+
+    def test_can_clear_fields(self):
+        """Patching can clear optional fields by setting them to None."""
+
+        # First patch to set optional fields
+        cmd_set = commands.PatchSite(
+            site_code="A",
+            source="Source X",
+            timezone="UTC",
+            lat_deg=12.34,
+            lon_deg=56.78,
+            elevation_m=1000,
+            mpc_code="123",
+        )
+        self.bus.handle(cmd_set)
+
+        site = self.bus.uow.catalogs.sites.get("A")
+        assert site is not None
+        assert site.source == "Source X"
+        assert site.timezone == "UTC"
+        assert site.lat_deg == 12.34
+        assert site.lon_deg == 56.78
+        assert site.elevation_m == 1000
+        assert site.mpc_code == "123"
+
+        # Now patch to clear those fields
+        cmd_clear = commands.PatchSite(
+            site_code="A",
+            source=None,
+            timezone=None,
+            lat_deg=None,
+            lon_deg=None,
+            elevation_m=None,
+            mpc_code=None,
+        )
+        self.bus.handle(cmd_clear)
+
+        site_cleared = self.bus.uow.catalogs.sites.get("A")
+        assert site_cleared is not None
+        assert site_cleared.source is None
+        assert site_cleared.timezone is None
+        assert site_cleared.lat_deg is None
+        assert site_cleared.lon_deg is None
+        assert site_cleared.elevation_m is None
+        assert site_cleared.mpc_code is None
+        assert site_cleared.version == 3  # now version 3
