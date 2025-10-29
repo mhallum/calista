@@ -84,3 +84,59 @@ class TestPatchInstrument(HandlerTestBase):
             "PatchInstrument I1: no changes; noop" in message
             for message in caplog.messages
         )
+
+    def test_unpatched_fields_preserved(self):
+        """Unpatched fields are preserved in the new revision."""
+
+        # First, patch only the name
+        cmd = commands.PatchInstrument(instrument_code="I1", name="Patched Instrument")
+        self.bus.handle(cmd)
+
+        # updated to version 2
+        i1 = self.bus.uow.catalogs.instruments.get("I1")
+        assert i1 is not None
+        assert i1.version == 2
+        assert i1.name == "Patched Instrument"
+
+        # unpatched fields preserved
+        i1_v1 = self.bus.uow.catalogs.instruments.get("I1", version=1)
+        assert i1_v1 is not None
+        assert i1.source == i1_v1.source and i1.source is not None
+        assert i1.mode == i1_v1.mode and i1.mode is not None
+
+    def test_can_clear_source_and_mode(self):
+        """Can clear optional fields source and mode via patching."""
+
+        # First, patch to set source and mode
+        cmd = commands.PatchInstrument(
+            instrument_code="I1", source="Initial Source", mode="Initial Mode"
+        )
+        self.bus.handle(cmd)
+
+        # updated to version 2
+        i1 = self.bus.uow.catalogs.instruments.get("I1")
+        assert i1 is not None
+        assert i1.version == 2
+        assert i1.source == "Initial Source"
+        assert i1.mode == "Initial Mode"
+
+        # Now, patch to clear source and mode
+        cmd = commands.PatchInstrument(instrument_code="I1", source=None, mode=None)
+        self.bus.handle(cmd)
+
+        # updated to version 3
+        i1 = self.bus.uow.catalogs.instruments.get("I1")
+        assert i1 is not None
+        assert i1.version == 3
+        assert i1.source is None
+        assert i1.mode is None
+
+    def test_cannot_clear_name(self):
+        """Patching to clear the name field raises an error."""
+
+        cmd = commands.PatchInstrument(instrument_code="I1", name=None)
+        with pytest.raises(
+            catalog_errors.InvalidRevisionError,
+            match=re.escape("Invalid instrument (I1) revision: name cannot be cleared"),
+        ):
+            self.bus.handle(cmd)
