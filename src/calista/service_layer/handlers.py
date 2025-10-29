@@ -210,7 +210,9 @@ def patch_instrument(cmd: commands.PatchInstrument, uow: AbstractUnitOfWork) -> 
 def register_facility(cmd: commands.RegisterFacility, uow: AbstractUnitOfWork) -> None:
     """Register a new facility."""
 
-    facility_code = cmd.facility_code.upper()
+    # This is technically redundant since the Facility model uppercases it,
+    # but it's nice to have it here for logging and error messages.
+    facility_code = cmd.facility_code.upper()  # pragma: no mutate
 
     facility = Facility(
         facility_code=facility_code,
