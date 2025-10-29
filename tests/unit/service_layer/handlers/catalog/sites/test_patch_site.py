@@ -36,7 +36,15 @@ class TestPatchSite(HandlerTestBase):
     def test_publishes_new_revision_on_patch(self):
         """Patching a site creates a new revision."""
 
-        cmd = commands.PatchSite(site_code="A", name="Patched Site A")
+        cmd = commands.PatchSite(
+            site_code="A",
+            name="Patched Site A",
+            timezone="UTC",
+            lat_deg=12.34,
+            lon_deg=56.78,
+            elevation_m=1000,
+            mpc_code="123",
+        )
         self.bus.handle(cmd)
 
         # updated to version 2
@@ -44,6 +52,36 @@ class TestPatchSite(HandlerTestBase):
         assert site is not None
         assert site.version == 2
         assert site.name == "Patched Site A"
+        assert site.timezone == "UTC"
+        assert site.lat_deg == 12.34
+        assert site.lon_deg == 56.78
+        assert site.elevation_m == 1000
+        assert site.mpc_code == "123"
+
+    def test_preserves_unpatched_fields(self):
+        """Patching a site preserves unpatched fields."""
+
+        cmd = commands.PatchSite(
+            site_code="A",
+            name="Patched Site A",
+        )
+        self.bus.handle(cmd)
+
+        # updated to version 2
+        site = self.bus.uow.catalogs.sites.get("A")
+        assert site is not None
+        assert site.version == 2
+        assert site.name == "Patched Site A"
+
+        # unpatched fields preserved
+        site_v1 = self.bus.uow.catalogs.sites.get("A", version=1)
+        assert site_v1 is not None
+        assert site.source == site_v1.source and site.source is not None
+        assert site.timezone == site_v1.timezone and site.timezone is not None
+        assert site.lat_deg == site_v1.lat_deg and site.lat_deg is not None
+        assert site.lon_deg == site_v1.lon_deg and site.lon_deg is not None
+        assert site.elevation_m == site_v1.elevation_m and site.elevation_m is not None
+        assert site.mpc_code == site_v1.mpc_code and site.mpc_code is not None
 
     def test_idempotent_on_no_change(self):
         """Patching with no changes does not create a new version."""
