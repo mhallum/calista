@@ -2,6 +2,7 @@
 
 from calista.interfaces.catalog.errors import (
     CatalogError,
+    FacilityNotFoundError,
     InvalidSnapshotError,
     NoChangeError,
     VersionConflictError,
@@ -44,3 +45,9 @@ def test_invalid_snapshot_error_message():
         reason="missing required field 'name'",
     )
     assert str(error) == "Invalid site (LDT) snapshot: missing required field 'name'"
+
+
+def test_facility_not_found_error_message():
+    """FacilityNotFoundError constructs the correct error message."""
+    error = FacilityNotFoundError("XYZ")
+    assert str(error) == "Facility (XYZ) not found in catalog"
