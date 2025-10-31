@@ -11,7 +11,8 @@ Provided fixtures
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 import pytest
 
@@ -39,3 +40,21 @@ def catalog(request: pytest.FixtureRequest) -> SiteCatalog:
             return InMemorySiteCatalog(data=InMemoryCatalogData())
         case _:
             raise ValueError(f"unknown catalog type: {request.param}")
+
+
+@pytest.fixture
+def make_params(make_site_params) -> Callable[..., dict[str, Any]]:
+    """Factory for site parameters with sensible defaults.
+
+    Args (defaults):
+        - source: str | None = "Some Test Source"
+        - timezone: str | None = "America/New_York"
+        - lat_deg: float | None = 90.0
+        - lon_deg: float | None = 30.0
+        - elevation_m: float | None = 100.0
+        - mpc_code: str | None = "XXX"
+
+    defaults can be overridden by keyword arguments.
+    """
+
+    return make_site_params
