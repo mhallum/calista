@@ -2,11 +2,7 @@
 
 import datetime
 
-from calista.adapters.catalog.memory_store import InMemoryCatalogData
-from calista.interfaces.catalog.errors import (
-    NoChangeError,
-    VersionConflictError,
-)
+from calista.adapters.catalog.memory_base import InMemoryVersionedCatalogBase
 from calista.interfaces.catalog.telescope_catalog import (
     TelescopeCatalog,
     TelescopeRevision,
@@ -16,55 +12,15 @@ from calista.interfaces.catalog.telescope_catalog import (
 # pylint: disable=consider-using-assignment-expr
 
 
-class InMemoryTelescopeCatalog(TelescopeCatalog):
+class InMemoryTelescopeCatalog(
+    InMemoryVersionedCatalogBase[TelescopeSnapshot, TelescopeRevision], TelescopeCatalog
+):
     """In-memory implementation of the TelescopeCatalog interface."""
 
-    def __init__(self, data: InMemoryCatalogData):
-        self._data = data
+    BUCKET_ATTR = "telescopes"
 
-    def get(
-        self, telescope_code: str, version: int | None = None
-    ) -> TelescopeSnapshot | None:
-        telescope_snapshots = self._data.telescopes.get(telescope_code, None)
-        if telescope_snapshots is None:
-            return None
-        if version is None:
-            return telescope_snapshots[-1]
-        for telescope in telescope_snapshots:
-            if telescope.version == version:
-                return telescope
-        return None
-
-    def get_head_version(self, telescope_code: str) -> int | None:
-        telescope_snapshots = self._data.telescopes.get(telescope_code, None)
-        if telescope_snapshots is None or len(telescope_snapshots) == 0:
-            return None
-        return telescope_snapshots[-1].version
-
-    def publish(self, revision: TelescopeRevision, expected_version: int) -> None:
-        telescope_snapshots = self._data.telescopes.setdefault(
-            revision.telescope_code, []
-        )
-        head_version = telescope_snapshots[-1].version if telescope_snapshots else 0
-
-        if expected_version != head_version:
-            raise VersionConflictError(
-                "telescope",
-                revision.telescope_code,
-                head_version,
-                expected_version,
-            )
-
-        if telescope_snapshots and not revision.get_diff(telescope_snapshots[-1]):
-            raise NoChangeError("telescope", revision.telescope_code)
-
-        telescope_snapshots.append(
-            self._revision_to_snapshot(revision, head_version + 1)
-        )
-
-    @staticmethod
     def _revision_to_snapshot(
-        revision: TelescopeRevision, version: int
+        self, revision: TelescopeRevision, version: int
     ) -> TelescopeSnapshot:
         return TelescopeSnapshot(
             telescope_code=revision.telescope_code,
