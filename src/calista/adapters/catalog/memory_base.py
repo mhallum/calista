@@ -79,7 +79,7 @@ class InMemoryVersionedCatalogBase(Generic[S, R]):
         if not snapshots:
             return None
         head = snapshots[-1]
-        return getattr(head, "version", None)
+        return getattr(head, "version")
 
     def publish(self, revision: R, expected_version: int) -> None:
         """Append a new revision; enforce optimistic lock if expected_version is set.
