@@ -5,7 +5,7 @@ from __future__ import annotations
 import abc
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any, TypeAlias
+from typing import Any, ClassVar, TypeAlias
 
 from .base import VersionedCatalog
 from .errors import InvalidRevisionError, InvalidSnapshotError
@@ -173,3 +173,8 @@ class SitePatch:
 
 class SiteCatalog(VersionedCatalog[SiteSnapshot, SiteRevision], abc.ABC):
     """Interface for managing the site catalog."""
+
+    KIND: ClassVar[str] = "site"
+    CODE_ATTR: ClassVar[str] = "site_code"
+    REVISION_CLASS: ClassVar[type[SiteRevision]] = SiteRevision
+    SNAPSHOT_CLASS: ClassVar[type[SiteSnapshot]] = SiteSnapshot

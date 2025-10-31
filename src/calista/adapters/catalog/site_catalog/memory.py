@@ -17,8 +17,6 @@ class InMemorySiteCatalog(
 ):
     """In-memory implementation of the SiteCatalog interface for testing purposes."""
 
-    KIND = "site"
-    CODE_ATTR = "site_code"
     BUCKET_ATTR = "sites"
 
     def _revision_to_snapshot(

@@ -3,15 +3,19 @@
 from __future__ import annotations
 
 import abc
-from typing import Generic, TypeVar
+from typing import ClassVar, Generic, TypeVar
 
 S = TypeVar("S")  # Snapshot type
 R = TypeVar("R")  # Revision type
-K = TypeVar("K")  # Key type (e.g., facility_code)
 
 
 class VersionedCatalog(abc.ABC, Generic[S, R]):
     """Entities that evolve via published revisions (versions 1..N)."""
+
+    KIND: ClassVar[str]  # e.g., "site", "telescope"
+    CODE_ATTR: ClassVar[str]
+    REVISION_CLASS: ClassVar[type]
+    SNAPSHOT_CLASS: ClassVar[type]
 
     @abc.abstractmethod
     def get(self, code: str, version: int | None = None) -> S | None:
