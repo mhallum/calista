@@ -17,7 +17,7 @@ class InMemoryFacilityCatalog(FacilityCatalog):
         self._data = data
 
     def get(self, facility_code: str) -> Facility | None:
-        facility = self._data.facilities.get(facility_code.upper(), None)
+        facility = self._data.facilities.get(facility_code.upper())
         return facility
 
     def register(self, facility: Facility) -> None:
