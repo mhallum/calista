@@ -5,8 +5,9 @@ from __future__ import annotations
 import abc
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any, TypeAlias
+from typing import Any, ClassVar, TypeAlias
 
+from .base import VersionedCatalog
 from .errors import InvalidRevisionError, InvalidSnapshotError
 from .unsettable import UNSET, Unsettable, resolve
 
@@ -127,51 +128,10 @@ class TelescopePatch:
 # --- Interface ---
 
 
-class TelescopeCatalog(abc.ABC):
+class TelescopeCatalog(VersionedCatalog[TelescopeSnapshot, TelescopeRevision], abc.ABC):
     """Interface for managing the telescope catalog."""
 
-    @abc.abstractmethod
-    def get(
-        self, telescope_code: str, version: int | None = None
-    ) -> TelescopeSnapshot | None:
-        """Get a telescope by its code.
-
-        Args:
-            telescope_code: The unique code of the telescope.
-            version: The specific version of the telescope to retrieve.
-                If None, retrieves the latest version.
-
-        Returns:
-            The telescope snapshot if found, otherwise None.
-
-        Note:
-            `telescope_code` lookup is case-insensitive; implementers should uppercase it.
-        """
-
-    @abc.abstractmethod
-    def get_head_version(self, telescope_code: str) -> int | None:
-        """Get the head version of a telescope by its code.
-
-        Args:
-            telescope_code: The unique code of the telescope.
-
-        Returns:
-            The latest version number if found, otherwise None.
-        """
-
-    @abc.abstractmethod
-    def publish(
-        self,
-        revision: TelescopeRevision,
-        expected_version: int,
-    ) -> None:
-        """Append a new revision; enforce optimistic lock if expected_version is set.
-
-        Args:
-            revision: The telescope revision to publish.
-            expected_version: The expected head version of the telescope for optimistic locking.
-
-        Raises:
-            VersionConflictError: If the expected_version does not match the current version.
-            NoChangeError: If the revision does not introduce any changes.
-        """
+    KIND: ClassVar[str] = "telescope"
+    CODE_ATTR: ClassVar[str] = "telescope_code"
+    REVISION_CLASS: ClassVar[type[TelescopeRevision]] = TelescopeRevision
+    SNAPSHOT_CLASS: ClassVar[type[TelescopeSnapshot]] = TelescopeSnapshot

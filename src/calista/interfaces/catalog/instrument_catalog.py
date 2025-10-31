@@ -5,8 +5,9 @@ from __future__ import annotations
 import abc
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any, TypeAlias
+from typing import Any, ClassVar, TypeAlias
 
+from .base import VersionedCatalog
 from .errors import InvalidRevisionError, InvalidSnapshotError
 from .unsettable import UNSET, Unsettable, resolve
 
@@ -118,51 +119,12 @@ class InstrumentPatch:
 # --- Interface ---
 
 
-class InstrumentCatalog(abc.ABC):
+class InstrumentCatalog(
+    VersionedCatalog[InstrumentSnapshot, InstrumentRevision], abc.ABC
+):
     """Interface for managing the instrument catalog."""
 
-    @abc.abstractmethod
-    def get(
-        self, instrument_code: str, version: int | None = None
-    ) -> InstrumentSnapshot | None:
-        """Get an instrument by its code.
-
-        Args:
-            instrument_code: The unique code of the instrument.
-            version: The specific version of the instrument to retrieve.
-                If None, retrieves the latest version.
-
-        Returns:
-            The instrument snapshot if found, otherwise None.
-
-        Note:
-            `instrument_code` lookup is case-insensitive; implementers should uppercase it.
-        """
-
-    @abc.abstractmethod
-    def get_head_version(self, instrument_code: str) -> int | None:
-        """Get the head version of an instrument by its code.
-
-        Args:
-            instrument_code: The unique code of the instrument.
-
-        Returns:
-            The latest version number if found, otherwise None.
-        """
-
-    @abc.abstractmethod
-    def publish(
-        self,
-        revision: InstrumentRevision,
-        expected_version: int,
-    ) -> None:
-        """Append a new revision; enforce optimistic lock if expected_version is set.
-
-        Args:
-            revision: The instrument revision to publish.
-            expected_version: The expected head version of the instrument for optimistic locking.
-
-        Raises:
-            VersionConflictError: If the expected_version does not match the current version.
-            NoChangeError: If the revision does not introduce any changes.
-        """
+    KIND: ClassVar[str] = "instrument"
+    CODE_ATTR: ClassVar[str] = "instrument_code"
+    REVISION_CLASS: ClassVar[type[InstrumentRevision]] = InstrumentRevision
+    SNAPSHOT_CLASS: ClassVar[type[InstrumentSnapshot]] = InstrumentSnapshot
