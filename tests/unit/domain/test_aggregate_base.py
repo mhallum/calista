@@ -18,7 +18,7 @@ class FakeAggregate(Aggregate):
         self.event_a_applied: bool = False
         self.event_b_applied: bool = False
 
-    def _apply(self, event) -> None:
+    def _apply(self, event: DomainEvent) -> None:
         if isinstance(event, FakeEventA):
             self.event_a_applied = True
         elif isinstance(event, FakeEventB):
