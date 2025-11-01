@@ -1,4 +1,4 @@
-""" "Domain-layer error definitions."""
+"""Domain-layer error definitions."""
 
 
 class DomainError(Exception):
