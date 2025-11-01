@@ -32,6 +32,11 @@ class Aggregate(abc.ABC):
         """Rebuild an aggregate from its past events."""
         aggregate = cls(aggregate_id)
         for event in event_stream:
+            if event.aggregate_id != aggregate_id:
+                raise ValueError(
+                    f"Event aggregate ID '{event.aggregate_id}' does not match "
+                    f"aggregate ID '{aggregate_id}'."
+                )
             aggregate._apply(event)
             aggregate._version += 1
         return aggregate
@@ -40,11 +45,20 @@ class Aggregate(abc.ABC):
 
     @abc.abstractmethod
     def _apply(self, event: DomainEvent) -> None:
-        """Apply an event to the aggregate."""
+        """Apply an event to the aggregate.
+
+        Note:
+           This method already assumes that the event's aggregate ID matches the aggregate's ID.
+        """
 
     # --- Plumbing ---
 
     def _enqueue(self, event: DomainEvent) -> None:
+        if event.aggregate_id != self.aggregate_id:
+            raise ValueError(
+                f"Event aggregate ID '{event.aggregate_id}' does not match "
+                f"aggregate ID '{self.aggregate_id}'."
+            )
         self._pending_events.append(event)
         self._apply(event)
 
