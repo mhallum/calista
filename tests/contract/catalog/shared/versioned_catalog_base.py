@@ -1,3 +1,5 @@
+"""Tests for versioned catalog base functionality."""
+
 from datetime import timedelta
 
 import pytest
