@@ -3,7 +3,7 @@
 from calista.domain import errors
 
 
-class TestMismatchedAggregateIdError:
+class TestAggregateIdMismatchError:
     """Tests for the AggregateIdMismatchError domain error."""
 
     @staticmethod
