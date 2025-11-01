@@ -4,6 +4,7 @@ import abc
 from collections.abc import Sequence
 from typing import ClassVar, TypeVar
 
+from calista.domain.errors import AggregateIdMismatchError
 from calista.domain.events import DomainEvent
 
 A = TypeVar("A", bound="Aggregate")
@@ -29,14 +30,23 @@ class Aggregate(abc.ABC):
     def rehydrate(
         cls: type[A], aggregate_id: str, event_stream: Sequence[DomainEvent]
     ) -> A:
-        """Rebuild an aggregate from its past events."""
+        """Rebuild an aggregate from its past events.
+
+        Args:
+            aggregate_id: The ID of the aggregate to rebuild.
+            event_stream: A sequence of events to apply to the aggregate in order.
+
+        Returns:
+            An instance of the aggregate rebuilt to the state represented by the event stream.
+
+        Raises:
+            AggregateIdMismatchError: If any event in the stream has an aggregate_id
+                that does not match the provided aggregate_id.
+        """
         aggregate = cls(aggregate_id)
         for event in event_stream:
             if event.aggregate_id != aggregate_id:
-                raise ValueError(
-                    f"Event aggregate ID '{event.aggregate_id}' does not match "
-                    f"aggregate ID '{aggregate_id}'."
-                )
+                raise AggregateIdMismatchError(aggregate_id, event.aggregate_id)
             aggregate._apply(event)
             aggregate._version += 1
         return aggregate
@@ -55,20 +65,21 @@ class Aggregate(abc.ABC):
 
     def _enqueue(self, event: DomainEvent) -> None:
         if event.aggregate_id != self.aggregate_id:
-            raise ValueError(
-                f"Event aggregate ID '{event.aggregate_id}' does not match "
-                f"aggregate ID '{self.aggregate_id}'."
-            )
+            raise AggregateIdMismatchError(self.aggregate_id, event.aggregate_id)
         self._pending_events.append(event)
         self._apply(event)
 
     def dequeue_uncommitted(self) -> list[DomainEvent]:
         """Dequeue all uncommitted events.
 
+        Returns:
+            A list of all uncommitted events since the last call to this method.
+
         Note: This is NOT thread-safe. It is the caller's responsibility to ensure
         that no other operations are performed on the aggregate between calls to this
         method.
         """
+
         uncommitted_events, self._pending_events = self._pending_events, []
         return uncommitted_events
 

@@ -2,7 +2,9 @@
 
 from dataclasses import dataclass
 
-from calista.domain.aggregates.base import Aggregate
+import pytest
+
+from calista.domain.aggregates.base import Aggregate, AggregateIdMismatchError
 from calista.domain.events import DomainEvent
 
 # pylint: disable=protected-access,magic-value-comparison,too-few-public-methods
@@ -101,6 +103,17 @@ class TestAggregateRehydration:
         agg = FakeAggregate.rehydrate("agg-1", events)
         assert agg.version == len(events)
 
+    @staticmethod
+    def test_rehydrate_raises_on_id_mismatch() -> None:
+        """Test that rehydration raises an error on aggregate ID mismatch."""
+        event_stream = [FakeEventA("agg-2")]  # Mismatched ID
+
+        with pytest.raises(AggregateIdMismatchError) as e:
+            FakeAggregate.rehydrate("agg-1", event_stream)
+        error = e.value
+        assert error.aggregate_id == "agg-1"
+        assert error.event_aggregate_id == "agg-2"
+
 
 class TestAggregateEventEnqueueing:
     """Test for the _enqueue method of Aggregate."""
@@ -125,6 +138,18 @@ class TestAggregateEventEnqueueing:
         aggregate._enqueue(FakeEventA("agg-1"))
 
         assert aggregate.version == initial_version
+
+    @staticmethod
+    def test_enqueue_raises_on_id_mismatch() -> None:
+        """Test that enqueuing an event with a mismatched ID raises an error."""
+        aggregate = FakeAggregate("agg-1")
+        event = FakeEventA("agg-2")  # Mismatched ID
+
+        with pytest.raises(AggregateIdMismatchError) as e:
+            aggregate._enqueue(event)
+        error = e.value
+        assert error.aggregate_id == "agg-1"
+        assert error.event_aggregate_id == "agg-2"
 
 
 class TestAggregateDequeueUncommitted:
