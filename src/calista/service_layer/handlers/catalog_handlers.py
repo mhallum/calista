@@ -1,4 +1,4 @@
-"""Service layer handlers."""
+"""Service layer handlers relating to the catalog."""
 
 import logging
 from collections.abc import Callable
@@ -19,8 +19,7 @@ from calista.interfaces.catalog.telescope_catalog import (
     TelescopeRevision,
 )
 from calista.interfaces.unit_of_work import AbstractUnitOfWork
-
-from . import commands
+from calista.service_layer import commands
 
 # pylint: disable=consider-using-assignment-expr
 
