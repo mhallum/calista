@@ -33,6 +33,7 @@ class TelescopeSnapshot:
     name: str
     source: str | None = None
     aperture_m: float | None = None
+    comment: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "telescope_code", self.telescope_code.upper())
@@ -64,6 +65,7 @@ class TelescopeRevision:
     name: str
     source: str | None = None
     aperture_m: float | None = None
+    comment: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "telescope_code", self.telescope_code.upper())
@@ -82,11 +84,7 @@ class TelescopeRevision:
                 f"telescope_code mismatch with head ({head.telescope_code})",
             )
         diffs: dict[str, tuple[object | None, object | None]] = {}
-        for field in (
-            "name",
-            "source",
-            "aperture_m",
-        ):
+        for field in ("name", "source", "aperture_m", "comment"):
             old_value = getattr(head, field)
             new_value = getattr(self, field)
             if old_value != new_value:
@@ -101,6 +99,7 @@ class TelescopePatch:
     name: Unsettable[str] = UNSET
     source: Unsettable[str] = UNSET
     aperture_m: Unsettable[float] = UNSET
+    comment: str | None = None
 
     def apply_to(self, head: TelescopeSnapshot) -> TelescopeRevision:
         """Apply the patch to the given telescope head and return a new TelescopeRevision."""
@@ -122,6 +121,7 @@ class TelescopePatch:
             name=_resolve("name", clearable=False),
             source=_resolve("source"),
             aperture_m=_resolve("aperture_m"),
+            comment=self.comment,
         )
 
 

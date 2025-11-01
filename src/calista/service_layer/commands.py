@@ -18,12 +18,13 @@ class PublishSiteRevision(Command):
 
     site_code: str
     name: str
-    source: str | None
-    timezone: str | None
-    lat_deg: float | None
-    lon_deg: float | None
-    elevation_m: float | None
-    mpc_code: str | None
+    source: str | None = None
+    timezone: str | None = None
+    lat_deg: float | None = None
+    lon_deg: float | None = None
+    elevation_m: float | None = None
+    mpc_code: str | None = None
+    comment: str | None = None
 
 
 @dataclass(frozen=True)
@@ -38,6 +39,7 @@ class PatchSite(Command):
     lon_deg: float | None | Unsettable = UNSET
     elevation_m: float | None | Unsettable = UNSET
     mpc_code: str | None | Unsettable = UNSET
+    comment: str | None = None
 
 
 @dataclass(frozen=True)
@@ -46,8 +48,9 @@ class PublishTelescopeRevision(Command):
 
     telescope_code: str
     name: str
-    source: str | None
-    aperture_m: float | None
+    source: str | None = None
+    aperture_m: float | None = None
+    comment: str | None = None
 
 
 @dataclass(frozen=True)
@@ -58,6 +61,7 @@ class PatchTelescope(Command):
     name: str | None | Unsettable = UNSET
     source: str | None | Unsettable = UNSET
     aperture_m: float | None | Unsettable = UNSET
+    comment: str | None = None
 
 
 @dataclass(frozen=True)
@@ -66,8 +70,9 @@ class PublishInstrumentRevision(Command):
 
     instrument_code: str
     name: str
-    source: str | None
-    mode: str | None
+    source: str | None = None
+    mode: str | None = None
+    comment: str | None = None
 
 
 @dataclass(frozen=True)
@@ -78,6 +83,7 @@ class PatchInstrument(Command):
     name: str | None | Unsettable = UNSET
     source: str | None | Unsettable = UNSET
     mode: str | None | Unsettable = UNSET
+    comment: str | None = None
 
 
 @dataclass(frozen=True)

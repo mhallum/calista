@@ -22,18 +22,32 @@ class TestPublishTelescopeRevision(HandlerTestBase):
     def test_publishes_new_revision(self, make_telescope_params):
         """Test that a new telescope is published."""
         cmd = commands.PublishTelescopeRevision(
+            **make_telescope_params("T1", "Test Telescope 1")
+        )
+        self.bus.handle(cmd)
+        telescope = self.bus.uow.catalogs.telescopes.get("T1")
+        assert telescope is not None, "Expected telescope T1 to be published"
+        assert telescope.version == 1, "Expected telescope T1 to be at version 1"
+
+    def test_published_data_persists_correctly(self, make_telescope_params):
+        """Test that the published telescope data persists correctly."""
+        cmd = commands.PublishTelescopeRevision(
             **make_telescope_params(
-                "T1", "Test Telescope 1", source="Some Source", aperture_m=2.5
+                "T1",
+                "Test Telescope 1",
+                source="Some Source",
+                aperture_m=2.5,
+                comment="Initial publish",
             )
         )
         self.bus.handle(cmd)
         telescope = self.bus.uow.catalogs.telescopes.get("T1")
-        assert (
-            telescope
-            and telescope.version == 1
-            and telescope.name == "Test Telescope 1"
-            and telescope.source == "Some Source"
-            and telescope.aperture_m == 2.5
+        assert telescope is not None, "Expected telescope T1 to be published"
+        assert telescope.name == "Test Telescope 1", "name did not persist correctly"
+        assert telescope.source == "Some Source", "source did not persist correctly"
+        assert telescope.aperture_m == 2.5, "aperture_m did not persist correctly"
+        assert telescope.comment == "Initial publish", (
+            "comment did not persist correctly"
         )
 
     def test_idempotent_on_no_change(self, make_telescope_params):

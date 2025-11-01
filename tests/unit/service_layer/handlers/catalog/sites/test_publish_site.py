@@ -28,6 +28,7 @@ class TestPublishSiteRevision(HandlerTestBase):
                 lon_deg=56.78,
                 elevation_m=1000,
                 mpc_code="123",
+                comment="Some comment",
             )
         )
         self.bus.handle(cmd)
@@ -41,6 +42,7 @@ class TestPublishSiteRevision(HandlerTestBase):
         assert site.lon_deg == 56.78
         assert site.elevation_m == 1000
         assert site.mpc_code == "123"
+        assert site.comment == "Some comment"
 
     def test_idempotent_on_no_change(self, make_site_params):
         """Re-publishing the same revision does not create a new version."""

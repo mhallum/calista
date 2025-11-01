@@ -33,6 +33,7 @@ class InstrumentSnapshot:
     name: str
     source: str | None = None
     mode: str | None = None
+    comment: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "instrument_code", self.instrument_code.upper())
@@ -60,6 +61,7 @@ class InstrumentRevision:
     name: str
     source: str | None = None
     mode: str | None = None
+    comment: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "instrument_code", self.instrument_code.upper())
@@ -77,6 +79,7 @@ class InstrumentRevision:
             "name",
             "source",
             "mode",
+            "comment",
         ):
             old_value = getattr(head, field)
             new_value = getattr(self, field)
@@ -92,6 +95,7 @@ class InstrumentPatch:
     name: Unsettable[str] = UNSET
     source: Unsettable[str] = UNSET
     mode: Unsettable[str] = UNSET
+    comment: str | None = None
 
     def apply_to(self, head: InstrumentSnapshot) -> InstrumentRevision:
         """Apply the patch to the given instrument head and return a new InstrumentRevision."""
@@ -113,6 +117,7 @@ class InstrumentPatch:
             name=_resolve("name", clearable=False),
             source=_resolve("source"),
             mode=_resolve("mode"),
+            comment=self.comment,
         )
 
 

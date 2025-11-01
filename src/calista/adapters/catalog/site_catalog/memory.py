@@ -33,4 +33,5 @@ class InMemorySiteCatalog(
             elevation_m=revision.elevation_m,
             mpc_code=revision.mpc_code,
             recorded_at=datetime.datetime.now(datetime.timezone.utc),
+            comment=revision.comment,
         )

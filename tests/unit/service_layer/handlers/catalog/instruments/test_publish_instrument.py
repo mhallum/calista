@@ -21,7 +21,11 @@ class TestPublishInstrumentRevision(HandlerTestBase):
         """Publishes a new instrument revision to the catalog."""
         cmd = commands.PublishInstrumentRevision(
             **make_instrument_params(
-                "I1", "Test Instrument 1", source="Some Source", mode="Imaging"
+                "I1",
+                "Test Instrument 1",
+                source="Some Source",
+                mode="Imaging",
+                comment="Some comment",
             )
         )
         self.bus.handle(cmd)
@@ -31,6 +35,7 @@ class TestPublishInstrumentRevision(HandlerTestBase):
         assert instrument.name == "Test Instrument 1"
         assert instrument.source == "Some Source"
         assert instrument.mode == "Imaging"
+        assert instrument.comment == "Some comment"
 
     def test_idempotent_on_no_change(self, make_instrument_params):
         """Re-publishing the same revision does not create a new version."""

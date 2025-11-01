@@ -29,4 +29,5 @@ class InMemoryTelescopeCatalog(
             name=revision.name,
             aperture_m=revision.aperture_m,
             source=revision.source,
+            comment=revision.comment,
         )

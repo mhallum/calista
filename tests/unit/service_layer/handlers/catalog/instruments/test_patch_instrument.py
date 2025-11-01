@@ -104,33 +104,6 @@ class TestPatchInstrument(HandlerTestBase):
         assert i1.source == i1_v1.source and i1.source is not None
         assert i1.mode == i1_v1.mode and i1.mode is not None
 
-    def test_can_clear_source_and_mode(self):
-        """Can clear optional fields source and mode via patching."""
-
-        # First, patch to set source and mode
-        cmd = commands.PatchInstrument(
-            instrument_code="I1", source="Initial Source", mode="Initial Mode"
-        )
-        self.bus.handle(cmd)
-
-        # updated to version 2
-        i1 = self.bus.uow.catalogs.instruments.get("I1")
-        assert i1 is not None
-        assert i1.version == 2
-        assert i1.source == "Initial Source"
-        assert i1.mode == "Initial Mode"
-
-        # Now, patch to clear source and mode
-        cmd = commands.PatchInstrument(instrument_code="I1", source=None, mode=None)
-        self.bus.handle(cmd)
-
-        # updated to version 3
-        i1 = self.bus.uow.catalogs.instruments.get("I1")
-        assert i1 is not None
-        assert i1.version == 3
-        assert i1.source is None
-        assert i1.mode is None
-
     def test_cannot_clear_name(self):
         """Patching to clear the name field raises an error."""
 
@@ -140,3 +113,53 @@ class TestPatchInstrument(HandlerTestBase):
             match=re.escape("Invalid instrument (I1) revision: name cannot be cleared"),
         ):
             self.bus.handle(cmd)
+
+    @pytest.mark.parametrize(
+        "field", ["source", "mode"], ids=lambda field: f"can_clear_{field}"
+    )
+    def test_can_clear_clearable_fields(self, field):
+        """Patching can clear fields (those clearable) by setting them to None.
+
+        clearable fields: source, mode
+        """
+
+        # make sure the field is initially set
+        seeded_instrument = self.bus.uow.catalogs.instruments.get("I1")
+        assert getattr(seeded_instrument, field) is not None
+
+        # Issue patch command
+        patch_cmd = commands.PatchInstrument(instrument_code="I1", **{field: None})
+        self.bus.handle(cmd=patch_cmd)
+
+        # check that field is cleared in new head revision
+        patched_instrument = self.bus.uow.catalogs.instruments.get("I1")
+        assert patched_instrument is not None
+        assert getattr(patched_instrument, field) is None
+
+    def test_comment_field_does_not_inherit(self):
+        """The comment field does not inherit from head if not patched."""
+
+        # First patch with a comment
+        first_patch_cmd = commands.PatchInstrument(
+            instrument_code="I1",
+            comment="First patch comment",
+        )
+        self.bus.handle(cmd=first_patch_cmd)
+
+        i1_v2 = self.bus.uow.catalogs.instruments.get("I1")
+        assert i1_v2 is not None
+        assert i1_v2.version == 2
+        assert i1_v2.comment == "First patch comment"
+
+        # Second patch without a comment
+        second_patch_cmd = commands.PatchInstrument(
+            instrument_code="I1",
+            name="Second Patch Name",
+        )
+        self.bus.handle(cmd=second_patch_cmd)
+
+        i1_v3 = self.bus.uow.catalogs.instruments.get("I1")
+        assert i1_v3 is not None
+        assert i1_v3.version == 3
+        assert i1_v3.name == "Second Patch Name"
+        assert i1_v3.comment is None  # comment does not inherit

@@ -103,6 +103,7 @@ def make_site_params():
         - lon_deg: float | None = 30.0
         - elevation_m: float | None = 100.0
         - mpc_code: str | None = "XXX"
+        - comment: str | None = None
 
     defaults can be overridden by keyword arguments.
     """
@@ -117,6 +118,7 @@ def make_site_params():
         lon_deg: float | None = 30.0,
         elevation_m: float | None = 100.0,
         mpc_code: str | None = "XXX",
+        comment: str | None = None,
     ) -> dict:
         return {
             "site_code": site_code,
@@ -127,6 +129,7 @@ def make_site_params():
             "lon_deg": lon_deg,
             "elevation_m": elevation_m,
             "mpc_code": mpc_code,
+            "comment": comment,
         }
 
     return _make
@@ -139,6 +142,7 @@ def make_telescope_params():
     Args (defaults):
         - source: str | None = "Some Test Source"
         - aperture_m: float | None = 1.0
+        - comment: str | None = None
 
     defaults can be overridden by keyword arguments.
     """
@@ -149,12 +153,14 @@ def make_telescope_params():
         *,
         source: str | None = "Some Test Source",
         aperture_m: float | None = 1.0,
+        comment: str | None = None,
     ) -> dict:
         return {
             "telescope_code": telescope_code,
             "name": name,
             "source": source,
             "aperture_m": aperture_m,
+            "comment": comment,
         }
 
     return _make
@@ -167,6 +173,7 @@ def make_instrument_params():
     Args (defaults):
         - source: str | None = "Some Test Source"
         - mode: str | None = "Imaging"
+        - comment: str | None = None
 
     defaults can be overridden by keyword arguments.
     """
@@ -177,12 +184,14 @@ def make_instrument_params():
         *,
         source: str | None = "Some Test Source",
         mode: str | None = "Imaging",
+        comment: str | None = None,
     ) -> dict:
         return {
             "instrument_code": instrument_code,
             "name": name,
             "source": source,
             "mode": mode,
+            "comment": comment,
         }
 
     return _make

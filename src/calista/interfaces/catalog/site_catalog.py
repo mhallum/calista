@@ -40,6 +40,7 @@ class SiteSnapshot:
     lon_deg: float | None = None
     elevation_m: float | None = None
     mpc_code: str | None = None
+    comment: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "site_code", self.site_code.upper())
@@ -84,6 +85,7 @@ class SiteRevision:
     lon_deg: float | None = None
     elevation_m: float | None = None
     mpc_code: str | None = None
+    comment: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "site_code", self.site_code.upper())
@@ -121,6 +123,7 @@ class SiteRevision:
             "lon_deg",
             "elevation_m",
             "mpc_code",
+            "comment",
         ):
             old_value = getattr(head, field)
             new_value = getattr(self, field)
@@ -140,6 +143,7 @@ class SitePatch:
     lon_deg: Unsettable[float] = UNSET
     elevation_m: Unsettable[float] = UNSET
     mpc_code: Unsettable[str] = UNSET
+    comment: str | None = None
 
     def apply_to(self, head: SiteSnapshot) -> SiteRevision:
         """Apply the patch to the given site head and return a new SiteRevision."""
@@ -165,6 +169,7 @@ class SitePatch:
             lon_deg=_resolve("lon_deg"),
             elevation_m=_resolve("elevation_m"),
             mpc_code=_resolve("mpc_code"),
+            comment=self.comment,
         )
 
 

@@ -47,6 +47,7 @@ def publish_site_revision(
         lon_deg=cmd.lon_deg,
         elevation_m=cmd.elevation_m,
         mpc_code=cmd.mpc_code,
+        comment=cmd.comment,
     )
 
     with uow:
@@ -74,6 +75,7 @@ def patch_site(cmd: commands.PatchSite, uow: AbstractUnitOfWork) -> None:
         lon_deg=cmd.lon_deg,
         elevation_m=cmd.elevation_m,
         mpc_code=cmd.mpc_code,
+        comment=cmd.comment,
     )
 
     with uow:
@@ -106,6 +108,7 @@ def publish_telescope_revision(
         name=cmd.name,
         source=cmd.source,
         aperture_m=cmd.aperture_m,
+        comment=cmd.comment,
     )
     with uow:
         head = uow.catalogs.telescopes.get(cmd.telescope_code)
@@ -127,9 +130,7 @@ def patch_telescope(cmd: commands.PatchTelescope, uow: AbstractUnitOfWork) -> No
 
     telescope_code = cmd.telescope_code.upper()
     patch = TelescopePatch(
-        name=cmd.name,
-        source=cmd.source,
-        aperture_m=cmd.aperture_m,
+        name=cmd.name, source=cmd.source, aperture_m=cmd.aperture_m, comment=cmd.comment
     )
 
     with uow:
@@ -162,6 +163,7 @@ def publish_instrument_revision(
         name=cmd.name,
         source=cmd.source,
         mode=cmd.mode,
+        comment=cmd.comment,
     )
 
     with uow:
@@ -186,6 +188,7 @@ def patch_instrument(cmd: commands.PatchInstrument, uow: AbstractUnitOfWork) -> 
         name=cmd.name,
         source=cmd.source,
         mode=cmd.mode,
+        comment=cmd.comment,
     )
 
     with uow:

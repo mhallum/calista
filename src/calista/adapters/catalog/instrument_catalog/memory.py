@@ -30,4 +30,5 @@ class InMemoryInstrumentCatalog(
             name=revision.name,
             source=revision.source,
             mode=revision.mode,
+            comment=revision.comment,
         )
