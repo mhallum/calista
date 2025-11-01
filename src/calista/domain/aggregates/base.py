@@ -80,7 +80,8 @@ class Aggregate(abc.ABC):
         method.
         """
 
-        uncommitted_events, self._pending_events = self._pending_events, []
+        uncommitted_events = self._pending_events
+        self._pending_events = []
         return uncommitted_events
 
     @property
