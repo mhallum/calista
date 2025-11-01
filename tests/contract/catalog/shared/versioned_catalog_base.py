@@ -6,6 +6,8 @@ import pytest
 
 from calista.interfaces.catalog.errors import NoChangeError, VersionConflictError
 
+# pylint: disable=magic-value-comparison
+
 
 def test_can_publish_and_retrieve_revision(catalog, make_params):
     """A revision can be published and then retrieved as a snapshot."""
