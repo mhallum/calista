@@ -1,6 +1,5 @@
 """Unit tests for the Aggregate base class."""
 
-import random
 from dataclasses import dataclass
 
 from calista.domain.aggregates.base import Aggregate
@@ -81,9 +80,9 @@ class TestAggregateRehydration:
     @staticmethod
     def test_rehydrate_version_matches_event_count() -> None:
         """Test that the version after rehydration matches the number of events."""
-        events = [
-            FakeEventA() if i % 2 == 0 else FakeEventB()
-            for i in range(random.randint(1, 10))
+        num_events = 5
+        events: list[DomainEvent] = [
+            FakeEventA() if i % 2 == 0 else FakeEventB() for i in range(num_events)
         ]
         agg = FakeAggregate.rehydrate("agg-1", events)
         assert agg.version == len(events)
