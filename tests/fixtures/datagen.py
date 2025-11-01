@@ -99,14 +99,14 @@ def make_site_params():
     Args (defaults):
         - source: str | None = "Some Test Source"
         - timezone: str | None = "America/New_York"
-        - lat_deg: float | None = 90.0
+        - lat_deg: float | None = 34.0
         - lon_deg: float | None = 30.0
         - elevation_m: float | None = 100.0
         - mpc_code: str | None = "XXX"
         - comment: str | None = None
 
     Note:
-        The default coordinates (lat_deg=90.0, lon_deg=30.0) and elevation
+        The default coordinates (lat_deg=34.0, lon_deg=30.0) and elevation
         (elevation_m=100.0) are arbitrary and do not correspond to a real-world
         location. Adjust these values as needed for tests requiring realistic site data.
 
