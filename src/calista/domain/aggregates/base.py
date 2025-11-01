@@ -55,8 +55,7 @@ class Aggregate(abc.ABC):
         that no other operations are performed on the aggregate between calls to this
         method.
         """
-        uncommitted_events = list(self._pending_events)
-        self._pending_events.clear()
+        uncommitted_events, self._pending_events = self._pending_events, []
         return uncommitted_events
 
     @property
