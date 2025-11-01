@@ -8,6 +8,20 @@ class CatalogError(Exception):
         if message is None:
             message = f"{kind} ({key}) catalog error"
         super().__init__(message)
+        self.kind = kind
+        self.key = key
+
+
+class SnapshotError(CatalogError):
+    """Base class for errors related to invalid or inconsistent snapshots."""
+
+
+class InvalidSnapshotError(SnapshotError):
+    """Raised when a snapshot is malformed or violates domain invariants."""
+
+    def __init__(self, kind: str, key: str, reason: str) -> None:
+        super().__init__(kind, key, f"Invalid {kind} ({key}) snapshot: {reason}")
+        self.reason = reason
 
 
 class RevisionError(CatalogError):
@@ -19,3 +33,71 @@ class InvalidRevisionError(RevisionError):
 
     def __init__(self, kind: str, key: str, reason: str) -> None:
         super().__init__(kind, key, f"Invalid {kind} ({key}) revision: {reason}")
+        self.reason = reason
+
+
+class VersionConflictError(RevisionError):
+    """Raised when optimistic concurrency check fails."""
+
+    def __init__(self, kind: str, key: str, head: int, expected: int | None) -> None:
+        super().__init__(
+            kind,
+            key,
+            f"{kind} ({key}) version conflict: head={head}, expected={expected}",
+        )
+        self.head = head
+        self.expected = expected
+
+
+class NoChangeError(RevisionError):
+    """Raised when a patch or revision introduces no changes."""
+
+    def __init__(self, kind: str, key: str) -> None:
+        super().__init__(kind, key, f"{kind} ({key}) revision introduces no changes")
+
+
+class SiteNotFoundError(CatalogError):
+    """Raised when a site entry cannot be found in the catalog."""
+
+    def __init__(self, key: str) -> None:
+        super().__init__("site", key, f"Site ({key}) not found in catalog")
+
+
+class TelescopeNotFoundError(CatalogError):
+    """Raised when a telescope entry cannot be found in the catalog."""
+
+    def __init__(self, key: str) -> None:
+        super().__init__("telescope", key, f"Telescope ({key}) not found in catalog")
+
+
+class InstrumentNotFoundError(CatalogError):
+    """Raised when an instrument entry cannot be found in the catalog."""
+
+    def __init__(self, key: str) -> None:
+        super().__init__("instrument", key, f"Instrument ({key}) not found in catalog")
+
+
+class DuplicateFacilityError(CatalogError):
+    """Raised when attempting to register a facility that already exists."""
+
+    def __init__(self, key: str) -> None:
+        super().__init__("facility", key, f"Facility ({key}) already exists in catalog")
+
+
+class FacilityNotFoundError(CatalogError):
+    """Raised when a facility entry cannot be found in the catalog."""
+
+    def __init__(self, key: str) -> None:
+        super().__init__("facility", key, f"Facility ({key}) not found in catalog")
+
+
+class InvalidFacilityError(CatalogError):
+    """Raised when a facility references unknown site, telescope, or instrument."""
+
+    def __init__(self, key: str, reason: str) -> None:
+        super().__init__(
+            "facility",
+            key,
+            f"Invalid facility ({key}): {reason}",
+        )
+        self.reason = reason

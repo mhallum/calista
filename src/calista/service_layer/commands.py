@@ -2,7 +2,95 @@
 
 from dataclasses import dataclass
 
+from calista.interfaces.catalog.unsettable import UNSET, Unsettable
+
+# pylint: disable=too-many-instance-attributes
+
 
 @dataclass(frozen=True)
 class Command:
     """Base class for all commands."""
+
+
+@dataclass(frozen=True)
+class PublishSiteRevision(Command):
+    """Command to publish a site revision to the catalog."""
+
+    site_code: str
+    name: str
+    source: str | None = None
+    timezone: str | None = None
+    lat_deg: float | None = None
+    lon_deg: float | None = None
+    elevation_m: float | None = None
+    mpc_code: str | None = None
+    comment: str | None = None
+
+
+@dataclass(frozen=True)
+class PatchSite(Command):
+    """Command to publish a patch revision to an existing site head in the catalog."""
+
+    site_code: str
+    name: str | None | Unsettable = UNSET
+    source: str | None | Unsettable = UNSET
+    timezone: str | None | Unsettable = UNSET
+    lat_deg: float | None | Unsettable = UNSET
+    lon_deg: float | None | Unsettable = UNSET
+    elevation_m: float | None | Unsettable = UNSET
+    mpc_code: str | None | Unsettable = UNSET
+    comment: str | None = None
+
+
+@dataclass(frozen=True)
+class PublishTelescopeRevision(Command):
+    """Command to publish a telescope revision to the catalog."""
+
+    telescope_code: str
+    name: str
+    source: str | None = None
+    aperture_m: float | None = None
+    comment: str | None = None
+
+
+@dataclass(frozen=True)
+class PatchTelescope(Command):
+    """Command to publish a patch revision to an existing telescope head in the catalog."""
+
+    telescope_code: str
+    name: str | None | Unsettable = UNSET
+    source: str | None | Unsettable = UNSET
+    aperture_m: float | None | Unsettable = UNSET
+    comment: str | None = None
+
+
+@dataclass(frozen=True)
+class PublishInstrumentRevision(Command):
+    """Command to publish an instrument revision to the catalog."""
+
+    instrument_code: str
+    name: str
+    source: str | None = None
+    mode: str | None = None
+    comment: str | None = None
+
+
+@dataclass(frozen=True)
+class PatchInstrument(Command):
+    """Command to publish a patch revision to an existing instrument head in the catalog."""
+
+    instrument_code: str
+    name: str | None | Unsettable = UNSET
+    source: str | None | Unsettable = UNSET
+    mode: str | None | Unsettable = UNSET
+    comment: str | None = None
+
+
+@dataclass(frozen=True)
+class RegisterFacility(Command):
+    """Command to register a new facility in the catalog."""
+
+    facility_code: str
+    site_code: str
+    telescope_code: str
+    instrument_code: str

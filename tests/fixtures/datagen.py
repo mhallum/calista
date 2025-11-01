@@ -1,8 +1,8 @@
 """Fixtures for generating test data."""
 
+import datetime
 import itertools
 from collections.abc import Callable
-from datetime import datetime, timezone
 from typing import Any
 
 import pytest
@@ -76,7 +76,7 @@ def make_envelope() -> Callable[..., EventEnvelope]:
         event_id: str | None = None,
         payload: dict[str, Any] | None = None,
         metadata: dict[str, Any] | None = None,
-        recorded_at: datetime | None = None,
+        recorded_at: datetime.datetime | None = None,
     ) -> EventEnvelope:
         return EventEnvelope(
             stream_id=stream_id,
@@ -86,7 +86,117 @@ def make_envelope() -> Callable[..., EventEnvelope]:
             event_type=event_type,
             payload=payload or {},
             metadata=metadata,
-            recorded_at=recorded_at or datetime.now(timezone.utc),
+            recorded_at=recorded_at or datetime.datetime.now(datetime.timezone.utc),
         )
+
+    return _make
+
+
+@pytest.fixture
+def make_site_params():
+    """Factory for site parameters with sensible defaults.
+
+    Args (defaults):
+        - source: str | None = "Some Test Source"
+        - timezone: str | None = "America/New_York"
+        - lat_deg: float | None = 34.0
+        - lon_deg: float | None = 30.0
+        - elevation_m: float | None = 100.0
+        - mpc_code: str | None = "XXX"
+        - comment: str | None = None
+
+    Note:
+        The default coordinates (lat_deg=34.0, lon_deg=30.0) and elevation
+        (elevation_m=100.0) are arbitrary and do not correspond to a real-world
+        location. Adjust these values as needed for tests requiring realistic site data.
+
+    Defaults can be overridden by keyword arguments.
+    """
+
+    def _make(
+        site_code: str,
+        name: str,
+        *,
+        source: str | None = "Some Test Source",
+        timezone: str | None = "America/New_York",
+        lat_deg: float | None = 34.0,
+        lon_deg: float | None = 30.0,
+        elevation_m: float | None = 100.0,
+        mpc_code: str | None = "XXX",
+        comment: str | None = None,
+    ) -> dict:
+        return {
+            "site_code": site_code,
+            "name": name,
+            "source": source,
+            "timezone": timezone,
+            "lat_deg": lat_deg,
+            "lon_deg": lon_deg,
+            "elevation_m": elevation_m,
+            "mpc_code": mpc_code,
+            "comment": comment,
+        }
+
+    return _make
+
+
+@pytest.fixture
+def make_telescope_params():
+    """Factory for telescope parameters with sensible defaults.
+
+    Args (defaults):
+        - source: str | None = "Some Test Source"
+        - aperture_m: float | None = 1.0
+        - comment: str | None = None
+
+    defaults can be overridden by keyword arguments.
+    """
+
+    def _make(
+        telescope_code: str,
+        name: str,
+        *,
+        source: str | None = "Some Test Source",
+        aperture_m: float | None = 1.0,
+        comment: str | None = None,
+    ) -> dict:
+        return {
+            "telescope_code": telescope_code,
+            "name": name,
+            "source": source,
+            "aperture_m": aperture_m,
+            "comment": comment,
+        }
+
+    return _make
+
+
+@pytest.fixture
+def make_instrument_params():
+    """Factory for instrument parameters with sensible defaults.
+
+    Args (defaults):
+        - source: str | None = "Some Test Source"
+        - mode: str | None = "Imaging"
+        - comment: str | None = None
+
+    defaults can be overridden by keyword arguments.
+    """
+
+    def _make(
+        instrument_code: str,
+        name: str,
+        *,
+        source: str | None = "Some Test Source",
+        mode: str | None = "Imaging",
+        comment: str | None = None,
+    ) -> dict:
+        return {
+            "instrument_code": instrument_code,
+            "name": name,
+            "source": source,
+            "mode": mode,
+            "comment": comment,
+        }
 
     return _make
