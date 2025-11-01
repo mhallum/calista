@@ -54,7 +54,7 @@ class SiteSnapshot:
                 "site", self.site_code, "lon_deg must be between -180 and 180 degrees"
             )
         if self.mpc_code is not None:
-            if not self.mpc_code.isalnum() or len(self.mpc_code) != 3:
+            if not self.mpc_code.isalnum() or len(self.mpc_code) != 3:  # pylint: disable=magic-value-comparison
                 raise InvalidSnapshotError(
                     "site",
                     self.site_code,
