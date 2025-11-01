@@ -49,7 +49,7 @@ def make_params(make_site_params) -> Callable[..., dict[str, Any]]:
     Args (defaults):
         - source: str | None = "Some Test Source"
         - timezone: str | None = "America/New_York"
-        - lat_deg: float | None = 90.0
+        - lat_deg: float | None = 34.0
         - lon_deg: float | None = 30.0
         - elevation_m: float | None = 100.0
         - mpc_code: str | None = "XXX"
