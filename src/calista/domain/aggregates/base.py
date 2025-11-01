@@ -1,7 +1,7 @@
 """Base class for all aggregates."""
 
 import abc
-from collections.abc import Iterable
+from collections.abc import Sequence
 from typing import ClassVar, TypeVar
 
 from calista.domain.events import DomainEvent
@@ -27,7 +27,7 @@ class Aggregate(abc.ABC):
 
     @classmethod
     def rehydrate(
-        cls: type[A], aggregate_id: str, event_stream: Iterable[DomainEvent]
+        cls: type[A], aggregate_id: str, event_stream: Sequence[DomainEvent]
     ) -> A:
         """Rebuild an aggregate from its past events."""
         aggregate = cls(aggregate_id)
