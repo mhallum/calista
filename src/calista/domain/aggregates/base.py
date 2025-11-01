@@ -13,6 +13,10 @@ class Aggregate(abc.ABC):
     """Generic base class for all aggregates."""
 
     STREAM_TYPE: ClassVar[str]
+    """A string identifier for the type of event stream this aggregate uses.
+
+    Concrete aggregate implementations must set this to distinguish their event streams.
+    """
 
     def __init__(self, aggregate_id: str) -> None:
         self.aggregate_id: str = aggregate_id
@@ -45,10 +49,15 @@ class Aggregate(abc.ABC):
         self._apply(event)
 
     def dequeue_uncommitted(self) -> list[DomainEvent]:
-        """Dequeue all uncommitted events."""
-        out = list(self._pending_events)
+        """Dequeue all uncommitted events.
+
+        Note: This is NOT thread-safe. It is the caller's responsibility to ensure
+        that no other operations are performed on the aggregate between calls to this
+        method.
+        """
+        uncommitted_events = list(self._pending_events)
         self._pending_events.clear()
-        return out
+        return uncommitted_events
 
     @property
     def version(self) -> int:
