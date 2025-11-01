@@ -29,9 +29,22 @@ class FakeAggregate(Aggregate):
 class FakeEventA(DomainEvent):
     """A fake event for testing purposes."""
 
+    fake_aggregate_id: str
 
+    @property
+    def aggregate_id(self) -> str:
+        return self.fake_aggregate_id
+
+
+@dataclass(frozen=True)
 class FakeEventB(DomainEvent):
     """Another fake event for testing purposes."""
+
+    fake_aggregate_id: str
+
+    @property
+    def aggregate_id(self) -> str:
+        return self.fake_aggregate_id
 
 
 class TestAggregateInitialization:
@@ -62,7 +75,7 @@ class TestAggregateRehydration:
     @staticmethod
     def test_rehydrates_from_event_stream() -> None:
         """Test that an aggregate can be rehydrated from an event stream."""
-        event_stream = [FakeEventA(), FakeEventB()]
+        event_stream = [FakeEventA("agg-1"), FakeEventB("agg-1")]
         aggregate = FakeAggregate.rehydrate("agg-1", event_stream)
 
         assert aggregate.aggregate_id == "agg-1"
@@ -82,7 +95,8 @@ class TestAggregateRehydration:
         """Test that the version after rehydration matches the number of events."""
         num_events = 5
         events: list[DomainEvent] = [
-            FakeEventA() if i % 2 == 0 else FakeEventB() for i in range(num_events)
+            FakeEventA("agg-1") if i % 2 == 0 else FakeEventB("agg-1")
+            for i in range(num_events)
         ]
         agg = FakeAggregate.rehydrate("agg-1", events)
         assert agg.version == len(events)
@@ -95,7 +109,7 @@ class TestAggregateEventEnqueueing:
     def test_enqueues_and_applies_event() -> None:
         """Test that an event is enqueued and applied correctly."""
         aggregate = FakeAggregate("agg-1")
-        event = FakeEventA()
+        event = FakeEventA("agg-1")
 
         aggregate._enqueue(event)
 
@@ -108,7 +122,7 @@ class TestAggregateEventEnqueueing:
         aggregate = FakeAggregate("agg-1")
         initial_version = aggregate.version
 
-        aggregate._enqueue(FakeEventA())
+        aggregate._enqueue(FakeEventA("agg-1"))
 
         assert aggregate.version == initial_version
 
@@ -120,8 +134,8 @@ class TestAggregateDequeueUncommitted:
     def test_dequeues_uncommitted_events() -> None:
         """Test that uncommitted events are dequeued correctly."""
         aggregate = FakeAggregate("agg-1")
-        event_a = FakeEventA()
-        event_b = FakeEventB()
+        event_a = FakeEventA("agg-1")
+        event_b = FakeEventB("agg-1")
 
         aggregate._enqueue(event_a)
         aggregate._enqueue(event_b)
