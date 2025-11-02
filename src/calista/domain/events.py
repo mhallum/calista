@@ -14,3 +14,18 @@ class DomainEvent(abc.ABC):
     @abc.abstractmethod
     def aggregate_id(self) -> str:
         """Return the ID of the aggregate this event belongs to."""
+
+
+@dataclass(frozen=True, slots=True)
+class ObservationSessionRegistered(DomainEvent):
+    """Event indicating that an observation session has been registered."""
+
+    session_id: str
+    natural_key: str
+    facility_code: str
+    night_id: str
+    segment_number: int
+
+    @property
+    def aggregate_id(self) -> str:
+        return self.session_id
