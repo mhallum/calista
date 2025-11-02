@@ -82,6 +82,19 @@ class TestObservationSessionRegistration:
 
         assert session._version == 0
 
+    @staticmethod
+    def test_register_session_with_default_segment_number():
+        """test that segment_number defaults to 1 if not provided."""
+
+        session = ObservationSession.register(
+            aggregate_id="session-101",
+            natural_key="OBS-20240604-004",
+            facility_code="FAC004",
+            night_id="20240604",
+        )
+
+        assert session.segment_number == 1
+
 
 class TestObservationSessionApply:
     """Tests for the _apply method of ObservationSession."""
