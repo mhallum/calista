@@ -21,7 +21,7 @@ import pytest
 from sqlalchemy import func, insert, inspect, select
 from sqlalchemy.exc import IntegrityError
 
-from calista.adapters.eventstore.schema import event_store
+from calista.adapters.eventstore.sqlalchemy_adapters.schema import event_store
 from tests.helpers.time_asserts import assert_strict_utc
 
 if TYPE_CHECKING:

@@ -16,7 +16,9 @@ from datetime import timedelta
 import pytest
 
 from calista.adapters.eventstore.memory import MemoryEventStore
-from calista.adapters.eventstore.sqlalchemy import SqlAlchemyEventStore
+from calista.adapters.eventstore.sqlalchemy_adapters import (
+    SqlAlchemyEventStore,
+)
 from calista.interfaces.eventstore import (
     DuplicateEventIdError,
     EventStore,

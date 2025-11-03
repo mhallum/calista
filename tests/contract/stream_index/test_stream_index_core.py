@@ -16,7 +16,9 @@ from collections.abc import Iterable
 
 import pytest
 
-from calista.adapters.eventstore.stream_index import SqlAlchemyStreamIndex
+from calista.adapters.eventstore.sqlalchemy_adapters.stream_index import (
+    SqlAlchemyStreamIndex,
+)
 from calista.interfaces.stream_index import (
     NaturalKey,
     NaturalKeyAlreadyBound,

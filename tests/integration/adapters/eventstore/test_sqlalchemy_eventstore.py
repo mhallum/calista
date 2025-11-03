@@ -15,7 +15,9 @@ import pytest
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
-from calista.adapters.eventstore.sqlalchemy import SqlAlchemyEventStore
+from calista.adapters.eventstore.sqlalchemy_adapters.eventstore import (
+    SqlAlchemyEventStore,
+)
 from calista.interfaces.eventstore import (
     DuplicateEventIdError,
     EventEnvelope,

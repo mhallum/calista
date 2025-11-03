@@ -8,7 +8,9 @@ from typing import Literal
 
 import pytest
 
-from calista.adapters.eventstore.stream_index import SqlAlchemyStreamIndex
+from calista.adapters.eventstore.sqlalchemy_adapters.stream_index import (
+    SqlAlchemyStreamIndex,
+)
 from calista.interfaces.stream_index import (
     IndexEntry,
     NaturalKey,
