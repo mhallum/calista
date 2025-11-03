@@ -5,3 +5,7 @@ The in-memory event store is suitable for testing, prototyping, and scenarios wh
 is not a concern. It provides fast, ephemeral storage of events that are lost when the instance
 is discarded.
 """
+
+from .memory import MemoryEventStore
+
+__all__ = ["MemoryEventStore"]

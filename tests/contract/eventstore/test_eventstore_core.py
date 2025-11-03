@@ -15,7 +15,7 @@ from datetime import timedelta
 
 import pytest
 
-from calista.adapters.eventstore.memory import MemoryEventStore
+from calista.adapters.eventstore.in_memory_adapters import MemoryEventStore
 from calista.adapters.eventstore.sqlalchemy_adapters import (
     SqlAlchemyEventStore,
 )
