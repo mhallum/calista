@@ -25,7 +25,7 @@ from testcontainers.postgres import (  # pyright: ignore[reportMissingTypeStubs]
 )
 
 from calista import config
-from calista.adapters.eventstore.schema import event_store
+from calista.adapters.eventstore.sqlalchemy_adapters.schema import event_store
 
 # mypy: disable-error-code=no-untyped-def
 

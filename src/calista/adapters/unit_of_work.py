@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from calista.adapters.eventstore.sqlalchemy import SqlAlchemyEventStore
+from calista.adapters.eventstore.sqlalchemy_adapters import SqlAlchemyEventStore
 from calista.interfaces.unit_of_work import AbstractUnitOfWork
 
 if TYPE_CHECKING:

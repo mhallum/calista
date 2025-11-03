@@ -24,7 +24,7 @@ import pytest
 from sqlalchemy import insert, text
 from sqlalchemy.exc import DBAPIError
 
-from calista.adapters.eventstore.schema import event_store
+from calista.adapters.eventstore.sqlalchemy_adapters.schema import event_store
 
 if TYPE_CHECKING:
     from sqlalchemy.engine import Engine

@@ -5,7 +5,7 @@ from calista.adapters.catalog.instrument_catalog.memory import InMemoryInstrumen
 from calista.adapters.catalog.memory_store import InMemoryCatalogData
 from calista.adapters.catalog.site_catalog.memory import InMemorySiteCatalog
 from calista.adapters.catalog.telescope_catalog.memory import InMemoryTelescopeCatalog
-from calista.adapters.eventstore.memory import MemoryEventStore
+from calista.adapters.eventstore.in_memory_adapters import MemoryEventStore
 from calista.bootstrap.bootstrap import build_message_bus
 from calista.interfaces.unit_of_work import AbstractUnitOfWork, CatalogBundle
 from calista.service_layer.handlers import COMMAND_HANDLERS

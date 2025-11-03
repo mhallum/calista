@@ -4,7 +4,7 @@ This file contains tests that are specific to the SqlAlchemyStreamIndex
 implementation and are not covered by the generic StreamIndex contract tests.
 """
 
-from calista.adapters.eventstore.stream_index import (
+from calista.adapters.eventstore.sqlalchemy_adapters import (
     SqlAlchemyStreamIndex,
 )
 from calista.interfaces.stream_index import NaturalKey
