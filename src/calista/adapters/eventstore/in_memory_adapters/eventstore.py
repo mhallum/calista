@@ -18,7 +18,7 @@ from calista.interfaces.eventstore import (
 )
 
 
-class MemoryEventStore(EventStore):
+class InMemoryEventStore(EventStore):
     """In-memory EventStore for testing and non-durable use cases.
 
     - Non-durable: all data is lost when the instance is discarded.

@@ -6,6 +6,6 @@ is not a concern. It provides fast, ephemeral storage of events that are lost wh
 is discarded.
 """
 
-from .memory import MemoryEventStore
+from .eventstore import InMemoryEventStore
 
-__all__ = ["MemoryEventStore"]
+__all__ = ["InMemoryEventStore"]

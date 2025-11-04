@@ -15,7 +15,7 @@ from datetime import timedelta
 
 import pytest
 
-from calista.adapters.eventstore.in_memory_adapters import MemoryEventStore
+from calista.adapters.eventstore.in_memory_adapters import InMemoryEventStore
 from calista.adapters.eventstore.sqlalchemy_adapters import (
     SqlAlchemyEventStore,
 )
@@ -45,7 +45,7 @@ def eventstore(
     # Select backend based on param
     match request.param:
         case "memory":
-            yield MemoryEventStore()
+            yield InMemoryEventStore()
         case "sqlite":
             with sqlite_engine_memory.begin() as connection:
                 yield SqlAlchemyEventStore(connection)
