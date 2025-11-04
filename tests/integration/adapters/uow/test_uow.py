@@ -7,6 +7,7 @@ import pytest
 
 from calista.adapters.unit_of_work import SqlAlchemyUnitOfWork
 from calista.interfaces.eventstore import EventEnvelope
+from calista.interfaces.stream_index import NaturalKey
 
 
 def test_uow_can_add_event(sqlite_engine_memory, make_event):
@@ -56,3 +57,28 @@ def test_rolls_back_on_error(sqlite_engine_memory, make_event):
     with uow:
         events = list(uow.eventstore.read_since())
     assert len(events) == 0
+
+
+def test_uow_can_use_stream_index(sqlite_engine_memory):
+    """Unit of Work can interact with the StreamIndex."""
+    stream_id = "test-stream-123"
+    stream_type = "TestAggregate"
+    natural_key = "test-natural-key"
+
+    uow = SqlAlchemyUnitOfWork(sqlite_engine_memory)
+
+    # Reserve a natural key
+    with uow:
+        uow.stream_index.reserve(
+            NaturalKey(kind=stream_type, key=natural_key),
+            stream_id=stream_id,
+        )
+        uow.commit()
+
+    # Verify the reservation was made
+    with uow:
+        retrieved_entry = uow.stream_index.lookup(
+            NaturalKey(kind=stream_type, key=natural_key)
+        )
+        assert retrieved_entry is not None
+        assert retrieved_entry.stream_id == stream_id
