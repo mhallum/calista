@@ -11,12 +11,11 @@ Behavior under test:
 
 from __future__ import annotations
 
-import re
 from collections.abc import Iterable
 
 import pytest
 
-from calista.adapters.eventstore.sqlalchemy_adapters.stream_index import (
+from calista.adapters.eventstore.sqlalchemy_adapters import (
     SqlAlchemyStreamIndex,
 )
 from calista.interfaces.stream_index import (
@@ -164,10 +163,14 @@ class TestReserve:
 
         # Attempt to reserve the same key with a different stream_id "SID-B"
         # Should raise NaturalKeyAlreadyBound
-        with pytest.raises(
-            NaturalKeyAlreadyBound, match=re.escape(f"{key} → {first_stream_id}")
-        ):
+        with pytest.raises(NaturalKeyAlreadyBound) as exc_info:
             stream_index.reserve(key, "SID-B")
+
+        # Verify exception attributes
+        error = exc_info.value
+        assert error.natural_key == key.key
+        assert error.stream_id == first_stream_id
+        assert error.kind == key.kind
 
         # Assert that the original entry is still intact
         entry = stream_index.lookup(key)
@@ -188,11 +191,14 @@ class TestReserve:
         # Attempt to reserve a different key2 with the same stream_id "SID-1"
         # Should raise StreamIdAlreadyBound
         key_b = NaturalKey("obs", "B")
-        with pytest.raises(
-            StreamIdAlreadyBound,
-            match=re.escape(f"stream_id {stream_id} already indexed as {key_a}"),
-        ):
+        with pytest.raises(StreamIdAlreadyBound) as exc_info:
             stream_index.reserve(key_b, stream_id)
+
+        # Verify exception attributes
+        error = exc_info.value
+        assert error.stream_id == stream_id
+        assert error.natural_key == key_a.key
+        assert error.kind == key_a.kind
 
         # Assert that the original entry is still intact
         entry = stream_index.lookup(key_a)

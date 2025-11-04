@@ -91,12 +91,18 @@ class SqlAlchemyStreamIndex(StreamIndex):
         if existing := self.lookup(natural_key):
             if existing.stream_id == stream_id:
                 return  # idempotent
-            raise NaturalKeyAlreadyBound(f"{natural_key} → {existing.stream_id}")
+            raise NaturalKeyAlreadyBound(
+                natural_key=natural_key.key,
+                stream_id=existing.stream_id,
+                kind=natural_key.kind,
+            )
 
         if by_stream := self._lookup_by_stream(stream_id):
             # same stream_id used under a different natural key
             raise StreamIdAlreadyBound(
-                f"stream_id {stream_id} already indexed as {by_stream.natural_key}"
+                stream_id=stream_id,
+                natural_key=by_stream.natural_key.key,
+                kind=by_stream.natural_key.kind,
             )
 
         # If nothing matches, something is very wrong.
