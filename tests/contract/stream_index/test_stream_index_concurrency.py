@@ -12,7 +12,7 @@ from calista.adapters.eventstore.sqlalchemy_adapters.stream_index import (
     SqlAlchemyStreamIndex,
 )
 from calista.interfaces.stream_index import (
-    IndexEntry,
+    IndexEntrySnapshot,
     NaturalKey,
     NaturalKeyAlreadyBound,
 )
@@ -62,7 +62,7 @@ def test_concurrent_reserve_same_key_same_stream_id(make_stream_index_ctx):
     stream_id = "01HZZZ1111111111XXXXXX7"
 
     barrier = threading.Barrier(8)
-    results: list[tuple[Literal["ok", "err"], IndexEntry | Exception]] = []
+    results: list[tuple[Literal["ok", "err"], IndexEntrySnapshot | Exception]] = []
     lock = threading.Lock()  # protect results append
 
     def worker():

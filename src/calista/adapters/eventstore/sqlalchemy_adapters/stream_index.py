@@ -10,7 +10,7 @@ from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
 from calista.adapters.db.dialects import DialectName, UnsupportedDialect
 from calista.interfaces.stream_index import (
-    IndexEntry,
+    IndexEntrySnapshot,
     NaturalKey,
     NaturalKeyAlreadyBound,
     StreamIdAlreadyBound,
@@ -33,7 +33,7 @@ class SqlAlchemyStreamIndex(StreamIndex):
 
     # --- lookups ---
 
-    def lookup(self, natural_key: NaturalKey) -> IndexEntry | None:
+    def lookup(self, natural_key: NaturalKey) -> IndexEntrySnapshot | None:
         stm = select(stream_index.c.stream_id, stream_index.c.version).where(
             stream_index.c.kind == natural_key.kind,
             stream_index.c.key == natural_key.key,
@@ -41,15 +41,17 @@ class SqlAlchemyStreamIndex(StreamIndex):
 
         if not (row := self.connection.execute(stm).fetchone()):
             return None
-        return IndexEntry(natural_key, row.stream_id, int(row.version))
+        return IndexEntrySnapshot(natural_key, row.stream_id, int(row.version))
 
-    def _lookup_by_stream(self, stream_id: str) -> IndexEntry | None:
+    def _lookup_by_stream(self, stream_id: str) -> IndexEntrySnapshot | None:
         stmt = select(
             stream_index.c.kind, stream_index.c.key, stream_index.c.version
         ).where(stream_index.c.stream_id == stream_id)
         if not (row := self.connection.execute(stmt).fetchone()):
             return None
-        return IndexEntry(NaturalKey(row.kind, row.key), stream_id, int(row.version))
+        return IndexEntrySnapshot(
+            NaturalKey(row.kind, row.key), stream_id, int(row.version)
+        )
 
     # --- version updates ---
 
