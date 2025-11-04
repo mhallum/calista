@@ -36,18 +36,20 @@ class InMemoryStreamIndex(StreamIndex):
     # --- version updates ---
 
     def update_version(self, stream_id: str, version: int) -> None:
+        entry_to_update = None
         for entry in self.index_entries:
             if entry.stream_id == stream_id:
-                if version > entry.version:
-                    self.index_entries.remove(entry)
-                    self.index_entries.add(
-                        IndexEntrySnapshot(
-                            natural_key=entry.natural_key,
-                            stream_id=entry.stream_id,
-                            version=version,
-                        )
-                    )
-                return
+                entry_to_update = entry
+                break
+        if entry_to_update is not None and version > entry_to_update.version:
+            self.index_entries.remove(entry_to_update)
+            self.index_entries.add(
+                IndexEntrySnapshot(
+                    natural_key=entry_to_update.natural_key,
+                    stream_id=entry_to_update.stream_id,
+                    version=version,
+                )
+            )
 
     # --- reservations ---
 
