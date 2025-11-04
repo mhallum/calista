@@ -20,7 +20,7 @@ class NaturalKey:
 
 
 @dataclass(frozen=True)
-class IndexEntry:
+class IndexEntrySnapshot:
     """Index row describing the binding from natural key → stream id."""
 
     natural_key: NaturalKey
@@ -40,7 +40,7 @@ class StreamIndex(abc.ABC):
     """Natural-key → stream id lookup with idempotent reservation & version fencing."""
 
     @abc.abstractmethod
-    def lookup(self, natural_key: NaturalKey) -> IndexEntry | None:
+    def lookup(self, natural_key: NaturalKey) -> IndexEntrySnapshot | None:
         """Retrieve the existing mapping for a natural key.
 
         Looks up the index entry associated with the given natural key.
