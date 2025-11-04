@@ -9,6 +9,8 @@ from __future__ import annotations
 import abc
 from dataclasses import dataclass
 
+from calista.interfaces.stream_index import StreamIndex
+
 from . import catalog
 from .eventstore import EventStore
 
@@ -27,6 +29,7 @@ class AbstractUnitOfWork(abc.ABC):
     """Contract for a transactional unit of work."""
 
     eventstore: EventStore
+    stream_index: StreamIndex
     catalogs: CatalogBundle
 
     def __enter__(self) -> AbstractUnitOfWork:

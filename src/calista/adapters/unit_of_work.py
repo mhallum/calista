@@ -8,7 +8,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from calista.adapters.eventstore.sqlalchemy_adapters import SqlAlchemyEventStore
+from calista.adapters.eventstore.sqlalchemy_adapters import (
+    SqlAlchemyEventStore,
+    SqlAlchemyStreamIndex,
+)
 from calista.interfaces.unit_of_work import AbstractUnitOfWork
 
 if TYPE_CHECKING:
@@ -25,6 +28,7 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
     def __enter__(self):
         self.connection = self.engine.connect()
         self.eventstore = SqlAlchemyEventStore(self.connection)
+        self.stream_index = SqlAlchemyStreamIndex(self.connection)
         return super().__enter__()
 
     def __exit__(self, *args):
