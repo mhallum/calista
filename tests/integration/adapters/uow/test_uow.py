@@ -77,8 +77,8 @@ def test_uow_can_use_stream_index(sqlite_engine_memory):
 
     # Verify the reservation was made
     with uow:
-        retreived_entry = uow.stream_index.lookup(
+        retrieved_entry = uow.stream_index.lookup(
             NaturalKey(kind=stream_type, key=natural_key)
         )
-        assert retreived_entry is not None
-        assert retreived_entry.stream_id == stream_id
+        assert retrieved_entry is not None
+        assert retrieved_entry.stream_id == stream_id
