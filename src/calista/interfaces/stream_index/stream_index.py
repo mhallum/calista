@@ -28,14 +28,6 @@ class IndexEntrySnapshot:
     version: int  # last event version observed for this stream
 
 
-class NaturalKeyAlreadyBound(Exception):
-    """Conflict: natural key already points to a different stream."""
-
-
-class StreamIdAlreadyBound(Exception):
-    """Conflict: stream ID already bound to a different natural key."""
-
-
 class StreamIndex(abc.ABC):
     """Natural-key → stream id lookup with idempotent reservation & version fencing."""
 
