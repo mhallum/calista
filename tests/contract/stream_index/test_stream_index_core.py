@@ -15,6 +15,7 @@ from collections.abc import Iterable
 
 import pytest
 
+from calista.adapters.eventstore.in_memory_adapters import InMemoryStreamIndex
 from calista.adapters.eventstore.sqlalchemy_adapters import (
     SqlAlchemyStreamIndex,
 )
@@ -31,7 +32,7 @@ from calista.interfaces.stream_index import (
 # --- Fixtures ---
 
 
-@pytest.fixture(params=["sql_memory", "sql_file", "postgres"])
+@pytest.fixture(params=["memory", "sql_memory", "sql_file", "postgres"])
 def stream_index(
     request: pytest.FixtureRequest,
     sqlite_engine_memory,
@@ -41,6 +42,7 @@ def stream_index(
     """Return a fresh StreamIndex instance for the requested backend.
 
     Supported params:
+      - `"memory"` → in-memory StreamIndex
       - `"sql_memory"` → in-memory SQLite StreamIndex
       - `"sql_file"` → file-based SQLite StreamIndex
       - `"postgres"` → PostgreSQL StreamIndex
@@ -51,6 +53,8 @@ def stream_index(
     """
 
     match request.param:
+        case "memory":
+            yield InMemoryStreamIndex()
         case "sql_memory":
             with sqlite_engine_memory.connect() as conn:
                 yield SqlAlchemyStreamIndex(conn)
@@ -74,8 +78,9 @@ class TestLookup:
     # most lookup tests occur incidentally in reserve tests,
     # so only one explicit test here.
 
+    @staticmethod
     def _assert_stream_id(
-        self, stream_index: StreamIndex, key: NaturalKey, expected_stream_id: str
+        stream_index: StreamIndex, key: NaturalKey, expected_stream_id: str
     ):
         entry = stream_index.lookup(key)
         assert entry is not None

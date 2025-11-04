@@ -7,5 +7,6 @@ is discarded.
 """
 
 from .eventstore import InMemoryEventStore
+from .stream_index import InMemoryStreamIndex
 
-__all__ = ["InMemoryEventStore"]
+__all__ = ["InMemoryEventStore", "InMemoryStreamIndex"]
