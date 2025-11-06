@@ -29,3 +29,9 @@ class ObservationSessionRegistered(DomainEvent):
     @property
     def aggregate_id(self) -> str:
         return self.session_id
+
+
+# Registry of domain event types for deserialization
+DOMAIN_EVENT_REGISTRY: dict[str, type[DomainEvent]] = {
+    "ObservationSessionRegistered": ObservationSessionRegistered,
+}
