@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import asdict
 from typing import TYPE_CHECKING
 
 from calista.domain.events import DOMAIN_EVENT_REGISTRY
@@ -31,7 +32,7 @@ class EventMapper:
     ) -> EventEnvelope:
         """Convert a DomainEvent to an EventEnvelope."""
         event_type = type(event).__name__
-        payload = event.__dict__
+        payload = asdict(event)
         return EventEnvelope(
             stream_id=stream_id,
             stream_type=stream_type,
