@@ -6,6 +6,7 @@ from unittest import mock
 
 import pytest
 
+from calista.adapters.id_generators import SimpleIdGenerator
 from calista.adapters.unit_of_work import SqlAlchemyUnitOfWork
 from calista.bootstrap import bootstrap
 from calista.bootstrap.bootstrap import (
@@ -78,10 +79,43 @@ class TestBuildMessageBus:
             Command: sample_handler,
         }
 
-        bus = build_message_bus(uow, command_handlers)
+        bus = build_message_bus(
+            uow,
+            command_handlers,
+            aggregate_id_generator=SimpleIdGenerator(),
+            event_id_generator=SimpleIdGenerator(),
+        )
         bus.handle(Command())
         assert hasattr(bus.uow, "committed")
         assert bus.uow.committed is True
+
+    @staticmethod
+    def test_build_message_bus_injects_id_generators():
+        """Test that build_message_bus injects ID generators into handlers."""
+        uow = FakeUnitOfWork()
+        aggregate_id_gen = SimpleIdGenerator()
+        event_id_gen = SimpleIdGenerator()
+
+        def sample_handler(
+            cmd: Command,
+            uow: FakeUnitOfWork,
+            aggregate_id_generator: SimpleIdGenerator,
+            event_id_generator: SimpleIdGenerator,
+        ):
+            assert aggregate_id_generator is aggregate_id_gen
+            assert event_id_generator is event_id_gen
+
+        command_handlers: dict[type[Command], Callable[..., None]] = {
+            Command: sample_handler,
+        }
+
+        bus = build_message_bus(
+            uow,
+            command_handlers,
+            aggregate_id_generator=aggregate_id_gen,
+            event_id_generator=event_id_gen,
+        )
+        bus.handle(Command())
 
     @staticmethod
     def test_forwards_message_to_handler():
@@ -97,7 +131,12 @@ class TestBuildMessageBus:
             CustomCommand: sample_handler,
         }
 
-        bus = build_message_bus(uow, command_handlers)
+        bus = build_message_bus(
+            uow,
+            command_handlers,
+            aggregate_id_generator=SimpleIdGenerator(),
+            event_id_generator=SimpleIdGenerator(),
+        )
         command_instance = CustomCommand()
         bus.handle(command_instance)
 

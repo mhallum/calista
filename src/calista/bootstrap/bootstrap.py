@@ -9,7 +9,9 @@ from typing import TYPE_CHECKING
 
 from calista import config
 from calista.adapters.db.engine import make_engine
+from calista.adapters.id_generators import ULIDGenerator
 from calista.adapters.unit_of_work import SqlAlchemyUnitOfWork
+from calista.interfaces.id_generator import IdGenerator
 from calista.interfaces.unit_of_work import AbstractUnitOfWork
 from calista.service_layer.handlers import COMMAND_HANDLERS
 from calista.service_layer.messagebus import MessageBus
@@ -32,10 +34,17 @@ def build_write_uow(url: str) -> AbstractUnitOfWork:
 
 
 def build_message_bus(
-    uow: AbstractUnitOfWork, command_handlers: dict[type[Command], Callable[..., None]]
+    uow: AbstractUnitOfWork,
+    command_handlers: dict[type[Command], Callable[..., None]],
+    aggregate_id_generator: IdGenerator,
+    event_id_generator: IdGenerator,
 ) -> MessageBus:
     """Build a message bus with injected dependencies."""
-    dependencies = {"uow": uow}
+    dependencies = {
+        "uow": uow,
+        "aggregate_id_generator": aggregate_id_generator,
+        "event_id_generator": event_id_generator,
+    }
     injected_command_handlers = {
         command_type: inject_dependencies(handler, dependencies)
         for command_type, handler in command_handlers.items()
@@ -51,7 +60,12 @@ def bootstrap() -> AppContainer:
     """Bootstrap the message bus with handlers and unit of work."""
     uow = build_write_uow(config.get_db_url())
     command_handlers = COMMAND_HANDLERS
-    message_bus = build_message_bus(uow, command_handlers)
+    message_bus = build_message_bus(
+        uow,
+        command_handlers,
+        aggregate_id_generator=ULIDGenerator(),
+        event_id_generator=ULIDGenerator(),
+    )
 
     return AppContainer(
         message_bus=message_bus,

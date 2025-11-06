@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Generic, TypeVar
 
+from calista.domain import aggregates
 from calista.domain.aggregates import Aggregate  # pylint: disable=unused-import
 
 # pylint: disable=unused-import
@@ -85,3 +86,27 @@ class EventSourcedRepository(Generic[T]):
         ]
 
         self.event_store.append(envelopes)
+
+
+# ============================================================================
+#               Concrete Event-Sourced Keyed Repositories
+# ============================================================================
+
+
+class ObservationSessionRepository(
+    EventSourcedRepository[aggregates.ObservationSession]
+):
+    """Event-sourced repository for observation session aggregates."""
+
+    def __init__(
+        self,
+        event_store: EventStore,
+        event_id_generator: IdGenerator,
+        event_mapper: EventMapper | None = None,
+    ) -> None:
+        super().__init__(
+            event_store=event_store,
+            event_id_generator=event_id_generator,
+            event_mapper=event_mapper,
+            aggregate_cls=aggregates.ObservationSession,
+        )

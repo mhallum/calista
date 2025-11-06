@@ -94,3 +94,12 @@ class RegisterFacility(Command):
     site_code: str
     telescope_code: str
     instrument_code: str
+
+
+@dataclass(frozen=True)
+class RegisterObservationSession(Command):
+    """Command to register a new observation session."""
+
+    facility_code: str
+    night_id: str
+    segment_number: int
