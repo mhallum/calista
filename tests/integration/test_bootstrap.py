@@ -6,6 +6,7 @@ from unittest import mock
 
 import pytest
 
+from calista.adapters.id_generators import SimpleIdGenerator
 from calista.adapters.unit_of_work import SqlAlchemyUnitOfWork
 from calista.bootstrap import bootstrap
 from calista.bootstrap.bootstrap import (
@@ -78,7 +79,12 @@ class TestBuildMessageBus:
             Command: sample_handler,
         }
 
-        bus = build_message_bus(uow, command_handlers)
+        bus = build_message_bus(
+            uow,
+            command_handlers,
+            aggregate_id_generator=SimpleIdGenerator(),
+            event_id_generator=SimpleIdGenerator(),
+        )
         bus.handle(Command())
         assert hasattr(bus.uow, "committed")
         assert bus.uow.committed is True
@@ -97,7 +103,12 @@ class TestBuildMessageBus:
             CustomCommand: sample_handler,
         }
 
-        bus = build_message_bus(uow, command_handlers)
+        bus = build_message_bus(
+            uow,
+            command_handlers,
+            aggregate_id_generator=SimpleIdGenerator(),
+            event_id_generator=SimpleIdGenerator(),
+        )
         command_instance = CustomCommand()
         bus.handle(command_instance)
 

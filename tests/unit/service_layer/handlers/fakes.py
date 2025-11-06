@@ -5,7 +5,11 @@ from calista.adapters.catalog.instrument_catalog.memory import InMemoryInstrumen
 from calista.adapters.catalog.memory_store import InMemoryCatalogData
 from calista.adapters.catalog.site_catalog.memory import InMemorySiteCatalog
 from calista.adapters.catalog.telescope_catalog.memory import InMemoryTelescopeCatalog
-from calista.adapters.eventstore.in_memory_adapters import InMemoryEventStore
+from calista.adapters.eventstore.in_memory_adapters import (
+    InMemoryEventStore,
+    InMemoryStreamIndex,
+)
+from calista.adapters.id_generators import SimpleIdGenerator
 from calista.bootstrap.bootstrap import build_message_bus
 from calista.interfaces.unit_of_work import AbstractUnitOfWork, CatalogBundle
 from calista.service_layer.handlers import COMMAND_HANDLERS
@@ -21,6 +25,7 @@ class FakeUoW(AbstractUnitOfWork):
             sites={}, telescopes={}, instruments={}, facilities={}
         )
         self.eventstore = InMemoryEventStore()
+        self.stream_index = InMemoryStreamIndex()
         self.catalogs = CatalogBundle(
             sites=InMemorySiteCatalog(catalog_data),
             telescopes=InMemoryTelescopeCatalog(catalog_data),
@@ -39,4 +44,9 @@ class FakeUoW(AbstractUnitOfWork):
 def bootstrap_test_bus():
     """Bootstrap a message bus for testing purposes."""
     uow = FakeUoW()
-    return build_message_bus(uow=uow, command_handlers=COMMAND_HANDLERS)
+    return build_message_bus(
+        uow=uow,
+        command_handlers=COMMAND_HANDLERS,
+        aggregate_id_generator=SimpleIdGenerator(),
+        event_id_generator=SimpleIdGenerator(),
+    )
