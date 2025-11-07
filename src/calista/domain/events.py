@@ -2,7 +2,6 @@
 
 import abc
 from dataclasses import dataclass
-from datetime import datetime
 
 
 @dataclass(frozen=True, slots=True)
@@ -41,7 +40,7 @@ class RawFitsFileIngested(DomainEvent):
     sha256: str
     cas_key: str
     size_bytes: int
-    ingested_at: datetime
+    ingested_at: str  # UTC datetime in ISO format
 
     @property
     def aggregate_id(self) -> str:

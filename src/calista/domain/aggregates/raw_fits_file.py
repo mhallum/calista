@@ -66,7 +66,7 @@ class RawFitsFile(Aggregate):
             sha256=sha256,
             cas_key=cas_key,
             size_bytes=size_bytes,
-            ingested_at=ingested_at,
+            ingested_at=ingested_at.isoformat(),
         )
         raw_fits_file._enqueue(event)
         return raw_fits_file
@@ -109,7 +109,7 @@ class RawFitsFile(Aggregate):
                     sha256=event.sha256,
                     cas_key=event.cas_key,
                     size_bytes=event.size_bytes,
-                    stored_at=event.ingested_at,
+                    stored_at=datetime.fromisoformat(event.ingested_at),
                 )
                 self._set_status(Status.STORED)
             case events.RawFitsFileClassified():

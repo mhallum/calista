@@ -1,3 +1,5 @@
+"""Unit tests for the RawFitsFile aggregate."""
+
 import pytest
 
 from calista.domain import errors, events
@@ -83,7 +85,7 @@ class TestRawFitsFileRegisterIngestedFile:
         assert event.sha256 == metadata.sha256
         assert event.cas_key == metadata.cas_key
         assert event.size_bytes == metadata.size_bytes
-        assert event.ingested_at == metadata.stored_at
+        assert event.ingested_at == metadata.stored_at.isoformat()
 
     @staticmethod
     def test_does_not_bump_version(make_file_metadata):
