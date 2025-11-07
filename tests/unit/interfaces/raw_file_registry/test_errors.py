@@ -1,3 +1,5 @@
+""" "Unit tests for raw_file_registry error classes."""
+
 from calista.interfaces.raw_file_registry import FileAlreadyRegistered
 
 # pylint: disable=magic-value-comparison, too-few-public-methods
