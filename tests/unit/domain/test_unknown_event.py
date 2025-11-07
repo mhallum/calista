@@ -28,8 +28,9 @@ class UnknownEvent(events.DomainEvent):
     "aggregate",
     [
         aggregates.ObservationSession(aggregate_id="test-aggregate"),
+        aggregates.RawFitsFile(aggregate_id="test-aggregate"),
     ],
-    ids=["ObservationSession"],
+    ids=["ObservationSession", "RawFitsFile"],
 )
 def test_aggregate_raises_error_on_unknown_event_application(aggregate):
     """Test that applying an unknown event raises a ValueError for each aggregate."""

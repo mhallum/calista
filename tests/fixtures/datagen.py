@@ -7,6 +7,7 @@ from typing import Any
 
 import pytest
 
+from calista.domain.value_objects import StoredFileMetadata
 from calista.interfaces.eventstore import (
     EventEnvelope,
 )
@@ -198,5 +199,34 @@ def make_instrument_params():
             "mode": mode,
             "comment": comment,
         }
+
+    return _make
+
+
+@pytest.fixture
+def make_file_metadata():
+    """Factory for file metadata with sensible defaults.
+
+    Args (defaults):
+        - sha256: str = "dummysha256"
+        - cas_key: str = "dummycaskey"
+        - size_bytes: int = 2048
+        - stored_at: datetime = datetime(2024, 6, 1, 12, 0, 0)
+
+    Defaults can be overridden by keyword arguments.
+    """
+
+    def _make(
+        sha256: str = "dummysha256",
+        cas_key: str = "dummycaskey",
+        size_bytes: int = 2048,
+        stored_at: datetime.datetime = datetime.datetime(2024, 6, 1, 12, 0, 0),
+    ) -> StoredFileMetadata:
+        return StoredFileMetadata(
+            sha256=sha256,
+            cas_key=cas_key,
+            size_bytes=size_bytes,
+            stored_at=stored_at,
+        )
 
     return _make
