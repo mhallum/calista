@@ -33,7 +33,7 @@ class TestDuplicateClassificationError:
 
     @staticmethod
     def test_attributes() -> None:
-        """Test that the error attributes includes aggregate ID and frame type."""
+        """Test that the error attributes include aggregate ID and frame type."""
         aggregate_id = "file-123"
         frame_type = "BIAS"
         error = errors.DuplicateClassificationError(aggregate_id, frame_type)
@@ -57,7 +57,7 @@ class TestUnstoredFileClassificationError:
 
     @staticmethod
     def test_attributes() -> None:
-        """Test that the error attribute includes aggregate ID."""
+        """Test that the error attributes include aggregate ID."""
         aggregate_id = "file-456"
         error = errors.UnstoredFileClassificationError(aggregate_id)
         assert error.aggregate_id == aggregate_id
