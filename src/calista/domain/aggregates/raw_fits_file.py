@@ -9,7 +9,7 @@ from calista.domain.value_objects import FrameType, StoredFileMetadata
 
 from .base import Aggregate
 
-# pylint: disable=too-many-arguments,
+# pylint: disable=too-many-arguments
 
 
 class Status(Enum):
