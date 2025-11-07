@@ -24,12 +24,6 @@ class UnknownEvent(events.DomainEvent):
         return self.fake_aggregate_id
 
 
-@pytest.fixture
-def unknown_event():
-    """Fixture for an unknown event."""
-    return UnknownEvent(fake_aggregate_id="test-aggregate")
-
-
 @pytest.mark.parametrize(
     "aggregate",
     [
@@ -37,8 +31,8 @@ def unknown_event():
     ],
     ids=["ObservationSession"],
 )
-def test_apply_unknown_event(aggregate):
-    """Test that applying an unknown event raises a ValueError."""
+def test_aggregate_raises_error_on_unknown_event_application(aggregate):
+    """Test that applying an unknown event raises a ValueError for each aggregate."""
     event = UnknownEvent(fake_aggregate_id=aggregate.aggregate_id)
     with pytest.raises(ValueError, match="Unhandled event type: UnknownEvent"):
         aggregate._apply(event)
