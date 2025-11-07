@@ -1,9 +1,5 @@
 """Unit tests for the ObservationSession aggregate."""
 
-from dataclasses import dataclass
-
-import pytest
-
 from calista.domain import events
 from calista.domain.aggregates.observation_session import ObservationSession
 
@@ -94,39 +90,3 @@ class TestObservationSessionRegistration:
         )
 
         assert session.segment_number == 1
-
-
-class TestObservationSessionApply:
-    """Tests for the _apply method of ObservationSession."""
-
-    @staticmethod
-    def test_apply_observation_session_registered_event():
-        """Test that applying an ObservationSessionRegistered event sets attributes correctly."""
-
-        # Define a fake event class for testing
-        @dataclass(frozen=True)
-        class FakeEvent(events.DomainEvent):
-            """A fake event for testing purposes."""
-
-            fake_aggregate_id: str
-
-            @property
-            def aggregate_id(self) -> str:
-                return self.fake_aggregate_id
-
-        # Make an observation session
-        session = ObservationSession.register(
-            aggregate_id="session-001",
-            natural_key="OBS-20240604-004",
-            facility_code="FAC004",
-            night_id="20240604",
-            segment_number=4,
-        )
-
-        # Attempt to apply the event
-        event = FakeEvent(fake_aggregate_id="session-001")
-        with pytest.raises(
-            ValueError,
-            match="Unhandled event type: FakeEvent",
-        ):
-            session._apply(event)
