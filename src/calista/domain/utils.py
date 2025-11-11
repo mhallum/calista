@@ -32,8 +32,7 @@ def dict_to_dataclass(dc_type: type[D], values: dict[str, Any]) -> D:
             inner = values[field.name]
             target_dc = _resolve_dataclass_type(field_type)
             if target_dc and isinstance(inner, dict):
-                casted = cast(type[Any], target_dc)  # pragma: no mutate
-                kwargs[field.name] = dict_to_dataclass(casted, inner)  # pragma: no mutate # fmt: skip
+                kwargs[field.name] = dict_to_dataclass(cast(type[Any], target_dc), inner)  # pragma: no mutate # fmt: skip # pylint: disable=line-too-long
             else:
                 kwargs[field.name] = inner
         else:
