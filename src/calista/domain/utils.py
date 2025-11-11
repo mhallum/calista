@@ -25,23 +25,24 @@ def dict_to_dataclass(dc_type: type[D], values: dict[str, Any]) -> D:
         has_default = (
             field.default is not MISSING or field.default_factory is not MISSING
         )
-        # pylint: disable=consider-alternative-union-syntax
-        if field.name not in values:
+        if field.name in values:
+            inner = values[field.name]
+            if is_dataclass(field.type) and isinstance(inner, dict):
+                # to make mypy happy
+                casted = cast(type[Any], field.type)  # pragma: no mutate
+                kwargs[field.name] = dict_to_dataclass(casted, inner)  # pragma: no mutate # fmt: skip
+            else:
+                kwargs[field.name] = inner
+        else:
             if not has_default:
                 raise KeyError(f"Missing required field '{field.name}'")
             if field.default is not MISSING:
                 kwargs[field.name] = field.default
-                continue
-            if field.default_factory is not MISSING:
+            elif field.default_factory is not MISSING:
                 Sig: TypeAlias = Callable[[], Any]  # pragma: no mutate
                 factory = cast(Sig, field.default_factory)  # pragma: no mutate
                 kwargs[field.name] = factory()
-                continue
-        inner = values[field.name]
-        if is_dataclass(field.type) and isinstance(inner, dict):
-            # to make mypy happy
-            casted = cast(type[Any], field.type)  # pragma: no mutate
-            kwargs[field.name] = dict_to_dataclass(casted, inner)  # pragma: no mutate
-        else:
-            kwargs[field.name] = inner
+            else:
+                # this should be unreachable, but just in case ...
+                raise RuntimeError("Unreachable code reached")  # pragma: no mutate # pragma: no cover # fmt: skip # pylint: disable=line-too-long
     return cast(D, dc_type(**kwargs))  # pragma: no mutate
