@@ -60,6 +60,21 @@ def test_dict_to_dataclass_missing_field(data, missing):
         dict_to_dataclass(Foo, data)
 
 
+def test_dict_to_dataclass_union_none_field_is_required():
+    """Test that a field with type float | None is still required if not provided."""
+
+    @dataclass(frozen=True, slots=True)
+    class Foo:
+        a: int
+        b: str
+        c: float | None
+
+    # 'c' is omitted entirely, should raise KeyError
+    data = {"a": 1, "b": "test"}
+    with pytest.raises(KeyError, match="Missing required field 'c'"):
+        dict_to_dataclass(Foo, data)
+
+
 def test_dict_to_dataclass_extra_field():
     """Test that dict_to_dataclass ignores extra fields in the input dict."""
 
@@ -175,3 +190,24 @@ def test_dict_to_dataclass_default_factory_does_not_abort_loop():
 
     assert result.generated == [1]
     assert result.label == "custom"
+
+
+def test_dict_to_dataclass_nested_optional_dc_field():
+    """Test that optional nested dataclass fields are handled correctly."""
+
+    @dataclass(frozen=True, slots=True)
+    class Inner:
+        a: int
+        b: str
+
+    @dataclass(frozen=True, slots=True)
+    class Outer:
+        x: float
+        y: Inner | None = None
+
+    data_with_inner = {"x": 1.23, "y": {"a": 42, "b": "hello"}}
+    result_with_inner = dict_to_dataclass(Outer, data_with_inner)
+    assert result_with_inner == Outer(x=1.23, y=Inner(a=42, b="hello"))
+    data_without_inner = {"x": 4.56}
+    result_without_inner = dict_to_dataclass(Outer, data_without_inner)
+    assert result_without_inner == Outer(x=4.56, y=None)
