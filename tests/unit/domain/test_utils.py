@@ -244,3 +244,16 @@ def test_dict_to_dataclass_nested_optional_dc_field_explicit_none():
     data_with_explicit_none = {"x": 4.56, "y": None}
     result_with_explicit_none = dict_to_dataclass(Outer, data_with_explicit_none)
     assert result_with_explicit_none == Outer(x=4.56, y=None)
+
+
+def test_dict_to_dataclass_not_init_field():
+    """Test that dict_to_dataclass won't raise error for missing fields with init=False."""
+
+    @dataclass
+    class Foo:
+        a: int = field(init=False)
+        b: str
+
+    data = {"b": "test"}
+    result = dict_to_dataclass(Foo, data)
+    assert result.b == "test"

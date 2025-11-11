@@ -42,8 +42,10 @@ def dict_to_dataclass(dc_type: type[D], values: dict[str, Any]) -> D:
             else:
                 kwargs[field.name] = inner
         else:
-            if not has_default:
+            if not has_default and field.init:
                 raise KeyError(f"Missing required field '{field.name}'")
+            if not field.init:
+                continue
             if field.default is not MISSING:
                 kwargs[field.name] = field.default
             elif field.default_factory is not MISSING:
