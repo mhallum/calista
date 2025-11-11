@@ -211,3 +211,6 @@ def test_dict_to_dataclass_nested_optional_dc_field():
     data_without_inner = {"x": 4.56}
     result_without_inner = dict_to_dataclass(Outer, data_without_inner)
     assert result_without_inner == Outer(x=4.56, y=None)
+    data_with_explicit_none = {"x": 4.56, "y": None}
+    result_with_explicit_none = dict_to_dataclass(Outer, data_with_explicit_none)
+    assert result_with_explicit_none == Outer(x=4.56, y=None)
