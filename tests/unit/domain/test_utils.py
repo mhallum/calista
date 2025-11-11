@@ -192,8 +192,8 @@ def test_dict_to_dataclass_default_factory_does_not_abort_loop():
     assert result.label == "custom"
 
 
-def test_dict_to_dataclass_nested_optional_dc_field():
-    """Test that optional nested dataclass fields are handled correctly."""
+def test_dict_to_dataclass_nested_optional_dc_field_with_value():
+    """Test that optional nested dataclass field is handled correctly when value is provided."""
 
     @dataclass(frozen=True, slots=True)
     class Inner:
@@ -208,9 +208,39 @@ def test_dict_to_dataclass_nested_optional_dc_field():
     data_with_inner = {"x": 1.23, "y": {"a": 42, "b": "hello"}}
     result_with_inner = dict_to_dataclass(Outer, data_with_inner)
     assert result_with_inner == Outer(x=1.23, y=Inner(a=42, b="hello"))
+
+
+def test_dict_to_dataclass_nested_optional_dc_field_missing():
+    """Test that optional nested dataclass field is handled correctly when missing."""
+
+    @dataclass(frozen=True, slots=True)
+    class Inner:
+        a: int
+        b: str
+
+    @dataclass(frozen=True, slots=True)
+    class Outer:
+        x: float
+        y: Inner | None = None
+
     data_without_inner = {"x": 4.56}
     result_without_inner = dict_to_dataclass(Outer, data_without_inner)
     assert result_without_inner == Outer(x=4.56, y=None)
+
+
+def test_dict_to_dataclass_nested_optional_dc_field_explicit_none():
+    """Test that optional nested dataclass field is handled correctly when explicitly set to None."""
+
+    @dataclass(frozen=True, slots=True)
+    class Inner:
+        a: int
+        b: str
+
+    @dataclass(frozen=True, slots=True)
+    class Outer:
+        x: float
+        y: Inner | None = None
+
     data_with_explicit_none = {"x": 4.56, "y": None}
     result_with_explicit_none = dict_to_dataclass(Outer, data_with_explicit_none)
     assert result_with_explicit_none == Outer(x=4.56, y=None)
