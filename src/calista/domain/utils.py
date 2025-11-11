@@ -46,7 +46,7 @@ def dict_to_dataclass(dc_type: type[D], values: dict[str, Any]) -> D:
                 kwargs[field.name] = factory()
             else:
                 # this should be unreachable, but just in case ...
-                msg = f"Field '{field.name}' has neither default nor default_factory despite has_default check"  # pragma: no mutate # pragma: no cover # pylint: disable=line-too-long
+                msg = f"Field '{field.name}' has unexpected state: no default or default_factory found"  # pragma: no mutate # pragma: no cover # pylint: disable=line-too-long
                 raise RuntimeError(msg)  # pragma: no mutate  # pragma: no cover # fmt: skip # pylint: disable=line-too-long
     return cast(D, dc_type(**kwargs))  # pragma: no mutate
 
