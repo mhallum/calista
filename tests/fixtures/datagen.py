@@ -11,8 +11,9 @@ from calista.domain.value_objects import StoredFileMetadata
 from calista.interfaces.eventstore import (
     EventEnvelope,
 )
+from calista.service_layer import commands
 
-# pylint: disable=too-many-arguments
+# pylint: disable=too-many-arguments,redefined-outer-name
 
 _counter = itertools.count(1)  # for ulid_like()
 
@@ -230,3 +231,62 @@ def make_file_metadata():
         )
 
     return _make
+
+
+@pytest.fixture
+def make_seed_facility_commands(
+    make_site_params, make_telescope_params, make_instrument_params
+) -> Callable[..., list[commands.Command]]:
+    """Create a list of commands to seed a facility with its dependencies."""
+
+    def _make_seed_facility_commands(
+        site_code: str = "S1",
+        site_name: str = "Test Site 1",
+        telescope_code: str = "T1",
+        telescope_name: str = "Test Telescope 1",
+        instrument_code: str = "I1",
+        instrument_name: str = "Test Instrument 1",
+        site_params: dict | None = None,
+        telescope_params: dict | None = None,
+        instrument_params: dict | None = None,
+        facility_code: str = "Test",
+    ) -> list[commands.Command]:
+        if site_params is None:
+            site_params = {}
+        if telescope_params is None:
+            telescope_params = {}
+        if instrument_params is None:
+            instrument_params = {}
+
+        seed_site_cmd = commands.PublishSiteRevision(
+            **make_site_params(site_code, site_name, **site_params)
+        )
+        site_code = seed_site_cmd.site_code
+
+        seed_telescope_cmd = commands.PublishTelescopeRevision(
+            **make_telescope_params(telescope_code, telescope_name, **telescope_params)
+        )
+        telescope_code = seed_telescope_cmd.telescope_code
+
+        seed_instrument_cmd = commands.PublishInstrumentRevision(
+            **make_instrument_params(
+                instrument_code, instrument_name, **instrument_params
+            )
+        )
+        instrument_code = seed_instrument_cmd.instrument_code
+
+        seed_facility_command = commands.RegisterFacility(
+            facility_code=facility_code,
+            site_code=site_code,
+            telescope_code=telescope_code,
+            instrument_code=instrument_code,
+        )
+
+        return [
+            seed_site_cmd,
+            seed_telescope_cmd,
+            seed_instrument_cmd,
+            seed_facility_command,
+        ]
+
+    return _make_seed_facility_commands
