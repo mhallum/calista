@@ -2,7 +2,7 @@
 
 from collections.abc import Callable
 from dataclasses import MISSING, fields, is_dataclass
-from typing import Any, TypeAlias, TypeVar, cast
+from typing import Any, TypeVar, cast
 
 D = TypeVar("D")
 
@@ -39,10 +39,10 @@ def dict_to_dataclass(dc_type: type[D], values: dict[str, Any]) -> D:
             if field.default is not MISSING:
                 kwargs[field.name] = field.default
             elif field.default_factory is not MISSING:
-                Sig: TypeAlias = Callable[[], Any]  # pragma: no mutate
-                factory = cast(Sig, field.default_factory)  # pragma: no mutate
+                factory = cast(Callable[[], Any], field.default_factory)  # pragma: no mutate # fmt: skip
                 kwargs[field.name] = factory()
             else:
                 # this should be unreachable, but just in case ...
-                raise RuntimeError("Unreachable code reached")  # pragma: no mutate # pragma: no cover # fmt: skip # pylint: disable=line-too-long
+                msg = f"Field '{field.name}' has neither default nor default_factory despite has_default check"  # pragma: no mutate # pragma: no cover # pylint: disable=line-too-long
+                raise RuntimeError(msg)  # pragma: no mutate  # pragma: no cover # fmt: skip # pylint: disable=line-too-long
     return cast(D, dc_type(**kwargs))  # pragma: no mutate
