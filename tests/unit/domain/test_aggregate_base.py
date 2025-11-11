@@ -4,7 +4,10 @@ from dataclasses import dataclass
 
 import pytest
 
-from calista.domain.aggregates.base import Aggregate, AggregateIdMismatchError
+from calista.domain.aggregates.base import (
+    Aggregate,
+    AggregateIdMismatchError,
+)
 from calista.domain.events import DomainEvent
 
 # pylint: disable=protected-access,magic-value-comparison,too-few-public-methods
