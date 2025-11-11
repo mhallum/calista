@@ -20,7 +20,7 @@ def test_dict_to_dataclass_round_trip():
 
     @dataclass(frozen=True, slots=True)
     class Outer:
-        """Outer dataclass for testing"""
+        """Outer dataclass for testing."""
 
         x: float
         y: Inner
