@@ -14,8 +14,6 @@ from calista.bootstrap.bootstrap import build_message_bus
 from calista.interfaces.unit_of_work import AbstractUnitOfWork, CatalogBundle
 from calista.service_layer.handlers import COMMAND_HANDLERS
 
-# pylint: disable=consider-using-assignment-expr
-
 
 class FakeUoW(AbstractUnitOfWork):
     """A fake unit of work for testing purposes."""

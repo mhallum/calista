@@ -7,8 +7,6 @@ from calista.interfaces.catalog.errors import (
 )
 from calista.interfaces.catalog.facility_catalog import Facility, FacilityCatalog
 
-# pylint: disable=consider-using-assignment-expr
-
 
 class InMemoryFacilityCatalog(FacilityCatalog):
     """In-memory implementation of the FacilityCatalog interface."""

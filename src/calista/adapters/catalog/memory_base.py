@@ -15,8 +15,6 @@ from .memory_store import InMemoryCatalogData
 S = TypeVar("S")  # Snapshot
 R = TypeVar("R")  # Revision
 
-# pylint: disable=consider-using-assignment-expr
-
 
 class InMemoryVersionedCatalogBase(Generic[S, R]):
     """Shared mechanics for in-memory versioned catalogs: get, head, publish."""

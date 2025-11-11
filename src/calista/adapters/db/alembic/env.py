@@ -50,7 +50,7 @@ def get_url() -> str:
     url = xargs.get("url")
 
     # 2) alembic.ini / programmatic config
-    if not url:  # pylint: disable=consider-using-assignment-expr
+    if not url:
         url = config.get_main_option("sqlalchemy.url")
 
     # 3) environment variable

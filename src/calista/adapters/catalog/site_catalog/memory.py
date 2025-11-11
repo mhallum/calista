@@ -9,8 +9,6 @@ from calista.interfaces.catalog.site_catalog import (
     SiteSnapshot,
 )
 
-# pylint: disable=consider-using-assignment-expr
-
 
 class InMemorySiteCatalog(
     InMemoryVersionedCatalogBase[SiteSnapshot, SiteRevision], SiteCatalog

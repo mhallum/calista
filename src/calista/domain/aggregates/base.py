@@ -7,8 +7,6 @@ from typing import ClassVar, TypeVar
 from calista.domain.errors import AggregateIdMismatchError
 from calista.domain.events import DomainEvent
 
-# pylint: disable=consider-using-assignment-expr
-
 A = TypeVar("A", bound="Aggregate")
 
 
