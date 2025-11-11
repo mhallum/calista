@@ -21,8 +21,6 @@ from calista.interfaces.catalog.telescope_catalog import (
 from calista.interfaces.unit_of_work import AbstractUnitOfWork
 from calista.service_layer import commands
 
-# pylint: disable=consider-using-assignment-expr
-
 logger = logging.getLogger(__name__)
 
 # ============================================================================

@@ -9,8 +9,6 @@ from calista.interfaces.catalog.telescope_catalog import (
     TelescopeSnapshot,
 )
 
-# pylint: disable=consider-using-assignment-expr
-
 
 class InMemoryTelescopeCatalog(
     InMemoryVersionedCatalogBase[TelescopeSnapshot, TelescopeRevision], TelescopeCatalog

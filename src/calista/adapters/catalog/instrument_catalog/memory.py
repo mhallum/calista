@@ -9,8 +9,6 @@ from calista.interfaces.catalog.instrument_catalog import (
     InstrumentSnapshot,
 )
 
-# pylint: disable=consider-using-assignment-expr
-
 
 class InMemoryInstrumentCatalog(
     InMemoryVersionedCatalogBase[InstrumentSnapshot, InstrumentRevision],

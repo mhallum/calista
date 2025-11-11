@@ -83,7 +83,7 @@ class SqlAlchemyStreamIndex(StreamIndex):
         # Chasing this mutant would couple tests to internal control flow without increasing safety.
 
         # 3) If inserted, all is right with the world
-        if inserted:  # pylint: disable=consider-using-assignment-expr # (clearer this way)
+        if inserted:
             return
 
         # 4) If not inserted, there was a conflict.
