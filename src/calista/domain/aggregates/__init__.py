@@ -8,6 +8,5 @@ import path.
 
 from .base import Aggregate
 from .observation_session import ObservationSession
-from .raw_fits_file import RawFitsFile
 
-__all__ = ["Aggregate", "ObservationSession", "RawFitsFile"]
+__all__ = ["Aggregate", "ObservationSession"]
