@@ -17,6 +17,12 @@ def dict_to_dataclass(dc_type: type[D], values: dict[str, Any]) -> D:
 
     Returns:
         An instance of dc_type populated with data from values.
+
+    Note:
+        - Fields in values that are not in dc_type are ignored.
+        - All fields without defaults must be present in values.
+        - This does not handle complex types like lists of dataclasses
+          or unions beyond SomeDataclass | None.
     """
 
     if not is_dataclass(dc_type):
