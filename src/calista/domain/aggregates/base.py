@@ -7,6 +7,8 @@ from typing import ClassVar, TypeVar
 from calista.domain.errors import AggregateIdMismatchError
 from calista.domain.events import DomainEvent
 
+# pylint: disable=consider-using-assignment-expr
+
 A = TypeVar("A", bound="Aggregate")
 
 
@@ -38,36 +40,46 @@ class Aggregate(abc.ABC):
 
         Returns:
             An instance of the aggregate rebuilt to the state represented by the event stream.
-
         Raises:
             AggregateIdMismatchError: If any event in the stream has an aggregate_id
                 that does not match the provided aggregate_id.
+            UnknownEventType: if the aggregate does not know how to handle one of the events
         """
         aggregate = cls(aggregate_id)
         for event in event_stream:
-            if event.aggregate_id != aggregate_id:
-                raise AggregateIdMismatchError(aggregate_id, event.aggregate_id)
-            aggregate._apply(event)
+            aggregate._apply_checked(event)  # raises the errors as needed
             aggregate._version += 1
         return aggregate
 
     # --- Event Application ---
 
+    def _apply_checked(self, event: DomainEvent) -> None:
+        """Internal gate. Do not override.
+
+        Performs aggregate ID check before applying event.
+        """
+        if event.aggregate_id != self.aggregate_id:
+            raise AggregateIdMismatchError(self.aggregate_id, event.aggregate_id)
+        self._apply(event)
+
     @abc.abstractmethod
     def _apply(self, event: DomainEvent) -> None:
         """Apply an event to the aggregate.
 
-        Note:
-           This method already assumes that the event's aggregate ID matches the aggregate's ID.
+        Args:
+            event: The event to apply.
+        Raises:
+            UnknownEventType: If the concrete aggregate does not implement handling logic for
+                the event type.
+
+        Note: ID matching is automatically enforced by the base class.
         """
 
     # --- Plumbing ---
 
     def _enqueue(self, event: DomainEvent) -> None:
-        if event.aggregate_id != self.aggregate_id:
-            raise AggregateIdMismatchError(self.aggregate_id, event.aggregate_id)
+        self._apply_checked(event)
         self._pending_events.append(event)
-        self._apply(event)
 
     def dequeue_uncommitted(self) -> list[DomainEvent]:
         """Dequeue all uncommitted events.
