@@ -15,30 +15,13 @@ class TestRegisterObservationSession(HandlerTestBase):
     # Used by HandlerTestBase to seed the bus
     def _seed_bus(self, request):
         """Seed the message bus with a facility."""
-        make_site_params = request.getfixturevalue("make_site_params")
-        make_telescope_params = request.getfixturevalue("make_telescope_params")
-        make_instrument_params = request.getfixturevalue("make_instrument_params")
-        self.bus.handle(
-            commands.PublishSiteRevision(**make_site_params("S1", "Test Site 1"))
+        make_seed_facility_commands = request.getfixturevalue(
+            "make_seed_facility_commands"
         )
-        self.bus.handle(
-            commands.PublishTelescopeRevision(
-                **make_telescope_params("T1", "Test Telescope 1")
-            )
-        )
-        self.bus.handle(
-            commands.PublishInstrumentRevision(
-                **make_instrument_params("I1", "Test Instrument 1")
-            )
-        )
-        self.bus.handle(
-            commands.RegisterFacility(
-                facility_code="FAC1",
-                site_code="S1",
-                telescope_code="T1",
-                instrument_code="I1",
-            )
-        )
+
+        cmds = make_seed_facility_commands(facility_code="FAC1")
+        for cmd in cmds:
+            self.bus.handle(cmd)
 
     # --- Tests ---
 
