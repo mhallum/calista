@@ -1,7 +1,8 @@
 """Domain layer utilities."""
 
-from dataclasses import fields, is_dataclass
-from typing import Any, TypeVar, cast
+from collections.abc import Callable
+from dataclasses import MISSING, fields, is_dataclass
+from typing import Any, TypeAlias, TypeVar, cast
 
 D = TypeVar("D")
 
@@ -21,9 +22,26 @@ def dict_to_dataclass(dc_type: type[D], values: dict[str, Any]) -> D:
         raise TypeError(f"{dc_type} is not a dataclass type")
     kwargs = {}
     for field in fields(dc_type):
-        inner = values.get(field.name)
+        has_default = (
+            field.default is not MISSING or field.default_factory is not MISSING
+        )
+        # pylint: disable=consider-alternative-union-syntax
+        if field.name not in values:
+            if not has_default:
+                raise KeyError(f"Missing required field '{field.name}'")
+            if field.default is not MISSING:
+                kwargs[field.name] = field.default
+                continue
+            if field.default_factory is not MISSING:
+                Sig: TypeAlias = Callable[[], Any]  # pragma: no mutate
+                factory = cast(Sig, field.default_factory)  # pragma: no mutate
+                kwargs[field.name] = factory()
+                continue
+        inner = values[field.name]
         if is_dataclass(field.type) and isinstance(inner, dict):
-            kwargs[field.name] = dict_to_dataclass(cast(type[Any], field.type), inner)
+            # to make mypy happy
+            casted = cast(type[Any], field.type)  # pragma: no mutate
+            kwargs[field.name] = dict_to_dataclass(casted, inner)  # pragma: no mutate
         else:
             kwargs[field.name] = inner
-    return cast(D, dc_type(**kwargs))
+    return cast(D, dc_type(**kwargs))  # pragma: no mutate
