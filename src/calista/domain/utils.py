@@ -2,6 +2,7 @@
 
 from collections.abc import Callable
 from dataclasses import MISSING, fields, is_dataclass
+from types import NoneType
 from typing import Any, TypeVar, cast, get_args, get_origin, get_type_hints
 
 D = TypeVar("D")
@@ -54,7 +55,7 @@ def _resolve_dataclass_type(field_type: Any) -> type[Any] | None:
     origin = get_origin(field_type)
     if origin is None:
         return cast(type[Any], field_type) if is_dataclass(field_type) else None  # pragma: no mutate # fmt: skip # pylint: disable=line-too-long
-    args = [arg for arg in get_args(field_type) if arg is not type(None)]
+    args = [arg for arg in get_args(field_type) if arg is not NoneType]
     if len(args) == 1 and is_dataclass(args[0]):
         return cast(type[Any], args[0])
     return None
