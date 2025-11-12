@@ -9,7 +9,6 @@ class SHA256AlreadyBound(ExposureIndexError):
     """Raised when the ExposureIndex is asked to bind a SHA256 that
     is already bound to a different exposure ID.
 
-
     Attributes:
         sha256 (str): The SHA256 hash that is already bound.
         exposure_id (str): The exposure ID that the SHA256 is bound to.
@@ -40,14 +39,14 @@ class ExposureIDAlreadyBound(ExposureIndexError):
         self.sha256 = sha256
 
 
-class SHA256NotFoundError(ExposureIndexError):
-    """Raised when the ExposureIndex is asked to deprecate a SHA256
-    that is not found in the index.
+class ExposureIDNotFoundError(ExposureIndexError):
+    """Raised when the ExposureIndex is asked to deprecate an exposure whose id
+    is not found in the index.
 
     Attributes:
-        sha256 (str): The SHA256 hash that was not found.
+        exposure_id (str): The exposure ID that was not found.
     """
 
-    def __init__(self, sha256: str):
-        super().__init__(f"SHA256 '{sha256}' not found in ExposureIndex.")
-        self.sha256 = sha256
+    def __init__(self, exposure_id: str):
+        super().__init__(f"Exposure ID '{exposure_id}' not found in ExposureIndex.")
+        self.exposure_id = exposure_id

@@ -2,8 +2,8 @@
 
 from calista.interfaces.exposure_index.errors import (
     ExposureIDAlreadyBound,
+    ExposureIDNotFoundError,
     SHA256AlreadyBound,
-    SHA256NotFoundError,
 )
 
 
@@ -63,24 +63,24 @@ class TestSHA256AlreadyBound:
         assert str(error) == expected_message
 
 
-class TestSHA256NotFoundError:
-    """Tests for the SHA256NotFoundError error."""
+class TestExposureIDNotFoundError:
+    """Tests for the ExposureIDNotFoundError error."""
 
     @staticmethod
     def test_attributes() -> None:
         """Test that the attributes are set correctly."""
-        sha256 = "sha256-hash-mno"
+        exposure_id = "exposure-123"
 
-        error = SHA256NotFoundError(sha256)
+        error = ExposureIDNotFoundError(exposure_id)
 
-        assert error.sha256 == sha256
+        assert error.exposure_id == exposure_id
 
     @staticmethod
     def test_message() -> None:
         """Test that the error message is formatted correctly."""
-        sha256 = "sha256-hash-pqr"
+        exposure_id = "exposure-456"
 
-        error = SHA256NotFoundError(sha256)
+        error = ExposureIDNotFoundError(exposure_id)
 
-        expected_message = f"SHA256 '{sha256}' not found in ExposureIndex."
+        expected_message = f"Exposure ID '{exposure_id}' not found in ExposureIndex."
         assert str(error) == expected_message

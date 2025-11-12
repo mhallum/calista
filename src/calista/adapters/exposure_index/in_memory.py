@@ -3,8 +3,8 @@
 from calista.interfaces.exposure_index import ExposureIndex
 from calista.interfaces.exposure_index.errors import (
     ExposureIDAlreadyBound,
+    ExposureIDNotFoundError,
     SHA256AlreadyBound,
-    SHA256NotFoundError,
 )
 
 
@@ -34,7 +34,13 @@ class InMemoryExposureIndex(ExposureIndex):
             raise ExposureIDAlreadyBound(exposure_id, bound_sha256)
         self._index[sha256] = exposure_id
 
-    def deprecate(self, sha256: str) -> None:
-        if sha256 not in self._index:
-            raise SHA256NotFoundError(sha256=sha256)
-        del self._index[sha256]
+    def deprecate(self, exposure_id: str) -> None:
+        if exposure_id not in self._index.values():
+            raise ExposureIDNotFoundError(exposure_id=exposure_id)
+
+        # Find the sha256 that is bound to this exposure_id
+        bound_sha256 = next(
+            key for key, value in self._index.items() if value == exposure_id
+        )
+
+        del self._index[bound_sha256]

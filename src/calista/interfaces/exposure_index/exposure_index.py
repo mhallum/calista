@@ -33,17 +33,17 @@ class ExposureIndex(abc.ABC):
             exposure_id (str): The exposure_id to register.
 
         Raises:
-            ExposureIDAlreadyBound: If the sha256 is already registered with a different exposure_id.
-            SHA256AlreadyBound: if the exposure_id is already registered with a different sha256.
+            SHA256AlreadyBound: If the sha256 is already registered with a different exposure_id.
+            ExposureIDAlreadyBound: If the exposure_id is already registered with a different sha256.
         """
 
     @abc.abstractmethod
-    def deprecate(self, sha256: str) -> None:
+    def deprecate(self, exposure_id: str) -> None:
         """Removes the exposure from the index.
 
         Args:
-            sha256 (str): The SHA256 hash of the exposure file to remove.
+            exposure_id (str): The exposure ID to remove.
 
         Raises:
-            SHA256NotFoundError: If the sha256 is not found in the index.
+            ExposureIDNotFoundError: If the exposure_id is not found in the index.
         """

@@ -14,8 +14,8 @@ import pytest
 from calista.adapters.exposure_index import InMemoryExposureIndex
 from calista.interfaces.exposure_index import (
     ExposureIDAlreadyBound,
+    ExposureIDNotFoundError,
     SHA256AlreadyBound,
-    SHA256NotFoundError,
 )
 
 if TYPE_CHECKING:
@@ -151,31 +151,31 @@ class TestExposureIndexDeprecate:
     """Tests for the ExposureIndex.deprecate method."""
 
     @staticmethod
-    def test_deprecate_existing_sha256_removes_the_index(
+    def test_deprecate_existing_exposure_id_removes_the_index(
         exposure_index: ExposureIndex,
     ) -> None:
-        """Test that deprecating an existing SHA256 removes the index entry."""
+        """Test that deprecating an existing exposure ID removes the index entry."""
         sha256 = "deprecate-sha256"
         exposure_id = "exposure-404"
 
         exposure_index.register(sha256, exposure_id)
 
-        exposure_index.deprecate(sha256)
+        exposure_index.deprecate(exposure_id)
 
         result = exposure_index.lookup(sha256)
         assert result is None
 
     @staticmethod
-    def test_deprecate_nonexistent_sha256_raises(
+    def test_deprecate_nonexistent_exposure_id_raises(
         exposure_index: ExposureIndex,
     ) -> None:
-        """Test that deprecating a nonexistent SHA256 raises an error."""
-        sha256 = "nonexistent-sha256"
+        """Test that deprecating a nonexistent exposure ID raises an error."""
+        exposure_id = "nonexistent-exposure-id"
 
         with pytest.raises(
-            SHA256NotFoundError,
+            ExposureIDNotFoundError,
         ) as exc_info:
-            exposure_index.deprecate(sha256)
+            exposure_index.deprecate(exposure_id)
 
         error = exc_info.value
-        assert error.sha256 == sha256
+        assert error.exposure_id == exposure_id
