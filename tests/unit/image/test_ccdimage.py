@@ -10,7 +10,7 @@ from calista.image.ccd_image import CCDImage
 # pylint: disable=magic-value-comparison
 
 
-def test_2d_shape_inforced():
+def test_2d_shape_enforced():
     """Test that CCDImage enforces 2D shape for data array."""
     data_1d = np.array([1, 2, 3], dtype=np.float32)
     data_1d.setflags(write=False)  # Make immutable
@@ -93,7 +93,7 @@ def test_data_immutability_enforced():
 
 
 def test_mask_immutability_enforced():
-    """Test that CCDImage enforces immutability of data, mask, and variance."""
+    """Test that CCDImage enforces immutability of mask."""
     data = np.array([[1, 2], [3, 4]], dtype=np.float32)
     mask = np.array([[True, False], [False, True]], dtype=np.bool_)
     data.setflags(write=False)  # Make immutable
@@ -103,7 +103,7 @@ def test_mask_immutability_enforced():
 
 
 def test_variance_immutability_enforced():
-    """Test that CCDImage enforces immutability of data, mask, and variance."""
+    """Test that CCDImage enforces immutability of variance."""
     data = np.array([[1, 2], [3, 4]], dtype=np.float32)
     variance = np.array([[0.1, 0.2], [0.3, 0.4]], dtype=np.float32)
     data.setflags(write=False)  # Make immutable
