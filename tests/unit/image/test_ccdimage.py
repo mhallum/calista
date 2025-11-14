@@ -146,8 +146,11 @@ def test_happy_path_construction():
 
     assert np.array_equal(ccd_image.data, data)
     assert ccd_image.header["EXPTIME"] == 30.0
-    assert np.array_equal(ccd_image.mask, mask)  # type: ignore[arg-type]
-    assert np.array_equal(ccd_image.variance, variance)  # type: ignore[arg-type]
+    assert ccd_image.mask is not None
+    assert ccd_image.variance is not None
+    assert np.array_equal(ccd_image.variance, variance)
+    assert ccd_image.variance is not None
+    assert np.array_equal(ccd_image.variance, variance)
     assert ccd_image.unit == "adu"
 
 
@@ -194,14 +197,18 @@ def test_copy_with_clearing_fields():
 
     # now clear those fields
     cleared_image = ccd_image.copy_with(mask=None, variance=None, unit=None)
-
     # check that they are cleared
+    assert cleared_image.mask is None
     assert cleared_image.mask is None
     assert cleared_image.variance is None
     assert cleared_image.unit is None
     # Original remains unchanged
-    assert np.array_equal(ccd_image.mask, mask)  # type: ignore[arg-type]
-    assert np.array_equal(ccd_image.variance, variance)  # type: ignore[arg-type]
+    assert ccd_image.mask is not None
+    assert np.array_equal(ccd_image.mask, mask)
+    assert ccd_image.variance is not None
+    assert np.array_equal(ccd_image.variance, variance)
+    assert ccd_image.unit == "adu"
+    assert ccd_image.unit == "adu"
     assert ccd_image.unit == "adu"
 
 
