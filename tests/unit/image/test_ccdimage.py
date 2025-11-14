@@ -172,6 +172,39 @@ def test_copy_with_modifications():
     assert ccd_image.header["EXPTIME"] == 30.0
 
 
+def test_copy_with_clearing_fields():
+    """Test that copy_with can clear optional fields by setting them to None."""
+
+    # make a CCDImage with mask, variance, and unit
+    data = np.array([[1, 2], [3, 4]], dtype=np.float32)
+    mask = np.array([[True, False], [False, True]], dtype=np.bool_)
+    variance = np.array([[0.1, 0.2], [0.3, 0.4]], dtype=np.float32)
+    data.setflags(write=False)  # Make immutable
+    mask.setflags(write=False)  # Make immutable
+    variance.setflags(write=False)  # Make immutable
+    header = {"EXPTIME": 30.0, "FILTER": "R"}
+
+    ccd_image = CCDImage(
+        data=data,
+        header=header,
+        mask=mask,
+        variance=variance,
+        unit="adu",
+    )
+
+    # now clear those fields
+    cleared_image = ccd_image.copy_with(mask=None, variance=None, unit=None)
+
+    # check that they are cleared
+    assert cleared_image.mask is None
+    assert cleared_image.variance is None
+    assert cleared_image.unit is None
+    # Original remains unchanged
+    assert np.array_equal(ccd_image.mask, mask)  # type: ignore[arg-type]
+    assert np.array_equal(ccd_image.variance, variance)  # type: ignore[arg-type]
+    assert ccd_image.unit == "adu"
+
+
 def test_copy_with_defaults():
     """Test that copy_with without arguments creates an identical copy."""
     data = np.array([[1, 2], [3, 4]], dtype=np.float32)

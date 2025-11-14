@@ -23,6 +23,13 @@ import numpy.typing as npt
 
 # pylint: disable=too-many-arguments,magic-value-comparison
 
+
+class _CopySentinel:
+    __slots__ = ()
+
+
+_COPY = _CopySentinel()
+
 Array2D = npt.NDArray[np.number]
 
 
@@ -51,28 +58,35 @@ class CCDImage:
     def copy_with(
         self,
         *,
-        data: Array2D | None = None,
-        header: Mapping[str, object] | None = None,
-        mask: npt.NDArray[np.bool_] | None = None,
-        variance: Array2D | None = None,
-        unit: str | None = None,
+        data: Array2D | _CopySentinel = _COPY,
+        header: Mapping[str, object] | None | _CopySentinel = _COPY,
+        mask: npt.NDArray[np.bool_] | None | _CopySentinel = _COPY,
+        variance: Array2D | None | _CopySentinel = _COPY,
+        unit: str | None | _CopySentinel = _COPY,
     ) -> CCDImage:
         """Create a copy of this CCDImage with optional modifications.
 
-        Args:
-            data (Array2D | None): New data array, or None to keep existing.
-            header (Mapping[str, object] | None): New header mapping, or None to keep existing.
-            mask (npt.NDArray[np.bool_] | None): New mask array, or None to keep existing.
-            variance (Array2D | None): New variance array, or None to keep existing.
-            unit (str | None): New unit string, or None to keep existing.
+        Values not provided will be copied from the existing instance.
+
+        Example:
+            # Create a new CCDImage with updated data and unit, everything else copied
+            new_image = old_image.copy_with(data=new_data_array, unit="adu")
+            # Create a new CCDImage with the mask cleared (set to None)
+            new_image = old_image.copy_with(mask=None)
         """
 
+        new_data: Array2D = self.data if data is _COPY else data  # type: ignore[assignment] # pylint: disable=line-too-long
+        new_header: Mapping[str, object] = self.header if header is _COPY else header  # type: ignore[assignment] # pylint: disable=line-too-long
+        new_mask: npt.NDArray[np.bool_] | None = self.mask if mask is _COPY else mask  # type: ignore[assignment] # pylint: disable=line-too-long
+        new_variance: Array2D | None = self.variance if variance is _COPY else variance  # type: ignore[assignment] # pylint: disable=line-too-long
+        new_unit: str | None = self.unit if unit is _COPY else unit  # type: ignore[assignment] # pylint: disable=line-too-long
+
         return CCDImage(
-            data=data if data is not None else self.data,
-            header=header if header is not None else self.header,
-            mask=mask if mask is not None else self.mask,
-            variance=variance if variance is not None else self.variance,
-            unit=unit if unit is not None else self.unit,
+            data=new_data,
+            header=new_header,
+            mask=new_mask,
+            variance=new_variance,
+            unit=new_unit,
         )
 
     def with_updated_header(self, updates: Mapping[str, object]) -> CCDImage:
