@@ -21,7 +21,7 @@ from types import MappingProxyType
 import numpy as np
 import numpy.typing as npt
 
-# pylint: disable=too-many-arguments,magic-value-comparison
+# pylint: disable=too-many-arguments,magic-value-comparison,too-few-public-methods
 
 
 class _CopySentinel:
@@ -30,6 +30,7 @@ class _CopySentinel:
 
 _COPY = _CopySentinel()
 
+# Type alias for a numeric ndarray; 2D shape is enforced at runtime, not by the type system.
 Array2D = npt.NDArray[np.number]
 
 
@@ -59,7 +60,7 @@ class CCDImage:
         self,
         *,
         data: Array2D | _CopySentinel = _COPY,
-        header: Mapping[str, object] | None | _CopySentinel = _COPY,
+        header: Mapping[str, object] | _CopySentinel = _COPY,
         mask: npt.NDArray[np.bool_] | None | _CopySentinel = _COPY,
         variance: Array2D | None | _CopySentinel = _COPY,
         unit: str | None | _CopySentinel = _COPY,
@@ -75,18 +76,15 @@ class CCDImage:
             new_image = old_image.copy_with(mask=None)
         """
 
-        new_data: Array2D = self.data if data is _COPY else data  # type: ignore[assignment] # pylint: disable=line-too-long
-        new_header: Mapping[str, object] = self.header if header is _COPY else header  # type: ignore[assignment] # pylint: disable=line-too-long
-        new_mask: npt.NDArray[np.bool_] | None = self.mask if mask is _COPY else mask  # type: ignore[assignment] # pylint: disable=line-too-long
-        new_variance: Array2D | None = self.variance if variance is _COPY else variance  # type: ignore[assignment] # pylint: disable=line-too-long
-        new_unit: str | None = self.unit if unit is _COPY else unit  # type: ignore[assignment] # pylint: disable=line-too-long
+        def _resolve(field_value, current_value):
+            return current_value if field_value is _COPY else field_value
 
         return CCDImage(
-            data=new_data,
-            header=new_header,
-            mask=new_mask,
-            variance=new_variance,
-            unit=new_unit,
+            data=_resolve(data, self.data),
+            header=_resolve(header, self.header),
+            mask=_resolve(mask, self.mask),
+            variance=_resolve(variance, self.variance),
+            unit=_resolve(unit, self.unit),
         )
 
     def with_updated_header(self, updates: Mapping[str, object]) -> CCDImage:
