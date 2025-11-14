@@ -149,8 +149,6 @@ def test_happy_path_construction():
     assert ccd_image.mask is not None
     assert ccd_image.variance is not None
     assert np.array_equal(ccd_image.variance, variance)
-    assert ccd_image.variance is not None
-    assert np.array_equal(ccd_image.variance, variance)
     assert ccd_image.unit == "adu"
 
 
@@ -199,7 +197,6 @@ def test_copy_with_clearing_fields():
     cleared_image = ccd_image.copy_with(mask=None, variance=None, unit=None)
     # check that they are cleared
     assert cleared_image.mask is None
-    assert cleared_image.mask is None
     assert cleared_image.variance is None
     assert cleared_image.unit is None
     # Original remains unchanged
@@ -207,8 +204,6 @@ def test_copy_with_clearing_fields():
     assert np.array_equal(ccd_image.mask, mask)
     assert ccd_image.variance is not None
     assert np.array_equal(ccd_image.variance, variance)
-    assert ccd_image.unit == "adu"
-    assert ccd_image.unit == "adu"
     assert ccd_image.unit == "adu"
 
 
