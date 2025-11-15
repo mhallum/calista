@@ -1,6 +1,6 @@
 # ADR-0002: Content-Addressed File Store (CAS)
 
-**Status**: Accepted
+**Status**: Superseded by ADR-0024
 
 ## Context
 
