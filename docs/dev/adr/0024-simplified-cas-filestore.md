@@ -1,4 +1,4 @@
-# ADR-0024: Simplified Content-Addressed FileStore
+# ADR-0024: Simplified Content-Addressed File Store
 
 **Status**: Accepted
 **Supersedes**: ADR-0002 “Content-Addressed File Store (CAS)”
