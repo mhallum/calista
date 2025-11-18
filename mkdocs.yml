@@ -110,3 +110,4 @@ nav:
           - "ADR 0022: Logging & Flight Recorder": dev/adr/0022-logging-and-flight-recorder.md
           - "ADR 0023: Introduce `calista.utils` for cross-cutting, dependency-light helpers": dev/adr/0023-introduce-utils-subpackage-for-cross-cutting-helpers.md
           - "ADR 0024: Simplified Content-Addressed FileStore": dev/adr/0024-simplified-cas-filestore.md
+          - "ADR 0025: Refine FileStore Responsibilities": dev/adr/0025-refine-filestore-responsibilities.md
