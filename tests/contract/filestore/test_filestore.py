@@ -2,7 +2,7 @@
 
 These tests ensure that any filestore implementation adheres to the expected
 behavior defined by the filestore interface. These tests do not depend on
-specific implementations, backend, filesystem, or storage technology,but
+specific implementations, backend, filesystem, or storage technology, but
 rather validate the contract that all implementations must fulfill.
 """
 
@@ -35,7 +35,7 @@ def filestore(request: pytest.FixtureRequest, tmp_path) -> Iterable[FileStore]:
     construct the corresponding backend. Each invocation yields a brand-new
     store instance for isolation.
     """
-    # Select filstore based on param
+    # Select filestore based on param
     match request.param:
         case "local":
             root = tmp_path / "filestore"
