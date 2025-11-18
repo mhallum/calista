@@ -25,7 +25,7 @@ The filestore no longer performs path-based ingestion or export. Those responsib
 ## Rationale
 
 * **Clearer boundaries.**
-  ingestion and export are workflow-specific and belong elsewhere.
+  Ingestion and export are workflow-specific and belong elsewhere.
 
 * **Safer by construction.**
   Restricting the filestore to streams guarantees it can’t accidentally write outside its root.
